@@ -11,9 +11,9 @@ During a 100 day period, create at least one GitHub commit per day.
 The idea is to get a lot of exposure in a somewhat structured way and come out of the experience with something to show for it much like all the (paid) coding boot-camps that have been popping up in various countries (mainly USA though).  
 
 Planning:  
-I might create a roadmap with weekly goals or I might see where my interests take me. Not quite sure yet. 
-Starting on the 1st of April I will try to do at least one commit per day until the end of the 100 day period on July, 10th.  
-Programming languages will be Python and Java with maybe some C and Haskell on the side.  
+I might create a roadmap with weekly goals or I might see where my interests take me. To be decided.  
+Time frame will be 01.04.2014 - 10.07.2014.
+Languages will be Python and Java with maybe some C and Haskell on the side.  
 Projects will mainly be picked from https://github.com/mikar/projects though some exercises from Books, Project Euler or similar sources might make their way into this repo, too. Ideally, I'll find at least one FOSS project i can contribute to while I'm at it.  
   
 Preliminary checklist:  
