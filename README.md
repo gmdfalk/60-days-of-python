@@ -23,5 +23,5 @@ A preliminary checklist:
   * make some time for refactoring either periodically or towards the end of the 100 days
   * possibly a dive into concurrency
   
-More to come, mainly regarding project ideas and planning!
-Cheers.
+More to come, mainly regarding project ideas and planning.  
+Cheers!
