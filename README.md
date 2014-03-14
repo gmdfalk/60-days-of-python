@@ -20,6 +20,7 @@ Preliminary checklist:
   * at least one web-based project with a framework like Django or Flask (a personal blog maybe?)
   * collect some SQL database experience
   * lots of OOP projects
+  * utilize Test-Driven Development with unittest/JUnit
   * make a detour into pure functional programming along the way
   * find an open-source project to contribute to even if it's just a couple of commits
   * make some time for refactoring either periodically or towards the end of the 100 days
