@@ -1,14 +1,14 @@
-100-days-of-coding
+100 Days of Coding
 ==================
 
-A Private Programming Boot-Camp!
+A Poor Man's Programming Boot-Camp
 ---
 
 Inspired by http://benlevy.com/blog/100-days-coding/.
 
 
 **Concept**:   
-During a 100 day period, create at least one GitHub commit per day.  
+During a 100 day period, work your way through a list of 20+ projects. Create at least one GitHub commit per day.  
 The idea is to get a lot of code exposure in a structured way during a relatively short amount of time and come out of the experience with something to show for it much like all the (paid) programming boot-camps that have been popping up in various countries (mainly USA though).  
 
 **Planning**:  
