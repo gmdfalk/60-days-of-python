@@ -25,8 +25,24 @@ Thus, the outcome should be around 20 projects.
 
 **Projects**:  
 List coming soon. Projects will likely be picked from https://github.com/mikar/projects or similar sources.  
-First rough draft: ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.
-  
+Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
+
+Preliminary draft:  
+  * Blog with Flask (Web)
+  * Forum with Flask (Web)
+  * To-Do-List with Flask (Web)
+  * Web Crawler (Web)
+  * PDF Generator on Google App Engine (Files, Web)
+  * Address Book (Database)
+  * TV Show Tracker (Database)
+  * IRC Bot (Network)
+  * Mail Checker, Port Scanner, FTP Client (Network)
+  * Hangman, Frogger, Chess (Game)
+  * Text Editor (GUI, Files)
+  * Calculator (GUI, Math)
+  * Unit Converter (Math, OOP)
+  * Fortune Teller
+  * Guestbook/Journal
   
 More to come, mainly regarding project ideas and planning.  
 Cheers!
