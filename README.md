@@ -27,12 +27,10 @@ Thus, the outcome should be around 20 projects.
 List coming soon. Projects will likely be picked from https://github.com/mikar/projects or similar sources.  
 Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
 
-Preliminary draft:  
-  * Blog with Flask (Web)
-  * Forum with Flask (Web)
-  * To-Do-List with Flask (Web)
+Preliminary list:  
+  * Website, Blog, Forum with Flask, probably hosted on GAE (Web)
+  * To-Do-List, PDF Generator or Name Scrambler Webapp (Web)
   * Web Crawler (Web)
-  * PDF Generator on Google App Engine (Files, Web)
   * Address Book (Database)
   * TV Show Tracker (Database)
   * IRC Bot (Network)
