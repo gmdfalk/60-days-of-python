@@ -24,7 +24,6 @@ A sensible goal might be 3 days per project:
 Thus, the outcome should be around 20 projects.  
 
 **Projects**:  
-List coming soon. Projects will likely be picked from https://github.com/mikar/projects or similar sources.  
 Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
 
 Preliminary list:  
