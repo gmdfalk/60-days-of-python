@@ -27,7 +27,7 @@ Thus, the outcome should be around 20 projects.
 Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
 
 Preliminary list:  
-  * Website, Blog, Forum with Flask, probably hosted on GAE (Web)
+  * Website, Blog, Forum with Flask, probably hosted on GAE (6-7 Days) (Web)
   * To-Do-List, PDF Generator or Name Scrambler Webapp (Web)
   * Web Crawler (Web)
   * Address Book (Database)
