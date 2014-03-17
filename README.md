@@ -13,7 +13,7 @@ The idea is to get a lot of code exposure in a structured way during a relativel
 Utilize Test-Driven Development from the start and get feedback on http://codereview.stackexchange.com and the IRC to keep it educational.
 
 **Planning**:  
-Time frame will be 21.03.2014 - 20.05.2014.  
+Time frame will be 24.03.2014 - 23.05.2014.  
 Language will be Python. Second iteration will be Java with maybe some C and Haskell thrown in.  
 
 A sensible goal might be 3 days per project:
