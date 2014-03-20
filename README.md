@@ -39,5 +39,3 @@ Semi-final list:
   * Fortune Teller (App?)
   * Guestbook/Journal/Notes (App?)
   
-More to come, mainly regarding project ideas and planning.  
-Cheers!
