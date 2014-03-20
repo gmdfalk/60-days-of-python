@@ -10,10 +10,10 @@ Inspired by http://benlevy.com/blog/100-days-coding/.
 **Concept**:   
 During a 60 day period, work your way through a list of projects in a programming language of your choice. Create at least one GitHub commit per day.  
 The idea is to get a lot of code exposure in a structured way during a relatively short amount of time and come out of the experience with something to show for it much like all the (paid) programming boot-camps that have been popping up in various countries (mainly USA though).  
-Utilize Test-Driven Development from the start and get feedback on http://codereview.stackexchange.com and the IRC to keep it educational.
+Use Test-Driven Development and some form of code review (IRC, StackOverflow, StackExchange).
 
 **Planning**:  
-Time frame will be 21.03.2014 - 20.05.2014.  
+Time frame will be 24.03.2014 - 23.05.2014.  
 Language will be Python. Second iteration will be Java with maybe some C and Haskell thrown in.  
 
 A sensible goal might be 3 days per project:
@@ -21,28 +21,21 @@ A sensible goal might be 3 days per project:
   * Day 2: Most of the coding
   * Day 3: Refactorization and Documentation  
   
-Thus, the outcome should be around 20 projects.  
+With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
-List coming soon. Projects will likely be picked from https://github.com/mikar/projects or similar sources.  
-Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
-
-Preliminary draft:  
-  * Blog with Flask (Web)
-  * Forum with Flask (Web)
-  * To-Do-List with Flask (Web)
-  * Web Crawler (Web)
-  * PDF Generator on Google App Engine (Files, Web)
-  * Address Book (Database)
-  * TV Show Tracker (Database)
-  * IRC Bot (Network)
-  * Mail Checker, Port Scanner, FTP Client (Network)
-  * Hangman, Frogger, Chess (Game)
-  * Text Editor (GUI, Files)
-  * Calculator (GUI, Math)
-  * Unit Converter (Math, OOP)
-  * Fortune Teller
-  * Guestbook/Journal
+Semi-final list:  
+  * Unit Converter
+  * Page Scraper
+  * Address Book
+  * IRC Bot
+  * Calculator (GUI?)
+  * Text Editor (GUI)
+  * Mail Checker, Port Scanner, FTP Client
+  * Hangman, Frogger, Chess
+  * Website, Blog and Forum with Flask, hosted on GAE (6-7 Days)
+  * To-Do-List, PDF Generator, Name Scrambler, Drawing Board (Apps)
+  * TV Show Tracker (App?)
+  * Fortune Teller (App?)
+  * Guestbook/Journal/Notes (App?)
   
-More to come, mainly regarding project ideas and planning.  
-Cheers!
