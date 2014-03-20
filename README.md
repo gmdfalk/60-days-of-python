@@ -1,7 +1,7 @@
 60 Days of Coding
 ==================
 
-A Poor Man's Programming Boot-Camp
+A Private Programming Boot-Camp
 ---
 
 Inspired by http://benlevy.com/blog/100-days-coding/.
