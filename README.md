@@ -24,22 +24,20 @@ A sensible goal might be 3 days per project:
 Thus, the outcome should be around 20 projects.  
 
 **Projects**:  
-Currently aiming for ~8 webbased, ~8 heavy OOP, 1 game, 1 fileops, 1 networking, 1 multimedia.  
-
-Preliminary list:  
-  * Website, Blog, Forum with Flask, probably hosted on GAE (6-7 Days) (Web)
-  * To-Do-List, PDF Generator or Name Scrambler Webapp (Web)
-  * Web Crawler (Web)
-  * Address Book (Database)
-  * TV Show Tracker (Database)
-  * IRC Bot (Network)
-  * Mail Checker, Port Scanner, FTP Client (Network)
-  * Hangman, Frogger, Chess (Game)
-  * Text Editor (GUI, Files)
-  * Calculator (GUI, Math)
-  * Unit Converter (Math, OOP)
-  * Fortune Teller
-  * Guestbook/Journal
+Semi-final list:  
+  * Unit Converter
+  * Page Scraper
+  * Address Book
+  * IRC Bot
+  * Calculator (GUI?)
+  * Text Editor (GUI)
+  * Mail Checker, Port Scanner, FTP Client
+  * Hangman, Frogger, Chess
+  * Website, Blog and Forum with Flask, hosted on GAE (6-7 Days)
+  * To-Do-List, PDF Generator, Name Scrambler, Drawing Board (Apps)
+  * TV Show Tracker (App?)
+  * Fortune Teller (App?)
+  * Guestbook/Journal/Notes (App?)
   
 More to come, mainly regarding project ideas and planning.  
 Cheers!
