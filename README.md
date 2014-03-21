@@ -29,7 +29,7 @@ Semi-final list:
   * Page Scraper
   * Address Book
   * IRC Bot
-  * Calculator (GUI?)
+  * Calculator (GUI)
   * Text Editor (GUI)
   * Mail Checker, Port Scanner, FTP Client
   * Hangman, Frogger, Chess
@@ -38,4 +38,6 @@ Semi-final list:
   * TV Show Tracker (App?)
   * Fortune Teller (App?)
   * Guestbook/Journal/Notes (App?)
+  * optional: IMDB Browser
+  * optional: File Browser (Mass Renaming with Simulation)
   
