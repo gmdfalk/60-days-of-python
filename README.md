@@ -38,6 +38,6 @@ Semi-final list:
   * TV Show Tracker (App?)
   * Fortune Teller (App?)
   * Guestbook/Journal/Notes (App?)
-  * optional: IMDB Browser
+  * optional: IMDB Browser 
   * optional: File Browser (Mass Renaming with Simulation)
   
