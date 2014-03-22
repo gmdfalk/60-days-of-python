@@ -25,7 +25,7 @@ With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
 Semi-final list:  
-  * Unit Converter
+  * (Unit Converter)
   * Page Scraper
   * Address Book
   * IRC Bot
