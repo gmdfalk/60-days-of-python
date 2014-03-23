@@ -32,11 +32,14 @@ With one additional day as buffer the outcome should be around 15 projects.
   * Text Editor (GUI)
   * Mail Checker or Port Scanner or FTP Client
   * Hangman or Frogger or Chess
-  * Website+Blog+Forum with Flask, 6-7 Days
-  * Drawing Board  and To-Do-List or PDF Generator and Name Scrambler (Apps)
-  * TV Show Tracker (App?)
-  * Fortune Teller (App?)
-  * Guestbook/Journal/Notes (App?)
+  * Website with Flask
+  	  * Blog
+  	  * Forum
+	  * Drawing Board  and To-Do-List
+	  * TV Show Tracker
+	  * Fortune Teller
+	  * Guestbook/Journal/Notes
+	  * optional: PDF Generator and Name Scrambler
   * optional: IMDB Browser 
   * optional: File Browser (Mass Renaming with Simulation)
   
