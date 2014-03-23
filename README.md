@@ -24,17 +24,16 @@ A sensible goal might be 3 days per project:
 With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
-Semi-final list:  
+  * Address Book
+  * Unit Converter
   * Page Scraper
   * IRC Bot
-  * (Address Book)
-  * (Unit Converter)
   * Calculator (GUI)
   * Text Editor (GUI)
-  * Mail Checker, Port Scanner, FTP Client
-  * Hangman, Frogger, Chess
-  * Website, Blog and Forum with Flask, hosted on GAE (6-7 Days)
-  * To-Do-List, PDF Generator, Name Scrambler, Drawing Board (Apps)
+  * Mail Checker or Port Scanner or FTP Client
+  * Hangman or Frogger or Chess
+  * Website+Blog+Forum with Flask, 6-7 Days
+  * Drawing Board  and To-Do-List or PDF Generator and Name Scrambler (Apps)
   * TV Show Tracker (App?)
   * Fortune Teller (App?)
   * Guestbook/Journal/Notes (App?)
