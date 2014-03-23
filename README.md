@@ -1,4 +1,4 @@
-60 Days of Coding
+60 Days of Code
 ==================
 
 A Private Programming Boot-Camp
@@ -25,10 +25,10 @@ With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
 Semi-final list:  
-  * (Unit Converter)
   * Page Scraper
-  * Address Book
   * IRC Bot
+  * (Address Book)
+  * (Unit Converter)
   * Calculator (GUI)
   * Text Editor (GUI)
   * Mail Checker, Port Scanner, FTP Client
