@@ -1,7 +1,7 @@
 Website
 ==================
 
-Website with Flask and Google Appengine
+Website with Flask and Google AppEngine
 ---
 
 Address: http://max-demian.appspot.com
