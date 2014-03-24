@@ -5,7 +5,7 @@
 """
 
 import unittest
-from ..address_book import Address
+from address_book import Address
 
 
 class Test(unittest.TestCase):

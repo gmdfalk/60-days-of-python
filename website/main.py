@@ -1,5 +1,6 @@
 from google.appengine.ext import webapp
 
+
 class MainPage(webapp.RequestHandler):
     
     
@@ -9,5 +10,4 @@ class MainPage(webapp.RequestHandler):
 
 
 app = webapp.WSGIApplication([('/', MainPage)], debug=True)
-
 

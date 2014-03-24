@@ -4,7 +4,7 @@
 """
 
 import unittest
-from ..tictactoe import Board
+from tictactoe import Board
 
 
 class TicTacToeTest(unittest.TestCase):

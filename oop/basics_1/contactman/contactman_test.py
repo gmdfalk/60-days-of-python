@@ -5,8 +5,8 @@
 # 100% coverage
 
 import unittest
-from ..contactman import Contact, ContactList, Friend, Supplier
-from ..contactman import EmailableContact, LongNameDict
+from contactman import Contact, ContactList, Friend, Supplier
+from contactman import EmailableContact, LongNameDict
 
 
 class ContactmanTest(unittest.TestCase):
@@ -16,7 +16,7 @@ class ContactmanTest(unittest.TestCase):
         d = Contact("1", "2")
         self.assertEqual(str(d), "1, 2")
         self.assertEqual(c.name, "max")
-        self.assertEqual(c.email, "demin@gmx.de")
+        self.assertEqual(c.email, "demian@gmx.de")
         self.assertEqual([c, d], Contact.all_contacts)
 
     def test_supplier(self):
