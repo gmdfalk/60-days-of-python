@@ -1,0 +1,4 @@
+class Address(object):
+    pass
+
+
