@@ -24,7 +24,7 @@ A sensible goal might be 3 days per project:
 With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
-  * Address Book
+  * [**Address Book**](https://github.com/mikar/60-days-of-code/blob/master/address_book)
   * Unit Converter
   * Page Scraper
   * IRC Bot
