@@ -23,7 +23,7 @@ class RealEstateTest(unittest.TestCase):
 
     def test_house(self):
         self.assertIsInstance(self.h, Property)
-        self.assertEqual(self.h.fence, False)
+        self.assertEqual(self.h.fenced, False)
 
 
 if __name__ == "__main__":

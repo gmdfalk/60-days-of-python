@@ -10,17 +10,20 @@ class Property(object):
         self.num_baths = baths
 
     def display(self):
+        print(self.square_feet, self.num_beds, self.num_baths)
         print("PROPERTY DETAILS")
         print("================")
         print("square footage:", self.square_feet)
         print("bedrooms:", self.num_beds)
         print("bathrooms:", self.num_baths)
+        print()
 
     @staticmethod
     def prompt_init():
         return dict(square_feet=raw_input("Enter the square feet: "),
                     beds=raw_input("Enter number of bedrooms: "),
                     baths=raw_input("Enter number of baths: "))
+
 
 def get_valid_input(input_string, valid_options):
     input_string += " ({}) ".format(", ".join(valid_options))
@@ -29,12 +32,13 @@ def get_valid_input(input_string, valid_options):
         response = raw_input(input_string)
     return response
 
+
 class Apartment(Property):
 
     valid_laundries = ("coin", "ensuite", "none")
     valid_balconies = ("yes", "no", "solarium")
 
-    def __init__(self, balcony='', laundry='', **kwargs):
+    def __init__(self, balcony="", laundry="", **kwargs):
         super(Apartment, self).__init__(**kwargs)
         self.balcony = balcony
         self.laundry = laundry
@@ -51,7 +55,7 @@ class Apartment(Property):
         parent_init = Property.prompt_init()
         laundry = get_valid_input(
               "What laundry facilities does "
-              " the property have? ",
+              "the property have? ",
               Apartment.valid_laundries)
         balcony = get_valid_input(
               "Does the property have a balcony? ",
@@ -65,34 +69,34 @@ class Apartment(Property):
 class House(Property):
 
     valid_garage = ("attached", "detached", "none")
-    valid_fence = ("yes", "no")
+    valid_fenced = ("yes", "no")
 
-    def __init__(self, stories='', garage='', fence='', **kwargs):
+    def __init__(self, num_stories='', garage='', fenced='', **kwargs):
         super(House, self).__init__(**kwargs)
-        self.stories = stories
+        self.stories = num_stories
         self.garage = garage
-        self.fence = fence
+        self.fenced = fenced
 
     def display(self):
         super(House, self).display()
         print("HOUSE DETAILS")
         print("# of stories:", self.stories)
         print("garage:", self.garage)
-        print("fence:", self.fence)
+        print("fenced:", self.fenced)
 
     @staticmethod
     def prompt_init():
         parent_init = Property.prompt_init()
-        fence = get_valid_input("Is the yard fenced? ",
-                                House.valid_fence)
+        fenced = get_valid_input("Is the yard fenced? ",
+                                House.valid_fenced)
         garage = get_valid_input("Is there a garage? ",
                                  House.valid_garage)
-        stories = raw_input("How many stories? ")
+        num_stories = raw_input("How many stories? ")
 
         parent_init.update({
-                            "fence": fence,
+                            "fenced": fenced,
                             "garage": garage,
-                            "stories": stories
+                            "num_stories": num_stories
                             })
         return parent_init
 
@@ -190,9 +194,9 @@ class Agent(object):
 
 
 if __name__ == "__main__":
-#     init = HouseRental.prompt_init()
-#     house = HouseRental(**init)
-#     house.display()
-    p = Property()
-    p.prompt_init()
-    p.display()
+#     p = Property("2", "4", "5")
+#     p.prompt_init()
+#     p.display()
+    init = HouseRental.prompt_init()
+    house = HouseRental(**init)
+    house.display()
