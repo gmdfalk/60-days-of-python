@@ -28,8 +28,8 @@ With one additional day as buffer the outcome should be around 15 projects.
   * Unit Converter
   * Page Scraper
   * IRC Bot
-  * Calculator (GUI)
-  * Text Editor (GUI)
+  * Calculator (for GUIs, keep in mind MVC)
+  * Text Editor ("")
   * Mail Checker or Port Scanner or FTP Client
   * Hangman or Frogger or Chess
   * Website with Flask

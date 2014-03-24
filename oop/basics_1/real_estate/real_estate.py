@@ -83,6 +83,7 @@ class House(Property):
         print("# of stories:", self.stories)
         print("garage:", self.garage)
         print("fenced:", self.fenced)
+        print()
 
     @staticmethod
     def prompt_init():
@@ -113,6 +114,7 @@ class Purchase(object):
         print("PURCHASE DETAILS")
         print("selling price:", self.price)
         print("estimated taxes:", self.taxes)
+        print()
 
     @staticmethod
     def prompt_init():
@@ -123,8 +125,8 @@ class Purchase(object):
 
 class Rental(object):
 
-    def __init__(self, furnished='', utilities='',
-                 rent='', **kwargs):
+    def __init__(self, furnished="", utilities="",
+                 rent="", **kwargs):
         super(Rental, self).__init__(**kwargs)
         self.furnished = furnished
         self.utilities = utilities
@@ -136,6 +138,7 @@ class Rental(object):
         print("rent:", self.rent)
         print("estimated utilities:", self.utilities)
         print("furnished:", self.furnished)
+        print()
 
     @staticmethod
     def prompt_init():
@@ -185,6 +188,13 @@ class HousePurchase(Purchase, House):
 
 class Agent(object):
 
+    actions = {
+        ("house", "rental"): HouseRental,
+        ("house", "purchase"): HousePurchase,
+        ("apartment", "rental"): ApartmentRental,
+        ("apartment", "purchase"): ApartmentPurchase
+        }
+
     def __init__(self):
         self.property_list = []
 
@@ -192,11 +202,24 @@ class Agent(object):
         for prop in self.property_list:
             prop.display()
 
+    def add_property(self):
+        property_type = get_valid_input(
+                "What type of property? ",
+                ("house", "apartment")).lower()
+        payment_type = get_valid_input(
+                "What payment type? ",
+                ("purchase", "rental")).lower()
+
+        PropertyClass = self.actions[(property_type, payment_type)]
+        init_args = PropertyClass.prompt_init()
+        self.property_list.append(PropertyClass(**init_args))
+
 
 if __name__ == "__main__":
-#     p = Property("2", "4", "5")
-#     p.prompt_init()
-#     p.display()
-    init = HouseRental.prompt_init()
-    house = HouseRental(**init)
-    house.display()
+#     init = HouseRental.prompt_init()
+#     house = HouseRental(**init)
+#     house.display()
+#     purch = HousePurchase()
+    agent = Agent()
+    agent.add_property()
+    agent.display_properties()
