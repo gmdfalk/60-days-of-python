@@ -25,13 +25,13 @@ With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
   * [**Address Book**](https://github.com/mikar/60-days-of-code/blob/master/address_book)
-  * Unit Converter
+  * Hangman or Frogger or Chess
   * Page Scraper
   * IRC Bot
-  * Calculator (for GUIs, keep in mind MVC)
-  * Text Editor ("")
-  * Mail Checker or Port Scanner or FTP Client
-  * Hangman or Frogger or Chess
+  * Mail Checker, Port Scanner or FTP Client
+  * Text Editor (GUI)
+  * Calculator (GUI)
+  * Unit Converter (GUI)
   * Website with Flask
   	  * Blog
   	  * Forum
