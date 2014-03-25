@@ -128,6 +128,8 @@ class Authorizor(object):
             else:
                 return True
 
-# if __name__ == "__main__":
-#     authenticator = Authenticator()
-#     authorizor = Authorizor(authenticator)
+# Instantiating. Normally, this shouldn't be done here but rather
+# in the client application that accesses this "API". It also makes
+# unittesting harder because we need a tearDown fixture now.
+authenticator = Authenticator()
+authorizor = Authorizor(authenticator)

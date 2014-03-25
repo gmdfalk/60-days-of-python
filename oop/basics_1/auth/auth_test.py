@@ -7,7 +7,8 @@
 import unittest
 from auth import (Authorizor, Authenticator, PasswordTooShort,
                   UsernameAlreadyExists, InvalidPassword, NotLoggedInError,
-                  NotPermittedError, InvalidUsername, PermissionError)
+                  NotPermittedError, InvalidUsername, PermissionError,
+                  authenticator, authorizor)
 
 
 # 100% Coverage :o)
@@ -15,68 +16,70 @@ class AuthTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.authenticator = Authenticator()
-        self.auth = Authorizor(self.authenticator)
-        self.authenticator.add_user("frank", "thetank")
+        authenticator.add_user("frank", "thetank")
+
+    def tearDown(self):
+        del authenticator.users["frank"]
+        authorizor.permissions = {}
 
     def test_user_exists_in_dictionary(self):
-        self.assertTrue("frank" in self.authenticator.users)
-        self.assertTrue(self.authenticator.users["frank"].check_password("thetank"))
+        self.assertTrue("frank" in authenticator.users)
+        self.assertTrue(authenticator.users["frank"].check_password("thetank"))
 
     def test_exception_password_too_short(self):
         with self.assertRaises(PasswordTooShort):
-            self.authenticator.add_user("struppi", "tim")
+            authenticator.add_user("struppi", "tim")
 
     def test_exception_username_exists(self):
         with self.assertRaises(UsernameAlreadyExists):
-            self.authenticator.add_user('frank', 'number2')
+            authenticator.add_user('frank', 'number2')
 
     def test_exception_invalid_password(self):
         with self.assertRaises(InvalidPassword):
-            self.authenticator.login("frank", "")
+            authenticator.login("frank", "")
 
     def test_exception_invalid_username(self):
         with self.assertRaises(InvalidUsername):
-            self.authenticator.login("tom", "")
-        self.auth.add_permission("paint")
+            authenticator.login("tom", "")
+        authorizor.add_permission("paint")
         with self.assertRaises(InvalidUsername):
-            self.auth.permit_user("paint", "fran")
+            authorizor.permit_user("paint", "fran")
 
     def test_exception_not_logged_in(self):
-        self.auth.add_permission("paint")
+        authorizor.add_permission("paint")
         with self.assertRaises(NotLoggedInError):
-            self.auth.check_permission("paint", "frank")
+            authorizor.check_permission("paint", "frank")
 
     def test_exception_not_permitted(self):
-        self.authenticator.login("frank", "thetank")
-        self.auth.add_permission("paint")
+        authenticator.login("frank", "thetank")
+        authorizor.add_permission("paint")
         with self.assertRaises(NotPermittedError):
-            self.auth.check_permission("paint", "frank")
+            authorizor.check_permission("paint", "frank")
 
     def test_add_user(self):
-        self.authenticator.add_user("tim", "struppi")
-        self.assertTrue("frank" in self.authenticator.users)
+        authenticator.add_user("tim", "struppi")
+        self.assertTrue("frank" in authenticator.users)
 
     def test_login(self):
-        self.assertFalse(self.authenticator.is_logged_in("dick"))
-        self.authenticator.login("frank", "thetank")
-        self.assertTrue(self.authenticator.is_logged_in("frank"))
+        self.assertFalse(authenticator.is_logged_in("dick"))
+        authenticator.login("frank", "thetank")
+        self.assertTrue(authenticator.is_logged_in("frank"))
 
     def test_check_permission(self):
-        self.authenticator.login("frank", "thetank")
-        self.auth.add_permission("paint")
-        self.auth.permit_user("paint", "frank")
-        self.assertTrue(self.auth.check_permission("paint", "frank"))
+        authenticator.login("frank", "thetank")
+        authorizor.add_permission("paint")
+        authorizor.permit_user("paint", "frank")
+        self.assertTrue(authorizor.check_permission("paint", "frank"))
         with self.assertRaises(PermissionError):
-            self.auth.check_permission("doesntexist", "frank")
+            authorizor.check_permission("doesntexist", "frank")
 
     def test_exception_permission_error(self):
-        self.auth.add_permission("paint")
+        authorizor.add_permission("paint")
         with self.assertRaises(PermissionError):
-            self.auth.add_permission("paint")
-        self.authenticator.login("frank", "thetank")
+            authorizor.add_permission("paint")
+        authenticator.login("frank", "thetank")
         with self.assertRaises(PermissionError):
-            self.auth.permit_user("doesntexist", "frank")
+            authorizor.permit_user("doesntexist", "frank")
 
 if __name__ == "__main__":
     unittest.main()
