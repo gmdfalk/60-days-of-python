@@ -78,7 +78,7 @@ class FlacFile(object):
         print "playing {} as flac".format(self.filename)
 
 class InvalidItemType(Exception):
-    def __init__(self):
+    def __init__(self, item_type):
         super(InvalidItemType).__init__("Sorry, we don't sell", item_type)
 
 class Inventory(object):
@@ -108,7 +108,7 @@ class Inventory(object):
 
 
 def test_inventory():
-    item_type = 'widgt'
+    item_type = 'widget'
     inv = Inventory()
     # ~ inv.lock(item_type)
     inv.purchase(item_type)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     mp3.play()
     # This will raise the exception for wrong filetype, even though we don't
     # actually check the type of the file.
-    not_mp3 = MP3File("myfile.ogg")
+#     not_mp3 = MP3File("myfile.ogg")
 
     # Custom Exceptions
     test_inventory()

@@ -18,6 +18,9 @@ class AuthTest(unittest.TestCase):
     def setUp(self):
         authenticator.add_user("frank", "thetank")
 
+    # tearDown and instance import is only necessary because we chose to do the
+    # instantiating in the main module. Would be better to just instantiate
+    # in the setUp fixture and the client modules.
     def tearDown(self):
         del authenticator.users["frank"]
         authorizor.permissions = {}
