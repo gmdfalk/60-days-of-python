@@ -294,6 +294,7 @@ def zip_processing():
     # ZipReplace("hello.zip", "hello", "hi").zip_find_replace()
     # ZipScale("horse.zip").process_zip()
 
+    # Same thing as composition:
     class ZipProcessorComp(object):
         "Base class that processes a zip archive"
         def __init__(self, zipname, processor):
@@ -340,8 +341,20 @@ def zip_processing():
                 with open(zipprocessor._full_filename(filename), "w") as file:
                     file.write(contents)
 
-    zipreplace = ZipReplaceComp("hello", "hi")
-    ZipProcessorComp("hello.zip", zipreplace).process_zip()
+    class ZipScaleComp(object):
+
+        def process(self, zipprocessor):
+            "Scale each image in the directory to 640x480"
+            for filename in os.listdir(zipprocessor.temp_directory):
+                im = image.load(zipprocessor._full_filename(filename))
+                scaled = scale(im, (640, 480))
+                image.save(scaled, zipprocessor._full_filename(filename))
+
+#     zipreplace = ZipReplaceComp("hello", "hi")
+#     ZipProcessorComp("hello.zip", zipreplace).process_zip()
+    zipscale = ZipScaleComp()
+    ZipProcessorComp("horse.zip", zipscale).process_zip()
+    # Note: Composition is great. Use it over Inheritance where possible.
 
 if __name__ == "__main__":
 #     properties()
