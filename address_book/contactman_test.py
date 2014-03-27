@@ -2,21 +2,23 @@
     Created on 22 Mar 2014
     @author: Max Demian
 """
-# 100% coverage
 
+# 100% coverage
 import unittest
 from contactman import Contact, ContactList, Friend, Supplier, EmailableContact
 
 
 class ContactmanTest(unittest.TestCase):
 
+    def setUp(self):
+        self.c = Contact("max", "demian@gmx.de")
+        self.d = Contact("1", "2")
+
     def test_contact(self):
-        c = Contact("max", "demian@gmx.de")
-        d = Contact("1", "2")
-        self.assertEqual(str(d), "1, 2")
-        self.assertEqual(c.name, "max")
-        self.assertEqual(c.email, "demian@gmx.de")
-        self.assertEqual([c, d], Contact.all_contacts)
+        self.assertEqual(str(self.d), "1, 2")
+        self.assertEqual(self.c.name, "max")
+        self.assertEqual(self.c.email, "demian@gmx.de")
+        self.assertEqual([self.c, self.d], Contact.all_contacts)
 
     def test_supplier(self):
         s = Supplier("mix", "dimian@gmx.de")
