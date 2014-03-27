@@ -79,15 +79,20 @@ class Contacts(object):
         with self.db:
             cur = self.db.cursor()
             # Brace yourselves. Long lines are coming.
-            for row in cur.execute("SELECT {} FROM {} WHERE Name LIKE ?".format(columns, table), ('%{}%'.format(search_string),)):
-#             for row in cur.execute("SELECT {} FROM {} WHERE Name LIKE %{}%".format(columns, table, search_string)):
-                print row
+            results = []
+            for col in columns.split(","):
+                for row in cur.execute("SELECT {} FROM {} WHERE {} LIKE ?".format(
+                    columns, table, col), ('%{}%'.format(search_string),)):
+                    if row:
+                        results.append(row)
+            return results
 
-if __name__ == "__main__":
-    c = Contacts()
-    c.populate_database()
-    c.show_all()
-    c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
-             street="742 Evergreen Terrace", phone="555 636", mobile="",
-             email="chunkylover53@aol.com")
-    c.search("Simpson")
+
+# if __name__ == "__main__":
+#     c = Contacts()
+#     c.populate_database()
+#     c.show_all()
+#     c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
+#              street="742 Evergreen Terrace", phone="555 636", mobile="",
+#              email="chunkylover53@aol.com")
+#     c.search("Simpson")
