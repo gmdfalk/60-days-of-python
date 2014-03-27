@@ -11,10 +11,9 @@ class Contacts(object):
         # Create and/or connect to our database.
         self.db_file = db_file
         self.db = sql.connect(self.db_file)
-        # Fix encoding issues.
+        # Fix encoding issues. I will have to revisit this as it doesn't seem
+        # right.
         self.db.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
-        # And create the cursor so we can perform database actions.
-        self.cur = self.db.cursor()
 
     def populate_database(self):
         "Creates a sample database to work with"
@@ -30,47 +29,70 @@ class Contacts(object):
         )
 
         with self.db:
-            self.cur.execute("DROP TABLE IF EXISTS {}".format(self.table))
-            self.cur.execute("CREATE TABLE {}(Name TEXT, ZIP Text, City Text,\
+            cur = self.db.cursor()
+            cur.execute("DROP TABLE IF EXISTS {}".format(self.table))
+            cur.execute("CREATE TABLE {}(Name TEXT, Zip Text, City Text,\
                               Street Text, Phone Text, Mobile Text,\
                               Email TEXT)".format(self.table))
-            self.cur.executemany("INSERT INTO {} VALUES(?, ?, ?, ?, ?, ?, ?\
+            cur.executemany("INSERT INTO {} VALUES(?, ?, ?, ?, ?, ?, ?\
                                  )".format(self.table), addresses)
 
-    def insert(self, name="", zip="", city="", street="",
-               phone="", mobile="", email=""):
-        with self.db:
-            self.cur.execute("INSERT INTO {} VALUES({}, {}, {}, {}, {},\
-                              {}, {})".format(self.table, name, zip, city,
-                                             street, phone, mobile, email))
-
-    def search(self):
-        pass
-
-    def show(self):
-        # FIXME: SQLite wants to use ASCII here so we abide, for now.
-        with self.db:
-            self.db.text_factory = str
-            self.cur.execute("SELECT * from {}".format(self.table))
-            for i in self.cur.fetchall():
-                print "{}, {} {}, {}".format(i[0], i[1], i[2], i[3])
-                print "{}, {}, mobile: {}\n".format(i[6], i[4], i[5])
-
-    def delete_entry(self):
-        pass
-
-    def delete_table(self, table=""):
-        if not table:
+    def insert(self, name="", zipcode="", city="", street="",
+               phone="", mobile="", email="", table=None):
+        "Insert a new entry into the database in the selected table"
+        if table is None:
             table = self.table
         with self.db:
-            self.cur.execute("DROP TABLE IF EXISTS {}".format(table))
+            cur = self.db.cursor()
+            cur.execute("INSERT INTO {} VALUES(?, ?, ?, ?, ?, ?, ?)\
+                             ".format(table), (name, zipcode, city, street,
+                                               phone, mobile, email))
+
+    def show_all(self, table=None):
+        "Print out all contacts of the currently selected table"
+        if table is None:
+            table = self.table
+        # FIXME: SQLite wants to use ASCII here so we abide, for now.
+        with self.db:
+            cur = self.db.cursor()
+            self.db.text_factory = str
+            cur.execute("SELECT * FROM {}".format(table))
+            for i in cur.fetchall():
+                print "{}, {} {}, {}".format(i[0], i[1], i[2], i[3])
+                print "{}, {}, mobile: {}\n".format(i[6], i[4], i[5])
+            self.db.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
+
+    def delete_table(self, table=None):
+        if table is None:
+            table = self.table
+        with self.db:
+            cur = self.db.cursor()
+            cur.execute("DROP TABLE IF EXISTS {}".format(table))
 
     def delete_database(self):
         os.remove(self.db_file)
 
+    def search(self, search_string, table=None):
+        if table is None:
+            table = self.table
+        with self.db:
+            cur = self.db.cursor()
+            # Enable extension loading.
+            self.db.enable_load_extension(True)
+            # Load the fulltext search extension.
+#             cur.execute("SELECT load_extension('./fts3.so')")
+            self.db.load_extension("./fts3")
+            # Disable extension loading again.
+            self.db.enable_load_extension(False)
+            cur.execute("CREATE VIRTUAL TABLE docs USING fts3(Name, Zip, City, Street, Phone, Mobile, Email)")
+            for row in cur.execute("SELECT Name, Zip, City, Street, Phone, Mobile, Email FROM {} WHERE Name MATCH {}").format(table, search_string):
+                print row
 
 if __name__ == "__main__":
     c = Contacts()
     c.populate_database()
-    c.show()
-    c.insert("yes", "hey", "hey", "hey", "hey", "hey", "hey")
+    c.show_all()
+    c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
+             street="742 Evergreen Terrace", phone="555 636", mobile="",
+             email="chunkylover53@aol.com")
+    c.search("Simpson")
