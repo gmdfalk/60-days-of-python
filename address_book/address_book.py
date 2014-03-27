@@ -11,8 +11,8 @@ class Contacts(object):
         # Create and/or connect to our database.
         self.db_file = db_file
         self.db = sql.connect(self.db_file)
-        # Fix encoding issues. I will have to revisit this as it doesn't seem
-        # right.
+        # TODO: Fix encoding issues. I will have to revisit this as it doesn't
+        # seem right.
         self.db.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
 
     def populate_database(self):
@@ -69,8 +69,15 @@ class Contacts(object):
             cur = self.db.cursor()
             cur.execute("DROP TABLE IF EXISTS {}".format(table))
 
-    def delete_database(self):
-        os.remove(self.db_file)
+    def delete_database(self, db_file=None):
+        if db_file is None:
+            db_file = self.db_file
+        # FIXME: Somehow, when testing this method, the db_file gets deleted
+        # before we even get to the next line. Maybe tearDown interfering?
+        try:
+            os.remove(db_file)
+        except OSError as e:
+            print e
 
     def search(self, search_string, table=None):
         if table is None:

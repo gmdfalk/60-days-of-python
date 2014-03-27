@@ -16,6 +16,9 @@ class Test(unittest.TestCase):
         self.c = Contacts("test.db")
         self.c.populate_database()
 
+    def tearDown(self):
+        self.c.delete_database()
+
     def test_search(self):
         self.assertEquals(self.c.search("Simpson"), [])
         self.assertNotEquals(self.c.search("Frankfurt"), [])
@@ -35,6 +38,7 @@ class Test(unittest.TestCase):
             self.c.search("Frankfurt")
 
     def test_delete_database(self):
+        self.c.populate_database()
         self.assertTrue(os.path.isfile("test.db"))
         self.c.delete_database()
         self.assertFalse(os.path.isfile("test.db"))
