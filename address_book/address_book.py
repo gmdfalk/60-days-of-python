@@ -75,17 +75,12 @@ class Contacts(object):
     def search(self, search_string, table=None):
         if table is None:
             table = self.table
+        columns = "Name, Zip, City, Street, Phone, Mobile, Email"
         with self.db:
             cur = self.db.cursor()
-            # Enable extension loading.
-            self.db.enable_load_extension(True)
-            # Load the fulltext search extension.
-#             cur.execute("SELECT load_extension('./fts3.so')")
-            self.db.load_extension("./fts3")
-            # Disable extension loading again.
-            self.db.enable_load_extension(False)
-            cur.execute("CREATE VIRTUAL TABLE docs USING fts3(Name, Zip, City, Street, Phone, Mobile, Email)")
-            for row in cur.execute("SELECT Name, Zip, City, Street, Phone, Mobile, Email FROM {} WHERE Name MATCH {}").format(table, search_string):
+            # Brace yourselves. Long lines are coming.
+            for row in cur.execute("SELECT {} FROM {} WHERE Name LIKE ?".format(columns, table), ('%{}%'.format(search_string),)):
+#             for row in cur.execute("SELECT {} FROM {} WHERE Name LIKE %{}%".format(columns, table, search_string)):
                 print row
 
 if __name__ == "__main__":
