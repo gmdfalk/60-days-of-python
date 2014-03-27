@@ -34,8 +34,9 @@ class ContactmanTest(unittest.TestCase):
 
     def test_friend(self):
         ContactList().delete_all()
-        new_friend = Friend("Tom", "tom@gmail.com", "1-504-298", "Common St 1",
-                            "New Orleans", "Louisiana", "70112")
+#         new_friend = Contact("Tom")
+        new_friend = Friend(name="Tom", email="tom@gmail.com", phone="1-504-298", street="Common St 1",
+                            city="New Orleans", state="Louisiana", code="70112")
         self.assertEqual(Contact.all_contacts.search("Tom"), [new_friend])
         print new_friend
 

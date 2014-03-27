@@ -61,10 +61,10 @@ class Supplier(Contact):
     def order(self, order):
         return order
 
-
 class Friend(Contact, AddressHolder):
     ""
     def __init__(self, phone="", **kwargs):
+
         super(Friend, self).__init__(**kwargs)
         self.phone = phone
 
