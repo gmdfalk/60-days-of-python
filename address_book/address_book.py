@@ -1,7 +1,7 @@
 # coding: utf-8
 
-import sqlite3 as sql
-import os
+import sqlite3
+from os import remove
 
 class Contacts(object):
     "Manages your contacts in a sqlite3 database"
@@ -10,7 +10,7 @@ class Contacts(object):
         self.table = table
         # Create and/or connect to our database.
         self.db_file = db_file
-        self.db = sql.connect(self.db_file)
+        self.db = sqlite3.connect(self.db_file)
         # TODO: Fix encoding issues. I will have to revisit this as it doesn't
         # seem right.
         self.db.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
@@ -75,7 +75,7 @@ class Contacts(object):
         # FIXME: Somehow, when testing this method, the db_file gets deleted
         # before we even get to the next line. Maybe tearDown interfering?
         try:
-            os.remove(db_file)
+            remove(db_file)
         except OSError as e:
             print e
 
@@ -95,11 +95,11 @@ class Contacts(object):
             return results
 
 
-# if __name__ == "__main__":
-#     c = Contacts()
-#     c.populate_database()
-#     c.show_all()
-#     c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
-#              street="742 Evergreen Terrace", phone="555 636", mobile="",
-#              email="chunkylover53@aol.com")
-#     c.search("Simpson")
+if __name__ == "__main__":
+    c = Contacts()
+    c.populate_database()
+    c.show_all()
+    c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
+             street="742 Evergreen Terrace", phone="555 636", mobile="",
+             email="chunkylover53@aol.com")
+    c.search("Simpson")
