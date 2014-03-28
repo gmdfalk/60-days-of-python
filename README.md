@@ -25,8 +25,8 @@ With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
   * [**Address Book**](https://github.com/mikar/60-days-of-code/blob/master/address_book)
-  * Hangman or Frogger or Chess
   * Page Scraper
+  * Chess (or Hangman/Frogger)
   * IRC Bot
   * Mail Checker, Port Scanner or FTP Client
   * Text Editor (GUI)
