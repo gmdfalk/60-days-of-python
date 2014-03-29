@@ -55,3 +55,11 @@ if __name__ == "__main__":
     c.collect_links()
     for link, item in c.collected_links.items():
         print("{}: {}".format(link, item))
+
+    # With LXML (python2 only) we could do somethiing like this:
+#     from lxml import html
+#     tree = html.parse(filename)
+#     for element,attribute, link, pos in tree.getroot().iterlinks():
+#         print link
+    # Amazing, isn't it?
+    # And for real scraping we would probably use BeautifulSoup and requests.
