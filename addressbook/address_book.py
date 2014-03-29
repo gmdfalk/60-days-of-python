@@ -7,6 +7,7 @@ class Contacts(object):
     "Manages your contacts in a sqlite3 database"
 
     def __init__(self, db_file="addresses.db", table="Addresses"):
+
         self.table = table
         # Create and/or connect to our database.
         self.db_file = db_file
