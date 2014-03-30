@@ -12,6 +12,7 @@ import sys
 
 
 # FIXME: This regex catches e-mail addresses, too.
+# negative lookahead: href=(?!mailto:) should exclude mails.
 LINK_REGEX = re.compile("<a [^>]*href=['\"]([^'\"]+)['\"][^>]*>")
 
 
