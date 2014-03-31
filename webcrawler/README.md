@@ -3,7 +3,7 @@ Web Crawler
 
 So, i've cheated a bit with this one as this web crawler is written by Guido Rossum  
 but it seemed like a great opportunity to study idiomatic code and some interesting  
-new features of Python 3.4.
+new features of Python 3.4.  
 I modified it to use docopts instead of argparse and am adding some commentary.  
 Other modifications could be:
   * BeautifulSoup instead of regex for parsing 
