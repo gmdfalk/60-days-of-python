@@ -26,7 +26,6 @@ Options:
 """
 
 from docopt import docopt
-
 import asyncio
 import logging
 import sys
