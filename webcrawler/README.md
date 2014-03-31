@@ -1,9 +1,9 @@
 Web Crawler
 ==================
 
-So, i've cheated a bit with this one as this web crawler is written by Guido Rossum  
+Okay, so i've cheated a bit with this one as this web crawler is written by Guido van Rossum  
 but it seemed like a great opportunity to study idiomatic code and some interesting  
-new features of Python 3.4.  
+new features of Python 3.4 (concurrency in web requests, yield from and others).  
 I modified it to use docopts instead of argparse and am adding some commentary.  
 Other modifications could be:
   * BeautifulSoup instead of regex for parsing 
