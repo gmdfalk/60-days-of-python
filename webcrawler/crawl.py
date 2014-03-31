@@ -19,7 +19,7 @@ Options:
   --max-tasks N     Limit concurrent connections [default: 100]
   --max-pool N      Limit connection pool size [default: 100]
   --exclude REGEX   Exclude matching URLs
-  --strict          Strict host matching [default: True]
+  --strict          Strict host matching (default)
   --lenient         Lenient host matching
   -v, --verbose N   Verbose logging (0-3) [default: 1]
   -q, --quiet       Quiet logging
@@ -42,14 +42,21 @@ def fix_url(url):
 
 
 def main():
-    "Parse arguments, set up event loop, run crawler, print report."
+    "Parse arguments, set up event loop, run crawler and print a report."
 
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    if args["--verbose"]:
-        logging.basicConfig(level=levels[int(args["--verbose"])])
     if args["--quiet"]:
         logging.basicConfig(level=levels[0])
+    else:
+        logging.basicConfig(level=levels[int(args["--verbose"])])
 
+    # Not sure how to set --strict to True by default with docopts. So this is
+    # where we handle strict vs lenient.
+    if args["--lenient"]:
+        args["--strict"] = False
+    else:
+        args["--strict"] = True
+        
     if args["--iocp"]:
         from asyncio.windows_events import ProactorEventLoop
         loop = ProactorEventLoop()
@@ -60,8 +67,10 @@ def main():
     else:
         loop = asyncio.get_event_loop()
 
+    # Set comprehension to avoid redundancy.
     roots = {fix_url(root) for root in args["<root>"]}
 
+    # Instantiating the crawler with our arguments.
     crawler = crawling.Crawler(roots,
                                exclude=args["--exclude"],
                                strict=args["--strict"],
@@ -70,6 +79,8 @@ def main():
                                max_tasks=int(args["--max-tasks"]),
                                max_pool=int(args["--max-pool"])
                                )
+
+    # "And this is where the magic happens."
     try:
         loop.run_until_complete(crawler.crawl())
     except KeyboardInterrupt:
@@ -82,7 +93,5 @@ def main():
 
 
 if __name__ == "__main__":
-
     args = docopt(__doc__, version="0.1")
-    print(args)
     main()
