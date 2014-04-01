@@ -8,6 +8,34 @@
 import pygame
 import sys
 
+class Frog(object):
+
+    def __init__(self, screen):
+        self.frog = pygame.image.load("data/frog.png")
+        self.screen = screen
+        self.x = 0
+        self.y = 0
+        self.draw()
+
+    def draw(self):
+        self.screen.blit(self.frog, (self.x, self.y))
+
+    def left(self):
+        self.x -= 5
+        self.draw()
+
+    def right(self):
+        self.x += 5
+        self.draw()
+
+    def forward(self):
+        self.y += 5
+        self.draw()
+
+    def back(self):
+        self.y -= 5
+        self.draw()
+
 
 def terminate():
     pygame.quit()
@@ -49,27 +77,30 @@ def start_screen():
 
 def main():
     while True:
-        # Cap the framerate at 60 FPS.
+        # Cap the framerate at 30 FPS.
         clock = pygame.time.Clock()
         clock.tick(30)
 
+        # Draw the background from our resource file.
         background = pygame.image.load("data/background.png")
         window.blit(background, (0, 0))
 
-        frog = pygame.Rect((0, 0), (32, 32))
+
+#         frog = pygame.Rect((0, 0), (32, 32))
+        f = Frog(window)
+        f.draw()
 
         # Map Arrow Keys to movements.
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            frog.centerx -= 4
+            f.left()
         if keys[pygame.K_RIGHT]:
-            frog.centerx += 4
+            f.right()
         if keys[pygame.K_UP]:
-            frog.centery -= 4
+            f.forward()
         if keys[pygame.K_DOWN]:
-            frog.centery += 4
+            f.back()
 
-        window.fill((55, 155, 255), frog)
         pygame.display.update()
 
 
