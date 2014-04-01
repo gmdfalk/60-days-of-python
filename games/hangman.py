@@ -10,7 +10,6 @@
 
 
 from random import shuffle, choice
-import sys
 
 gallows = [
 """
@@ -64,7 +63,7 @@ gallows = [
 """
 \t______
 \t|    |
-\t|    O
+\t|    O *snap*
 \t|   /|\\
 \t|   / \\
 \t|
@@ -115,6 +114,7 @@ def check_endstate(mistakes, word, guessed_word):
         print "Congrats! You've won!"
         print "-"*10
     else:
+        print gallows[mistakes]
         print "\nThe word was '{}'\nYou guessed  '{}'.".format(word,
                                                               guessed_word)
         print "Sorry mate, you've lost."
