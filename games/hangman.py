@@ -12,21 +12,21 @@
 from random import shuffle, choice
 import sys
 
-gallow = [
+gallows = [
 """
 \t______
 \t|    |
-\t|    
-\t|    
-\t|   
+\t|
+\t|
+\t|
 \t|
 """,
 """
 \t______
 \t|    |
 \t|    o
-\t|    
-\t|   
+\t|
+\t|
 \t|
 """,
 """
@@ -34,7 +34,7 @@ gallow = [
 \t|    |
 \t|    o
 \t|    |
-\t|   
+\t|
 \t|
 """,
 """
@@ -42,7 +42,7 @@ gallow = [
 \t|    |
 \t|    o/
 \t|    |
-\t|   
+\t|
 \t|
 """,
 """
@@ -50,7 +50,7 @@ gallow = [
 \t|    |
 \t|   \o/
 \t|    |
-\t|  
+\t|
 \t|
 """,
 """
@@ -58,14 +58,14 @@ gallow = [
 \t|    |
 \t|   \o/
 \t|    |
-\t|   / 
+\t|   /
 \t|
 """,
 """
 \t______
 \t|    |
-\t|   \o/
-\t|    |
+\t|    O
+\t|   /|\\
 \t|   / \\
 \t|
 """]
@@ -102,11 +102,25 @@ def create_wordlist(difficulty="easy"):
 
 def update_guessed_word(guess, word, guessed_word):
     "Update guessed_word to reflect correctly guessed characters"
-    indices =  [i for i, c in enumerate(word) if c == guess]
+    indices = [i for i, c in enumerate(word) if c == guess]
     guessed_word = list(guessed_word)
     for i in indices:
         guessed_word[i] = guess
     return "".join(guessed_word)
+
+
+def check_endstate(mistakes, word, guessed_word):
+    if word == guessed_word:
+        print "\nYou've correctly guessed '{}'.".format(word)
+        print "Congrats! You've won!"
+        print "-"*10
+    else:
+        print "\nThe word was '{}'\nYou guessed  '{}'.".format(word,
+                                                              guessed_word)
+        print "Sorry mate, you've lost."
+        print "-"*10
+    print "\nNew Game!"
+
 
 def main():
     used_words = set()
@@ -120,40 +134,36 @@ def main():
         used_words.add(word)
 
         guessed_word = "".join(["_" for i in range(len(word))])
-        guesses = set()
+        guesses, wrong_guesses = set(), set()
         mistakes = 0
-        print gallow[0]
-        print "".join(word)
-        
+
         # Main loop.
         while word != guessed_word and mistakes < 6:
             # Add spaces when displaying the words to see the length.
-            print " ".join(guessed_word)
+            print gallows[mistakes]
+            print "missed:\t{}".format(" ".join(sorted(wrong_guesses)))
+            print "word:\t{}".format(" ".join(guessed_word))
 
-            guess = raw_input(" ")
+            # Guess until we have a unique lowercase string character.
+            guess = ""
+            while len(guess) != 1 or guess in guesses or not guess.islower():
+                guess = raw_input("guess:\t")
 
-            if guess in guesses:
-                print "you've already guessed", guess
-            elif guess not in word:
+            if guess not in word:
                 mistakes += 1
-                print gallow[mistakes]
+                wrong_guesses.add(guess)
             else:
                 guessed_word = update_guessed_word(guess, word, guessed_word)
-                
+
             guesses.add(guess)
 
         # Check for victory.
-        print guessed_word
-        if mistakes == 6:
-            print "-"*10
-            print "sorry mate, you've lost."
-            print "the word was '{}'".format(word)
-            print "-"*10
-        else:
-            print "-"*10
-            print "congrats! you've won!"
-            print "-"*10
+        check_endstate(mistakes, word, guessed_word)
+
 
 
 if __name__ == "__main__":
+    print "\nWelcome to Hangman!"
+    print "Guess the word before the man is hung and you win!"
+    raw_input("\n\t---Enter to Continue---\n")
     main()
