@@ -1,4 +1,4 @@
-﻿EASY:
+﻿easy:
 angle
 apple
 basin
@@ -100,7 +100,7 @@ wheel
 whistle
 window
 
-MEDIUM:
+medium:
 money
 sunburn
 babysitter
@@ -201,7 +201,7 @@ landscape
 retail
 darkness
 
-HARD:
+hard:
 jazz
 jacuzzi
 humidifier

@@ -3,7 +3,11 @@
     Created on 1 Apr 2014
 
     @author: Max Demian
+
+    Note: To display it in a non-maddening way, you'd have to use a
+    console interface library like urwid.
 """
+
 
 from random import shuffle, choice
 import sys
@@ -84,7 +88,7 @@ def choose_difficulty():
         difficulty = raw_input("Choose your difficulty: ")
     return difficulty
 
-def create_list(difficulty="easy"):
+def create_wordlist(difficulty="easy"):
     easy, medium, hard = get_words()
     if difficulty == "hard":
         shuffle(hard)
@@ -97,43 +101,59 @@ def create_list(difficulty="easy"):
         return easy
 
 def update_guessed_word(guess, word, guessed_word):
-
+    "Update guessed_word to reflect correctly guessed characters"
     indices =  [i for i, c in enumerate(word) if c == guess]
+    guessed_word = list(guessed_word)
     for i in indices:
         guessed_word[i] = guess
-    return guessed_word
+    return "".join(guessed_word)
 
 def main():
-    difficulty = choose_difficulty()
-    words = create_list(difficulty)
-    mistakes = 0
-    word = [i for i in choice(words)]
-    guessed_word = ["_" for i in range(len(word))]
-    guesses = set()
-    print gallow[0]
-    print word
+    used_words = set()
+    while True:
+        difficulty = choose_difficulty()
+        words = set(create_wordlist(difficulty))
+        # Get the symmetric difference of words and used_words.
+        # Gotta love python syntax.
+        words = list(words ^ used_words)
+        word = choice(words)
+        used_words.add(word)
 
-    while word != guessed_word:
+        guessed_word = "".join(["_" for i in range(len(word))])
+        guesses = set()
+        mistakes = 0
+        print gallow[0]
+        print "".join(word)
+        
+        # Main loop.
+        while word != guessed_word and mistakes < 6:
+            # Add spaces when displaying the words to see the length.
+            print " ".join(guessed_word)
+
+            guess = raw_input(" ")
+
+            if guess in guesses:
+                print "you've already guessed", guess
+            elif guess not in word:
+                mistakes += 1
+                print gallow[mistakes]
+            else:
+                guessed_word = update_guessed_word(guess, word, guessed_word)
+                
+            guesses.add(guess)
+
+        # Check for victory.
+        print guessed_word
         if mistakes == 6:
-            print "you lose! the word was", "".join(word)
-            main()
-        
-        sys.stdout.flush()
-        print " ".join(guessed_word)
-        
-        guess = raw_input(" ")
-        
-        if guess in guesses:
-            print "you've already guessed", guess
-        elif guess not in word:
-            mistakes += 1
-            print gallow[mistakes]
+            print "-"*10
+            print "sorry mate, you've lost."
+            print "the word was '{}'".format(word)
+            print "-"*10
         else:
-            guessed_word = update_guessed_word(guess, word, guessed_word)
-            
-        guesses.add(guess)
+            print "-"*10
+            print "congrats! you've won!"
+            print "-"*10
 
-    print "congrats! you've won!"
-    
+
 if __name__ == "__main__":
     main()
