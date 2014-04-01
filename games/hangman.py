@@ -92,13 +92,16 @@ def create_list(difficulty="easy"):
     elif difficulty == "medium":
         shuffle(medium)
         return medium
-    else:
+    else:  # Return easy even if not explicitly picked - as failsafe.
         shuffle(easy)
         return easy
 
-def update_guessed_word(word, char):
+def update_guessed_word(guess, word, guessed_word):
 
-    return [i for i, ltr in enumerate(word) if ltr == char]
+    indices =  [i for i, c in enumerate(word) if c == guess]
+    for i in indices:
+        guessed_word[i] = guess
+    return guessed_word
 
 def main():
     difficulty = choose_difficulty()
@@ -108,6 +111,7 @@ def main():
     guessed_word = ["_" for i in range(len(word))]
     guesses = set()
     print gallow[0]
+    print word
 
     while word != guessed_word:
         if mistakes == 6:
@@ -126,8 +130,6 @@ def main():
             print gallow[mistakes]
         else:
             guessed_word = update_guessed_word(guess, word, guessed_word)
-            word = [i for i in word if i != guess]
-            print word
             
         guesses.add(guess)
 
