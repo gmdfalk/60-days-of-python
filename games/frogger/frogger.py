@@ -11,11 +11,12 @@ import sys
 
 class Obstacle(object):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, img, direction):
         self.speed = 10
-        self.go_left = 0
+        self.go_left = direction
         self.x = x
         self.y = y
+        self.img = pygame.image.load(img)
 
     def draw(self):
         if self.go_left:
@@ -26,17 +27,23 @@ class Obstacle(object):
 
 class Truck(Obstacle):
 
-    def __init__(self, x, y):
-        super(Truck, self).__init__(x, y)
-        self.go_left = 1
-        self.img = pygame.image.load("data/truck.png")
+    def __init__(self, x, y, img, direction=0):
+        super(Truck, self).__init__(x, y, img, direction)
 
 class Car(Obstacle):
 
-    def __init__(self, x, y, img="data/car_1.png", direction=1):
-        super(Car, self).__init__(x, y)
-        self.go_left = direction
-        self.img = pygame.image.load(img)
+    def __init__(self, x, y, img, direction=0):
+        super(Car, self).__init__(x, y, img, direction)
+
+class Turtle(Obstacle):
+
+    def __init__(self, x, y, img, direction=0):
+        super(Turtle, self).__init__(x, y, img, direction)
+
+class Log(Obstacle):
+
+    def __init__(self, x, y, img, direction=0):
+        super(Log, self).__init__(x, y, img, direction)
 
 class Frog(object):
 
@@ -124,21 +131,23 @@ def main():
     background = pygame.image.load("data/background.png")
     clock = pygame.time.Clock()
     f = Frog()
-    ca1 = Car(440, 520, "data/car_1.png", 1)
-    ca2 = Car(0, 480, "data/car_2.png", 0)
-    ca3 = Car(440, 440, "data/car_3.png", 1)
-    ca4 = Car(0, 400, "data/car_4.png", 0)
-    t1 = Truck(440, 370)
+    c1a = Car(440, 520, "data/car_1.png", 1)
+    c2a = Car(0, 480, "data/car_2.png")
+    c3a = Car(440, 440, "data/car_3.png", 1)
+    c4a = Car(0, 400, "data/car_4.png")
+    c5a = Car(440, 370, "data/car_5.png", 1)
+    t1a = Turtle(440, 280, "data/turtle_3_full.png", 1)
+    L1a = Log(0, 240, "data/tree_small.png")
+    L2a = Log(0, 200, "data/tree_big.png")
+    t2a = Turtle(440, 160, "data/turtle_2_full.png", 1)
+    L3a = Log(0, 120, "data/tree_medium.png")
 
     while True:
         # Draw the images.
         window.blit(background, (0, 0))
-        f.draw()
-        ca1.draw()
-        ca2.draw()
-        ca3.draw()
-        ca4.draw()
-        t1.draw()
+        objects = [f, c1a, c2a, c3a, c4a, c5a, t1a, t2a, L1a, L2a, L3a]
+        for i in objects:
+            i.draw()
 
         # Flip the buffer every 60 ms.
         pygame.display.flip()
@@ -159,7 +168,8 @@ def main():
                     f.forward()
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     f.back()
-                print f.x, f.y
+                if event.key == pygame.K_SPACE:
+                    print f.x, f.y
 
 
 if __name__ == '__main__':
