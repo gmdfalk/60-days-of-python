@@ -16,19 +16,21 @@ class Obstacle(object):
         self.go_left = direction
         self.x = x
         self.y = y
+        self.startpos = (x, y)
         self.img = pygame.image.load(img)
+        self.rect = self.img.get_rect()
 
     def draw(self):
+        # Adjust the position of the obstacle.
         if self.go_left:
             self.x -= 2
         else:
             self.x += 2
+        # Reset the object if it moves out of screen.
+        if abs(self.x - self.startpos[0]) > 480:
+            self.x, self.y = self.startpos
+        # And finally draw it.
         window.blit(self.img, (self.x, self.y))
-
-class Truck(Obstacle):
-
-    def __init__(self, x, y, img, direction=0):
-        super(Truck, self).__init__(x, y, img, direction)
 
 class Car(Obstacle):
 
@@ -57,6 +59,7 @@ class Frog(object):
         self.y = 560
 
     def draw(self):
+        self.rect = self.status
         window.blit(self.status, (self.x, self.y))
 
     def left(self):
@@ -132,6 +135,8 @@ def main():
     clock = pygame.time.Clock()
     f = Frog()
     c1a = Car(440, 520, "data/car_1.png", 1)
+    c1b = Car(280, 520, "data/car_1.png", 1)
+    c1c = Car(120, 520, "data/car_1.png", 1)
     c2a = Car(0, 480, "data/car_2.png")
     c3a = Car(440, 440, "data/car_3.png", 1)
     c4a = Car(0, 400, "data/car_4.png")
@@ -145,9 +150,11 @@ def main():
     while True:
         # Draw the images.
         window.blit(background, (0, 0))
-        objects = [f, c1a, c2a, c3a, c4a, c5a, t1a, t2a, L1a, L2a, L3a]
+        objects = [f, c1a, c1b, c1c, c2a, c3a, c4a, c5a, t1a, t2a,
+                   L1a, L2a, L3a]
         for i in objects:
             i.draw()
+#             i.rect.clamp_ip(game_zone)
 
         # Flip the buffer every 60 ms.
         pygame.display.flip()
@@ -176,7 +183,7 @@ if __name__ == '__main__':
     # Initialize Pygame and Window to draw in.
     pygame.init()
     window = pygame.display.set_mode((480, 600), 0, 32)
-
+    game_zone = window.get_rect()
     # ~ frog = pygame.image.load("data/frog.png")
     start_screen()
     main()
