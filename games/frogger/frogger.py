@@ -7,7 +7,7 @@
     Todo:
     * Frog always ontop
     * Drowning
-    * Collision + Lives
+    * Collision
     * Home Zone
     * Animations (Frog + Turtles)
     * Sounds & Music
@@ -87,8 +87,10 @@ class Frog(object):
         self.img_r = pygame.image.load("data/frog_right.png")
         self.img_safe = pygame.image.load("data/frog_safe.png")
         self.img_life = pygame.image.load("data/lives.png")
+        self.img_empty = pygame.image.load("data/empty.png")
         self.death_imgs = ["data/frog_death_1.png", "data/frog_death_2.png",
                            "data/frog_death_3.png"]
+        self.img_death = pygame.image.load(self.death_imgs[2])
         self.status = self.img_f
         self.x = 200
         self.y = 560
@@ -115,6 +117,7 @@ class Frog(object):
         self.y += 40
 
     def update_lives(self, reduction=0):
+        "Deduct/Add lives and draw the life bar"
         self.lives += reduction
         x, y = 0, 40
         for _ in range(self.lives):
@@ -122,14 +125,14 @@ class Frog(object):
             x += 20
 
     def death(self):
+        "Update lives, trigger visual clues and reset frog position to default"
         self.update_lives(-1)
-        for i in self.death_imgs:
-            self.update()
-            self.status = pygame.image.load(i)
-            pygame.time.delay(200)
+        self.status = self.img_death
+        self.update()
+        pygame.display.flip()
+        pygame.time.delay(1500)
+        self.status = self.img_f
         self.x, self.y = 200, 560
-#         self.status = self.img_f
-#         self.update()
 
 
 def wait_for_input():
@@ -159,8 +162,8 @@ def game_over():
     gameover_label = gameover_font.render("GAME OVER", 1, (255, 255, 255))
     window.blit(gameover_label, (150, 300))
     pygame.display.flip()
-    print "paused"
     wait_for_input()
+    terminate()
 
 
 def terminate():
@@ -169,6 +172,7 @@ def terminate():
 
 
 def start_screen():
+    "A simple welcome screen with some music"
     # Load music and loop it until the start screen ends.
     pygame.mixer.music.load("data/theme.mp3")
     pygame.mixer.music.play(-1)
@@ -194,6 +198,7 @@ def start_screen():
 
 
 def create_road():
+    "Create the Car instances"
     road = []
     ys = [520, 480, 440, 400, 360]
     x = 0
@@ -225,6 +230,7 @@ def create_road():
     return road
 
 def create_river():
+    "Create the Turtle and Log instances"
     river = []
     ys = [120, 160, 200, 240, 280]
     x = 0
@@ -262,15 +268,15 @@ def main():
     # Basic setup.
     clock = pygame.time.Clock()
     background = pygame.image.load("data/background.png")
-    f = Frog()
-    e = StaticObstacle()
+    frog, enemy = Frog(), StaticObstacle()
     road, river = create_road(), create_river()
+
     # Merge all movable objects into one list to allow easy iteration.
-    objects = [f] + road + river  # + [e]
+    objects = [frog] + road + river  # + [e]
     level = 0
 
     while True:
-        # Poll for events.
+        # Poll for events and apply actions accordingly.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -278,30 +284,30 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_SPACE:
-                    f.death()
+                    frog.death()
 #                     level += 1
-                    print f.x, f.y, f.lives
+                    print frog.x, frog.y, frog.lives
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    f.left()
+                    frog.left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    f.right()
+                    frog.right()
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    f.forward()
+                    frog.forward()
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    f.back()
+                    frog.back()
 
-        # Update all our objects and images before we refresh the screen.
+        # Update all our objects and images.
         window.blit(background, (0, 0))
         for i in objects:
             i.update()
 
         # If we're out of lives, invoke the game over screen.
-        f.update_lives()
-        if not f.lives:
+        frog.update_lives()
+        if not frog.lives:
             game_over()
 
-        # For now, we just increase the FPS per level, effectively speeding
-        # up the whole game.
+        # Set the FPS to 30. To implement a rudimentary difficulty system, we
+        # increment the FPS by 10 per level to speed up the game.
         clock.tick(30 + (level * 10))
 
         # Everything is drawn. Now we refresh the display to reflect the
