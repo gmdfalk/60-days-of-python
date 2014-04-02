@@ -8,33 +8,41 @@
 import pygame
 import sys
 
+
 class Frog(object):
 
     def __init__(self, screen):
-        self.frog = pygame.image.load("data/frog.png")
+        self.img_f = pygame.image.load("data/frog.png")
+        self.img_b = pygame.image.load("data/frog_back.png")
+        self.img_l = pygame.image.load("data/frog_left.png")
+        self.img_r = pygame.image.load("data/frog_right.png")
+        self.status = self.img_f
         self.screen = screen
-        self.x = 0
-        self.y = 0
+        self.x = 200
+        self.y = 560
 
     def draw(self):
-        self.screen.blit(self.frog, (self.x, self.y))
+        self.screen.blit(self.status, (self.x, self.y))
 
     def left(self):
+        self.status = self.img_l
         self.x -= 40
 
     def right(self):
+        self.status = self.img_r
         self.x += 40
 
+
     def forward(self):
+        self.status = self.img_f
         self.y -= 40
 
+
     def back(self):
+        self.status = self.img_b
         self.y += 40
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
 
 def wait_for_input():
     while True:
@@ -45,6 +53,10 @@ def wait_for_input():
                 if event.key == pygame.K_ESCAPE:  # pressing escape quits
                     terminate()
                 return
+
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 def start_screen():
     # Load music and loop it until the start screen ends.
@@ -70,10 +82,23 @@ def start_screen():
     wait_for_input()
     pygame.mixer.music.fadeout(2000)
 
+
+def pause():
+    pause_font = pygame.font.Font("data/emulogic.ttf", 20)
+    pause_label = pause_font.render("paused", 1, (255, 255, 255))
+    window.blit(pause_label, (180, 300))
+    pygame.display.flip()
+    print "pause"
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:  # pressing escape quits
+                    return
+
+
 def main():
 
     background = pygame.image.load("data/background.png")
-    keys = pygame.key.get_pressed()
     clock = pygame.time.Clock()
     f = Frog(window)
 
@@ -86,10 +111,11 @@ def main():
         # Main event loop.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                terminate()
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pause()
                 if event.key == pygame.K_LEFT:
-                    print "left"
                     f.left()
                 if event.key == pygame.K_RIGHT:
                     f.right()
@@ -97,6 +123,7 @@ def main():
                     f.forward()
                 if event.key == pygame.K_DOWN:
                     f.back()
+                print f.x, f.y
 
 
 if __name__ == '__main__':
