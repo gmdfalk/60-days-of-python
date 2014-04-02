@@ -15,26 +15,21 @@ class Frog(object):
         self.screen = screen
         self.x = 0
         self.y = 0
-        self.draw()
 
     def draw(self):
         self.screen.blit(self.frog, (self.x, self.y))
 
     def left(self):
-        self.x -= 5
-        self.draw()
+        self.x -= 40
 
     def right(self):
-        self.x += 5
-        self.draw()
+        self.x += 40
 
     def forward(self):
-        self.y += 5
-        self.draw()
+        self.y -= 40
 
     def back(self):
-        self.y -= 5
-        self.draw()
+        self.y += 40
 
 
 def terminate():
@@ -76,38 +71,33 @@ def start_screen():
     pygame.mixer.music.fadeout(2000)
 
 def main():
+
+    background = pygame.image.load("data/background.png")
+    keys = pygame.key.get_pressed()
+    clock = pygame.time.Clock()
+    f = Frog(window)
+
     while True:
-        # Cap the framerate at 30 FPS.
-        clock = pygame.time.Clock()
-        clock.tick(30)
-
-        # Draw the background from our resource file.
-        background = pygame.image.load("data/background.png")
         window.blit(background, (0, 0))
-
-
-#         frog = pygame.Rect((0, 0), (32, 32))
-        f = Frog(window)
         f.draw()
+        pygame.display.flip()  # Flips the buffer to show the new screen.
+        clock.tick(60)  # Pause for 60 ms.
 
-        # Map Arrow Keys to movements.
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            f.left()
-        if keys[pygame.K_RIGHT]:
-            f.right()
-        if keys[pygame.K_UP]:
-            f.forward()
-        if keys[pygame.K_DOWN]:
-            f.back()
-
-        pygame.display.update()
-
-
-
+        # Main event loop.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    print "left"
+                    f.left()
+                if event.key == pygame.K_RIGHT:
+                    f.right()
+                if event.key == pygame.K_UP:
+                    f.forward()
+                if event.key == pygame.K_DOWN:
+                    f.back()
+
 
 if __name__ == '__main__':
     # Initialize Pygame and Window to draw in.
