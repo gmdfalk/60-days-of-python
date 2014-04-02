@@ -29,9 +29,9 @@ class Obstacle(object):
         # Reset the object if it moves out of screen.
 #         if abs(self.x - self.startpos[0]) > 480:
 #             self.x, self.y = self.startpos
-        if self.x > 480:
+        if self.x > 660:
             self.x = 0
-        elif self.x < 0:
+        elif self.x < -120:
             self.x = 480
         # And finally draw it.
         window.blit(self.img, (self.x, self.y))
@@ -133,51 +133,82 @@ def start_screen():
     pygame.mixer.music.fadeout(2000)
 
 
+def create_road():
+    road = []
+    ys = [520, 480, 440, 400, 370]
+    x = 0
+    for i in range(2):
+        car = Car(x, ys[0], "data/car_1.png", 1)
+        road.append(car)
+        x += 144
+    x = 20
+    for i in range(3):
+        car = Car(x, ys[1], "data/car_2.png")
+        road.append(car)
+        x += 128
+    x = 40
+    for i in range(3):
+        car = Car(x, ys[2], "data/car_3.png", 1)
+        road.append(car)
+        x += 128
+    x = 60
+    for i in range(2):
+        car = Car(x, ys[3], "data/car_4.png")
+        road.append(car)
+        x += 128
+    x = 80
+    for i in range(2):
+        car = Car(x, ys[4], "data/car_5.png", 1)
+        road.append(car)
+        x += 176
+
+    return road
+
+def create_river():
+    river = []
+    ys = [120, 160, 200, 240, 280]
+    x = 0
+    for i in range(4):
+        turtle = Turtle(x, ys[4], "data/turtle_3_full.png", 1)
+        river.append(turtle)
+        x += 128
+    x = 20
+    for i in range(3):
+        log = Log(x, ys[3], "data/tree_small.png")
+        river.append(log)
+        x += 192
+    x = 40
+    for i in range(2):
+        log = Log(x, ys[2], "data/tree_big.png")
+        river.append(log)
+        x += 256
+    x = 60
+    for i in range(4):
+        turtle = Turtle(x, ys[1], "data/turtle_2_full.png", 1)
+        river.append(turtle)
+        x += 112
+    x = 80
+    for i in range(3):
+        log = Log(x, ys[0], "data/tree_medium.png")
+        river.append(log)
+        x += 176
+
+    return river
+
 def main():
 
     background = pygame.image.load("data/background.png")
     clock = pygame.time.Clock()
     f = Frog()
-    c1a = Car(440, 520, "data/car_1.png", 1)
-    c1b = Car(280, 520, "data/car_1.png", 1)
-    c1c = Car(120, 520, "data/car_1.png", 1)
-    c2a = Car(0, 480, "data/car_2.png")
-    c2b = Car(160, 480, "data/car_2.png")
-    c2c = Car(320, 480, "data/car_2.png")
-    c3a = Car(440, 440, "data/car_3.png", 1)
-    c3b = Car(280, 440, "data/car_3.png", 1)
-    c3c = Car(120, 440, "data/car_3.png", 1)
-    c4a = Car(0, 400, "data/car_4.png")
-    c4b = Car(160, 400, "data/car_4.png")
-    c4c = Car(320, 400, "data/car_4.png")
-    c5a = Car(440, 370, "data/car_5.png", 1)
-    c5b = Car(280, 370, "data/car_5.png", 1)
-    c5c = Car(120, 370, "data/car_5.png", 1)
-    t1a = Turtle(440, 280, "data/turtle_3_full.png", 1)
-    t1b = Turtle(280, 280, "data/turtle_3_full.png", 1)
-    t1c = Turtle(120, 280, "data/turtle_3_full.png", 1)
-    L1a = Log(0, 240, "data/tree_small.png")
-    L1b = Log(160, 240, "data/tree_small.png")
-    L1c = Log(320, 240, "data/tree_small.png")
-    L2a = Log(0, 200, "data/tree_big.png")
-    L2b = Log(200, 200, "data/tree_big.png")
-    t2a = Turtle(440, 160, "data/turtle_2_full.png", 1)
-    t2b = Turtle(280, 160, "data/turtle_2_full.png", 1)
-    t2c = Turtle(120, 160, "data/turtle_2_full.png", 1)
-    L3a = Log(0, 120, "data/tree_medium.png")
-    L3b = Log(160, 120, "data/tree_medium.png")
-    L3c = Log(320, 120, "data/tree_medium.png")
+    road = create_road()
+    river = create_river()
+    objects = [f] + road + river
 
     while True:
         # Draw the images.
         window.blit(background, (0, 0))
-        objects = [f, c1a, c1b, c1c, c2a, c2b, c2c, c3a, c3b, c3c,
-                   c4a, c4b, c4c, c5a, c5b, c5c,
-                   t1a, t1b, t1c, t2a, t2b, t2c,
-                   L1a, L1b, L1c, L2a, L2b, L3a, L3b, L3c]
         for i in objects:
             i.draw()
-#             i.rect.clamp_ip(game_zone)
 
         # Flip the buffer every 60 ms.
         pygame.display.flip()
@@ -190,6 +221,8 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pause()
+                if event.key == pygame.K_SPACE:
+                    print f.x, f.y
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     f.left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -198,12 +231,10 @@ def main():
                     f.forward()
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     f.back()
-                if event.key == pygame.K_SPACE:
-                    print f.x, f.y
 
 
 if __name__ == '__main__':
-    # Initialize Pygame and Window to draw in.
+    # Initialize Pygame, the screen/window and our globals..
     pygame.init()
     window = pygame.display.set_mode((480, 600), 0, 32)
     game_zone = window.get_rect()
