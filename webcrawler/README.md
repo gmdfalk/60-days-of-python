@@ -9,6 +9,6 @@ Other modifications could be:
   * BeautifulSoup instead of regex for parsing 
   * requests (urllib3) instead of urllib for http actions
 
-You can find the original [here](https://github.com/aosabook/500lines/tree/master/crawler).
-
-A very basic sketch of a web scraper can be found [here](https://github.com/mikar/60-days-of-code/tree/master/oop/datastructs/scraping).
+You can find the original [here](https://github.com/aosabook/500lines/tree/master/crawler).  
+  
+[This](https://github.com/mikar/60-days-of-code/tree/master/oop/datastructs/scraping) is the first draft, which lead me to look at more optimized versions of web scrapers.
