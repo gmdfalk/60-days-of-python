@@ -19,8 +19,22 @@ import sys
 from random import choice, randrange, random
 
 
-class Obstacle(object):
+class StaticObstacle(object):
 
+    def __init__(self):
+        self.y = 80
+        self.spawns = [420, 320, 220, 120, 20]
+        self.imgs = ["data/croc.png", "data/fly.png"]
+
+    def update(self):
+        "Draws at a random spawn point for a random duration"
+        self.img = pygame.image.load(choice(self.imgs))
+        self.duration = randrange(5, 10)
+        window.blit(self.img, (choice(self.spawns), self.y))
+
+
+class MovingObstacle(object):
+    "Base class for all moving obstacles"
     def __init__(self, x, y, img, direction):
         self.speed = 10
         self.go_left = direction
@@ -29,7 +43,7 @@ class Obstacle(object):
         self.img = pygame.image.load(img)
         self.rect = self.img.get_rect()
 
-    def draw(self):
+    def update(self):
         "Moves and then draws the obstacle"
         # Adjust the position of the obstacle.
         if self.go_left:
@@ -46,38 +60,22 @@ class Obstacle(object):
         window.blit(self.img, (self.x, self.y))
 
 
-class Car(Obstacle):
+class Car(MovingObstacle):
 
     def __init__(self, x, y, img, direction=0):
         super(Car, self).__init__(x, y, img, direction)
 
 
-class Turtle(Obstacle):
+class Turtle(MovingObstacle):
 
     def __init__(self, x, y, img, direction=0):
         super(Turtle, self).__init__(x, y, img, direction)
 
 
-class Log(Obstacle):
+class Log(MovingObstacle):
 
     def __init__(self, x, y, img, direction=0):
         super(Log, self).__init__(x, y, img, direction)
-
-
-class Enemy(object):
-
-    def __init__(self):
-        self.y = 80
-        self.spawns = [420, 320, 220, 120, 20]
-        self.imgs = ["data/croc.png", "data/fly.png"]
-
-    def draw(self):
-        if random() > 0.6:
-            return
-        self.img = pygame.image.load(choice(self.imgs))
-        self.duration = randrange(5, 10)
-
-        window.blit(self.img, (choice(self.spawns), self.y))
 
 
 class Frog(object):
@@ -87,12 +85,16 @@ class Frog(object):
         self.img_b = pygame.image.load("data/frog_back.png")
         self.img_l = pygame.image.load("data/frog_left.png")
         self.img_r = pygame.image.load("data/frog_right.png")
+        self.img_safe = pygame.image.load("data/frog_safe.png")
+        self.img_life = pygame.image.load("data/lives.png")
+        self.death_imgs = ["data/frog_death_1.png", "data/frog_death_2.png",
+                           "data/frog_death_3.png"]
         self.status = self.img_f
         self.x = 200
         self.y = 560
         self.lives = 4
 
-    def draw(self):
+    def update(self):
         self.rect = self.status
         window.blit(self.status, (self.x, self.y))
 
@@ -112,6 +114,23 @@ class Frog(object):
         self.status = self.img_b
         self.y += 40
 
+    def update_lives(self, reduction=0):
+        self.lives += reduction
+        x, y = 0, 40
+        for _ in range(self.lives):
+            window.blit(self.img_life, (x, y))
+            x += 20
+
+    def death(self):
+        self.update_lives(-1)
+        for i in self.death_imgs:
+            self.update()
+            self.status = pygame.image.load(i)
+            pygame.time.delay(200)
+        self.x, self.y = 200, 560
+#         self.status = self.img_f
+#         self.update()
+
 
 def wait_for_input():
     # Allow these keys to cancel the loop.
@@ -128,8 +147,17 @@ def wait_for_input():
 
 def pause():
     pause_font = pygame.font.Font("data/emulogic.ttf", 20)
-    pause_label = pause_font.render("paused", 1, (255, 255, 255))
+    pause_label = pause_font.render("PAUSED", 1, (255, 255, 255))
     window.blit(pause_label, (180, 300))
+    pygame.display.flip()
+    print "paused"
+    wait_for_input()
+
+
+def game_over():
+    gameover_font = pygame.font.Font("data/emulogic.ttf", 20)
+    gameover_label = gameover_font.render("GAME OVER", 1, (255, 255, 255))
+    window.blit(gameover_label, (150, 300))
     pygame.display.flip()
     print "paused"
     wait_for_input()
@@ -229,28 +257,20 @@ def create_river():
 
 def main():
 
+    start_screen()
+
     # Basic setup.
     clock = pygame.time.Clock()
     background = pygame.image.load("data/background.png")
     f = Frog()
-    e = Enemy()
+    e = StaticObstacle()
     road, river = create_road(), create_river()
     # Merge all movable objects into one list to allow easy iteration.
     objects = [f] + road + river  # + [e]
     level = 0
 
     while True:
-        # Draw all our objects and images before we refresh the screen.
-        window.blit(background, (0, 0))
-        for i in objects:
-            i.draw()
-
-        pygame.display.flip()
-        # For now, we just increase the FPS per level, effectively speeding
-        # up the whole game.
-        clock.tick(30 + (level * 10))
-
-        # Main event loop.
+        # Poll for events.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -258,9 +278,9 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_SPACE:
-                    print f.x, f.y
+                    f.death()
 #                     level += 1
-                    print level
+                    print f.x, f.y, f.lives
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     f.left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -270,11 +290,28 @@ def main():
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     f.back()
 
+        # Update all our objects and images before we refresh the screen.
+        window.blit(background, (0, 0))
+        for i in objects:
+            i.update()
+
+        # If we're out of lives, invoke the game over screen.
+        f.update_lives()
+        if not f.lives:
+            game_over()
+
+        # For now, we just increase the FPS per level, effectively speeding
+        # up the whole game.
+        clock.tick(30 + (level * 10))
+
+        # Everything is drawn. Now we refresh the display to reflect the
+        # changes.
+        pygame.display.flip()
+
 
 if __name__ == '__main__':
     # Initialize Pygame, the screen/window and some globals.
     pygame.init()
     window = pygame.display.set_mode((480, 600), 0, 32)
     game_zone = window.get_rect()
-    start_screen()
     main()
