@@ -9,20 +9,48 @@ import pygame
 import sys
 
 
+class Obstacle(object):
+
+    def __init__(self, x, y):
+        self.speed = 10
+        self.go_left = 0
+        self.x = x
+        self.y = y
+
+    def draw(self):
+        if self.go_left:
+            self.x -= 2
+        else:
+            self.x += 2
+        window.blit(self.img, (self.x, self.y))
+
+class Truck(Obstacle):
+
+    def __init__(self, x, y):
+        super(Truck, self).__init__(x, y)
+        self.go_left = 1
+        self.img = pygame.image.load("data/truck.png")
+
+class Car(Obstacle):
+
+    def __init__(self, x, y, img="data/car_1.png", direction=1):
+        super(Car, self).__init__(x, y)
+        self.go_left = direction
+        self.img = pygame.image.load(img)
+
 class Frog(object):
 
-    def __init__(self, screen):
+    def __init__(self):
         self.img_f = pygame.image.load("data/frog.png")
         self.img_b = pygame.image.load("data/frog_back.png")
         self.img_l = pygame.image.load("data/frog_left.png")
         self.img_r = pygame.image.load("data/frog_right.png")
         self.status = self.img_f
-        self.screen = screen
         self.x = 200
         self.y = 560
 
     def draw(self):
-        self.screen.blit(self.status, (self.x, self.y))
+        window.blit(self.status, (self.x, self.y))
 
     def left(self):
         self.status = self.img_l
@@ -32,17 +60,13 @@ class Frog(object):
         self.status = self.img_r
         self.x += 40
 
-
     def forward(self):
         self.status = self.img_f
         self.y -= 40
 
-
     def back(self):
         self.status = self.img_b
         self.y += 40
-
-
 
 def wait_for_input():
     while True:
@@ -53,6 +77,18 @@ def wait_for_input():
                 if event.key == pygame.K_ESCAPE:  # pressing escape quits
                     terminate()
                 return
+
+def pause():
+    pause_font = pygame.font.Font("data/emulogic.ttf", 20)
+    pause_label = pause_font.render("paused", 1, (255, 255, 255))
+    window.blit(pause_label, (180, 300))
+    pygame.display.flip()
+    print "pause"
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:  # pressing escape quits
+                    return
 
 def terminate():
     pygame.quit()
@@ -83,30 +119,30 @@ def start_screen():
     pygame.mixer.music.fadeout(2000)
 
 
-def pause():
-    pause_font = pygame.font.Font("data/emulogic.ttf", 20)
-    pause_label = pause_font.render("paused", 1, (255, 255, 255))
-    window.blit(pause_label, (180, 300))
-    pygame.display.flip()
-    print "pause"
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:  # pressing escape quits
-                    return
-
-
 def main():
 
     background = pygame.image.load("data/background.png")
     clock = pygame.time.Clock()
-    f = Frog(window)
+    f = Frog()
+    ca1 = Car(440, 520, "data/car_1.png", 1)
+    ca2 = Car(0, 480, "data/car_2.png", 0)
+    ca3 = Car(440, 440, "data/car_3.png", 1)
+    ca4 = Car(0, 400, "data/car_4.png", 0)
+    t1 = Truck(440, 370)
 
     while True:
+        # Draw the images.
         window.blit(background, (0, 0))
         f.draw()
-        pygame.display.flip()  # Flips the buffer to show the new screen.
-        clock.tick(60)  # Pause for 60 ms.
+        ca1.draw()
+        ca2.draw()
+        ca3.draw()
+        ca4.draw()
+        t1.draw()
+
+        # Flip the buffer every 60 ms.
+        pygame.display.flip()
+        clock.tick(30)
 
         # Main event loop.
         for event in pygame.event.get():
@@ -115,13 +151,13 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pause()
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     f.left()
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     f.right()
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     f.forward()
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     f.back()
                 print f.x, f.y
 
