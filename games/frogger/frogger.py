@@ -5,13 +5,12 @@
     @author: Max Demian
 
     Todo:
-    * Frog always ontop
-    * Drowning
-    * Collision
-    * Home Zone
+    * Collision (+Drowning)
+    * Home Zone (+img_safe)
+    * Timer
     * Animations (Frog + Turtles)
     * Sounds & Music
-    * Scores and Highscores
+    * Score and Highscores
 """
 
 import pygame
@@ -271,8 +270,6 @@ def main():
     frog, enemy = Frog(), StaticObstacle()
     road, river = create_road(), create_river()
 
-    # Merge all movable objects into one list to allow easy iteration.
-    objects = [frog] + road + river  # + [e]
     level = 0
 
     while True:
@@ -296,10 +293,13 @@ def main():
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     frog.back()
 
-        # Update all our objects and images.
+        # Draw the background image.
         window.blit(background, (0, 0))
-        for i in objects:
+
+        # Update all our objects and images.
+        for i in road + river:
             i.update()
+        frog.update()
 
         # If we're out of lives, invoke the game over screen.
         frog.update_lives()
