@@ -135,7 +135,7 @@ def start_screen():
 
 def create_road():
     road = []
-    ys = [520, 480, 440, 400, 370]
+    ys = [520, 480, 440, 400, 360]
     x = 0
     for i in range(2):
         car = Car(x, ys[0], "data/car_1.png", 1)
@@ -203,6 +203,7 @@ def main():
     road = create_road()
     river = create_river()
     objects = [f] + road + river
+    level = 0
 
     while True:
         # Draw the images.
@@ -210,9 +211,11 @@ def main():
         for i in objects:
             i.draw()
 
-        # Flip the buffer every 60 ms.
+        # Flip the buffer every 30 ms.
         pygame.display.flip()
-        clock.tick(30)
+        # Since we're lazy, we just increase the Clock per level, thus
+        # speeding up the whole game.
+        clock.tick(30 + (level * 10))
 
         # Main event loop.
         for event in pygame.event.get():
@@ -223,6 +226,8 @@ def main():
                     pause()
                 if event.key == pygame.K_SPACE:
                     print f.x, f.y
+#                     level += 1
+                    print level
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     f.left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
