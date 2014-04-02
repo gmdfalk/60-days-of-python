@@ -299,6 +299,7 @@ def main():
         # Update all our objects and images.
         for i in road + river:
             i.update()
+        # Update the frog last so that he is on top of other objects.
         frog.update()
 
         # If we're out of lives, invoke the game over screen.
