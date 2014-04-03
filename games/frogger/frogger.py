@@ -102,7 +102,7 @@ class Frog(pygame.sprite.Sprite):
         self.img = self.img_f
         self.rect = self.img.get_rect()
         self.rect.x = 220
-        self.rect.y = 565
+        self.rect.y = 560
         self.startpos = (self.rect.x, self.rect.y)
 
     def update(self):
@@ -212,10 +212,43 @@ def start_screen():
     pygame.mixer.music.fadeout(2000)
 
 
+def create_floatables():
+    "Create the Turtle and Log instances"
+    floatables = pygame.sprite.Group()
+    ys = [128, 160, 208, 248, 280]
+    x = 0
+    for _ in range(4):
+        turtle = Turtle(x, ys[4], "data/turtle_3_full.png", 1)
+        floatables.add(turtle)
+        x += 128
+    x = 20
+    for _ in range(3):
+        log = Log(x, ys[3], "data/log_small.png")
+        floatables.add(log)
+        x += 192
+    x = 40
+    for _ in range(2):
+        log = Log(x, ys[2], "data/log_big.png")
+        floatables.add(log)
+        x += 256
+    x = 60
+    for _ in range(4):
+        turtle = Turtle(x, ys[1], "data/turtle_2_full.png", 1)
+        floatables.add(turtle)
+        x += 112
+    x = 80
+    for _ in range(3):
+        log = Log(x, ys[0], "data/log_medium.png")
+        floatables.add(log)
+        x += 176
+
+    return floatables
+
+
 def create_hostiles():
-    "Create the Car instances"
+    "Create the obstacles that trigger death on collision"
     hostiles = pygame.sprite.Group()
-    ys = [520, 480, 440, 405, 365]
+    ys = [520, 480, 440, 400, 360]
     x = randrange(200)
     for _ in range(3):
         car = Car(x, ys[0], "data/car_1.png", 1)
@@ -244,37 +277,6 @@ def create_hostiles():
 
     return hostiles
 
-def create_floatables():
-    "Create the Turtle and Log instances"
-    floatables = pygame.sprite.Group()
-    ys = [120, 160, 200, 240, 280]
-    x = 0
-    for _ in range(4):
-        turtle = Turtle(x, ys[4], "data/turtle_3_full.png", 1)
-        floatables.add(turtle)
-        x += 128
-    x = 20
-    for _ in range(3):
-        log = Log(x, ys[3], "data/log_small.png")
-        floatables.add(log)
-        x += 192
-    x = 40
-    for _ in range(2):
-        log = Log(x, ys[2], "data/log_big.png")
-        floatables.add(log)
-        x += 256
-    x = 60
-    for _ in range(4):
-        turtle = Turtle(x, ys[1], "data/turtle_2_full.png", 1)
-        floatables.add(turtle)
-        x += 112
-    x = 80
-    for _ in range(3):
-        log = Log(x, ys[0], "data/log_medium.png")
-        floatables.add(log)
-        x += 176
-
-    return floatables
 
 def create_homezones():
     "Create the 5 safety zones at the top of the map"
@@ -315,19 +317,15 @@ def main():
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     frog.back()
 
-        # Handle collision.
-        for i in pygame.sprite.spritecollide(frog, hostiles, False):
-            pass
-#             frog.death()
-        for i in pygame.sprite.spritecollide(frog, floatables, False):
-#             if i.go_left:
-#                 frog.rect.x -= i.speed
-#             else:
-#                 frog.rect.x += i.speed
-            pass
 
         # Draw the background image.
         window.blit(background, (0, 0))
+
+        # Create the death-zone at the top of the map.
+        deathzone = pygame.Surface((480, 56), pygame.SRCALPHA)
+        deathzone.fill((255, 255, 255, 128))
+        window.blit(deathzone, (0, 62))
+
 
         # First, draw the floating obstacles.
         for i in floatables:
@@ -339,6 +337,18 @@ def main():
         for i in hostiles:
             i.update()
 
+        # Handle collision.
+
+        for i in pygame.sprite.spritecollide(frog, hostiles, False):
+            pass
+#             frog.death()
+        for i in pygame.sprite.spritecollide(frog, floatables, False):
+#             if i.go_left:
+#                 frog.rect.x -= i.speed
+#             else:
+#                 frog.rect.x += i.speed
+            pass
+
         # If we're out of lives, invoke the game over screen.
         if not frog.lives:
             game_over()
@@ -349,7 +359,7 @@ def main():
 
         # Everything is drawn. Now we refresh the display to reflect the
         # changes.
-        pygame.display.flip()
+        pygame.display.update()
 
 
 if __name__ == '__main__':
