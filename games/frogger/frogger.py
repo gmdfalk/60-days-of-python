@@ -11,7 +11,7 @@
     * Class that creates and holds all the objects as sprite groups
     * Handle sprites better (separation, SpriteGroups, ...)
     * Figure out a different delay for frog.death() as currently you can move
-      inside the frozen screen.
+      inside the frozen screen. Also, enable death when sliding out the river.
     * Sounds & Music
     * Score and Highscores
 """
