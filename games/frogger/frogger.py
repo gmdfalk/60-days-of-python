@@ -10,6 +10,8 @@
     * Animations (Frog + Turtles)
     * Class that creates and holds all the objects as sprite groups
     * Handle sprites better (separation, SpriteGroups, ...)
+    * Figure out a different delay for frog.death() as currently you can move
+      inside the frozen screen.
     * Sounds & Music
     * Score and Highscores
 """
@@ -20,13 +22,44 @@ from random import choice, randrange
 
 
 class StaticObstacle(pygame.sprite.Sprite):
-
+    "Base class for all static obstacles"
     def __init__(self):
         super(StaticObstacle, self).__init__()
-        self.spawns = [420, 320, 220, 120, 20]
-        self.duration = randrange(5, 11)
+
+    def draw(self):
+        window.blit(self.img, (self.rect.x, self.rect.y))
+
+
+class TopGround(StaticObstacle):
+
+    def __init__(self):
+        super(TopGround, self).__init__()
+        self.img = pygame.image.load("data/top_ground.png")
+        self.rect = self.img.get_rect()
+        self.rect.x = 0
+        self.rect.y = 60
+        self.mask = pygame.mask.from_surface(self.img)
+
+class River(StaticObstacle):
+
+    def __init__(self):
+        super(River, self).__init__()
+        self.img = pygame.Surface((480, 200), pygame.SRCALPHA)
+        self.rect = self.img.get_rect()
+
+    def draw(self):
+        self.img.fill((255, 255, 255, 128))
+        window.blit(self.img, (0, 118))
+
+
+class Camper(StaticObstacle):
+    "Enemies camping the safezones inside the TopGround"
+    def __init__(self):
+        super(Camper, self).__init__()
         self.imgs = ["data/croc.png", "data/fly.png"]
         self.img = pygame.image.load(choice(self.imgs))
+        self.spawns = [420, 320, 220, 120, 20]
+        self.duration = randrange(5, 11)
         self.rect = self.img.get_rect()
         self.rect.x = choice(self.spawns)
         self.rect.y = 80
@@ -281,24 +314,34 @@ def create_hostiles():
     return hostiles
 
 
-def create_homezones():
-    "Create the 5 safety zones at the top of the map"
-    xs = [420, 320, 220, 120, 20]
-    y = 80
+def create_deathzones():
 
+    deathzones = pygame.sprite.Group()
+
+    topground = TopGround()
+    deathzones.add(topground)
+
+    river = River()
+    deathzones.add(river)
+
+    return deathzones
 
 def main():
 
     start_screen()
 
     # Basic setup.
+    level = 0
     clock = pygame.time.Clock()
     background = pygame.image.load("data/background.png")
-    top_ground = pygame.image.load("data/top_ground.png")
-    frog, enemy = Frog(), StaticObstacle()
+
+
     # Sprite groups
-    hostiles, floatables = create_hostiles(), create_floatables()
-    level = 0
+    frog = Frog()
+    hostiles = create_hostiles()
+    floatables = create_floatables()
+    deathzones = create_deathzones()
+
 
     while True:
         #======================================================================
@@ -339,6 +382,8 @@ def main():
         for i in hostiles:
             i.draw()
 
+#         for i in deathzones:
+#             i.draw()
 
         #======================================================================
         # Collision
@@ -347,8 +392,13 @@ def main():
             offset_x = frog.rect.left - i.rect.left
             offset_y = frog.rect.top - i.rect.top
             # TODO: Fix car_5 (trucks). Somehow their collision box is off.
+            # Same goes for the TopGround... Formula to calculate the overlap
+            # might be off.
             if frog.mask.overlap(i.mask, (offset_x, offset_y)):
                 frog.death()
+
+#         if pygame.sprite.spritecollide(frog, deathzones, False):
+#             frog.death()
 
         # The floatable images have transparency everywhere. The mask collision
         # detection is not very reliable here. Thus, we use sprites.
@@ -357,7 +407,6 @@ def main():
                 frog.rect.x -= i.speed
             else:
                 frog.rect.x += i.speed
-
 
         # If we're out of lives, invoke the game over screen.
         if not frog.lives:
