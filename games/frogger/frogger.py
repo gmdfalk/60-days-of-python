@@ -332,10 +332,13 @@ def main():
 
 
         for i in pygame.sprite.spritecollide(frog, cars, False):
-            frog.death()
+            pass
 #             frog.death()
         for i in pygame.sprite.spritecollide(frog, floatables, False):
-            frog.x = i.x
+            if i.go_left:
+                frog.x -= i.speed
+            else:
+                frog.x += i.speed
 
         # Set the FPS to 30. To implement a rudimentary difficulty system, we
         # increment the FPS by 10 per level to speed up the game.
