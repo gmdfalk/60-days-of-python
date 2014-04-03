@@ -30,6 +30,7 @@ class StaticObstacle(pygame.sprite.Sprite):
         self.rect = self.img.get_rect()
         self.rect.x = choice(self.spawns)
         self.rect.y = 80
+        self.mask = pygame.mask.from_surface(self.img)
 
 
 
@@ -43,8 +44,9 @@ class MovingObstacle(pygame.sprite.Sprite):
         self.rect = self.img.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.mask = pygame.mask.from_surface(self.img)
 
-    def update(self):
+    def draw(self):
         "Moves and then draws the obstacle"
         # Adjust the position of the obstacle.
         if self.go_left:
@@ -58,13 +60,12 @@ class MovingObstacle(pygame.sprite.Sprite):
             elif self.rect.x < -40:
                 self.rect.x = 480
         else:
-            # To accomodate the big logs and introduce gaps, we use -180 here.
+            # To accommodate the big logs and introduce gaps, we use -180 here.
             if self.rect.x > 480:
                 self.rect.x = -180
             elif self.rect.x < -180:
                 self.rect.x = 480
 
-        # Update the rectangle position.
         # And finally draw it.
         window.blit(self.img, (self.rect.x, self.rect.y))
 
@@ -91,21 +92,23 @@ class Frog(pygame.sprite.Sprite):
 
     def __init__(self):
         super(Frog, self).__init__()
-        self.lives = 4
-        self.img_f = pygame.image.load("data/frog.png")
-        self.img_b = pygame.image.load("data/frog_back.png")
-        self.img_l = pygame.image.load("data/frog_left.png")
-        self.img_r = pygame.image.load("data/frog_right.png")
+        self.img_death = pygame.image.load("data/frog_death_3.png")
         self.img_safe = pygame.image.load("data/frog_safe.png")
         self.img_life = pygame.image.load("data/lives.png")
-        self.img_death = pygame.image.load("data/frog_death_3.png")
-        self.img = self.img_f
+        self.img_forward = pygame.image.load("data/frog.png")
+        self.img_back = pygame.image.load("data/frog_back.png")
+        self.img_left = pygame.image.load("data/frog_left.png")
+        self.img_right = pygame.image.load("data/frog_right.png")
+        self.img = self.img_forward
         self.rect = self.img.get_rect()
+        self.lives = 4
         self.rect.x = 220
         self.rect.y = 560
         self.startpos = (self.rect.x, self.rect.y)
+        self.mask = pygame.mask.from_surface(self.img)
 
-    def update(self):
+    def draw(self):
+        self.mask = pygame.mask.from_surface(self.img)
         self.move()
         self.display_lives()
         window.blit(self.img, (self.rect.x, self.rect.y))
@@ -116,19 +119,19 @@ class Frog(pygame.sprite.Sprite):
         self.rect.clamp_ip(pygame.Rect((0, 80), (480, 520)))
 
     def left(self):
-        self.img = self.img_l
+        self.img = self.img_left
         self.rect.x -= 20
 
     def right(self):
-        self.img = self.img_r
+        self.img = self.img_right
         self.rect.x += 20
 
     def forward(self):
-        self.img = self.img_f
+        self.img = self.img_forward
         self.rect.y -= 40
 
     def back(self):
-        self.img = self.img_b
+        self.img = self.img_back
         self.rect.y += 40
 
     def display_lives(self):
@@ -143,11 +146,11 @@ class Frog(pygame.sprite.Sprite):
         # TODO: Update lives display as soon as death occurs.
         self.lives -= 1
         self.img = self.img_death
-        self.update()
+        self.draw()
         pygame.display.flip()
         pygame.time.wait(500)
         self.rect.x, self.rect.y = self.startpos
-        self.img = self.img_f
+        self.img = self.img_forward
 
 
 def wait_for_input():
@@ -298,7 +301,9 @@ def main():
     level = 0
 
     while True:
-        # Poll for events and apply actions accordingly.
+        #======================================================================
+        # Polling
+        #======================================================================
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -318,36 +323,41 @@ def main():
                     frog.back()
 
 
-        # Draw the background image.
+        #======================================================================
+        # # Updating + Drawing
+        #======================================================================
         window.blit(background, (0, 0))
-
-        # Create the death-zone at the top of the map.
-        deathzone = pygame.Surface((480, 56), pygame.SRCALPHA)
-        deathzone.fill((255, 255, 255, 128))
-        window.blit(deathzone, (0, 62))
-
 
         # First, draw the floating obstacles.
         for i in floatables:
-            i.update()
+            i.draw()
+
         # Draw the frog so that he appears on top of river objects but beneath
         # hostiles.
-        frog.update()
+        frog.draw()
 
         for i in hostiles:
-            i.update()
+            i.draw()
 
-        # Handle collision.
 
-        for i in pygame.sprite.spritecollide(frog, hostiles, False):
-            pass
-#             frog.death()
+        #======================================================================
+        # Collision
+        #======================================================================
+        for i in hostiles:
+            offset_x = frog.rect.left - i.rect.left
+            offset_y = frog.rect.top - i.rect.top
+            # TODO: Fix car_5 (trucks). Somehow their collision box is off.
+            if frog.mask.overlap(i.mask, (offset_x, offset_y)):
+                frog.death()
+
+        # The floatable images have transparency everywhere. The mask collision
+        # detection is not very reliable here. Thus, we use sprites.
         for i in pygame.sprite.spritecollide(frog, floatables, False):
-#             if i.go_left:
-#                 frog.rect.x -= i.speed
-#             else:
-#                 frog.rect.x += i.speed
-            pass
+            if i.go_left:
+                frog.rect.x -= i.speed
+            else:
+                frog.rect.x += i.speed
+
 
         # If we're out of lives, invoke the game over screen.
         if not frog.lives:
