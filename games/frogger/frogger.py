@@ -16,14 +16,15 @@
 
 import pygame
 import sys
-from random import choice, randrange, random
+from random import choice, randrange
 
 
 class StaticObstacle(pygame.sprite.Sprite):
 
     def __init__(self):
+        super(StaticObstacle, self).__init__()
         self.spawns = [420, 320, 220, 120, 20]
-        self.duration = randrange(5, 10)
+        self.duration = randrange(5, 11)
         self.x = choice(self.spawns)
         self.y = 80
         self.imgs = ["data/croc.png", "data/fly.png"]
@@ -39,6 +40,7 @@ class StaticObstacle(pygame.sprite.Sprite):
 class MovingObstacle(pygame.sprite.Sprite):
     "Base class for all moving obstacles"
     def __init__(self, x, y, img, direction):
+        super(MovingObstacle, self).__init__()
         self.speed = 10
         self.go_left = direction
         self.x = x
@@ -87,6 +89,7 @@ class Log(MovingObstacle):
 class Frog(pygame.sprite.Sprite):
 
     def __init__(self):
+        super(Frog, self).__init__()
         self.x = 200
         self.y = 560
         self.lives = 4
@@ -313,6 +316,9 @@ def main():
             game_over()
 
 
+        if pygame.sprite.spritecollide(frog, road, False,
+                                       pygame.sprite.collide_circle):
+            frog.death()
 #         hit_list = pygame.sprite.spritecollide(frog, road, True)
 
         # Set the FPS to 30. To implement a rudimentary difficulty system, we
