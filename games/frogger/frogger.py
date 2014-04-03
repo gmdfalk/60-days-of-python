@@ -56,11 +56,17 @@ class MovingObstacle(pygame.sprite.Sprite):
         else:
             self.x += 2
         # Reset the object if it moves out of screen.
-        # To accomodate the big logs and introduce gaps, we use -180, not 0.
-        if self.x > 480:
-            self.x = -180
-        elif self.x < -180:
-            self.x = 480
+        if isinstance(self, Car):
+            if self.x > 480:
+                self.x = -40
+            elif self.x < -40:
+                self.x = 480
+        else:
+            # To accomodate the big logs and introduce gaps, we use -180, not 0.
+            if self.x > 480:
+                self.x = -180
+            elif self.x < -180:
+                self.x = 480
 
         # Update the rectangle position.
         self.rect.x, self.rect.y = self.x, self.y
@@ -90,8 +96,8 @@ class Frog(pygame.sprite.Sprite):
 
     def __init__(self):
         super(Frog, self).__init__()
-        self.x = 200
-        self.y = 560
+        self.x = 220
+        self.y = 565
         self.lives = 4
         self.img_f = pygame.image.load("data/frog.png")
         self.img_b = pygame.image.load("data/frog_back.png")
@@ -104,9 +110,13 @@ class Frog(pygame.sprite.Sprite):
         self.rect = self.status.get_rect()
 
     def update(self):
-        self.rect.x, self.rect.y = self.x, self.y
         self.update_lives()
+        self.rect.x, self.rect.y = self.x, self.y
         window.blit(self.status, (self.x, self.y))
+
+    def move(self, x):
+        self.rect.move_ip(x, self.y)
+        self.rect.clamp_ip(game_zone)
 
     def left(self):
         self.status = self.img_l
@@ -209,27 +219,27 @@ def create_road():
     "Create the Car instances"
     road = []
     ys = [520, 480, 440, 400, 360]
-    x = 0
-    for _ in range(2):
+    x = randrange(200)
+    for _ in range(3):
         car = Car(x, ys[0], "data/car_1.png", 1)
         road.append(car)
         x += 144
-    x = 20
+    x = randrange(200)
     for _ in range(3):
         car = Car(x, ys[1], "data/car_2.png")
         road.append(car)
         x += 128
-    x = 40
+    x = randrange(200)
     for _ in range(3):
         car = Car(x, ys[2], "data/car_3.png", 1)
         road.append(car)
         x += 128
-    x = 60
+    x = randrange(200)
     for _ in range(2):
         car = Car(x, ys[3], "data/car_4.png")
         road.append(car)
         x += 128
-    x = 80
+    x = randrange(200)
     for _ in range(2):
         car = Car(x, ys[4], "data/car_5.png", 1)
         road.append(car)
@@ -248,12 +258,12 @@ def create_river():
         x += 128
     x = 20
     for _ in range(3):
-        log = Log(x, ys[3], "data/tree_small.png")
+        log = Log(x, ys[3], "data/log_small.png")
         river.append(log)
         x += 192
     x = 40
     for _ in range(2):
-        log = Log(x, ys[2], "data/tree_big.png")
+        log = Log(x, ys[2], "data/log_big.png")
         river.append(log)
         x += 256
     x = 60
@@ -263,7 +273,7 @@ def create_river():
         x += 112
     x = 80
     for _ in range(3):
-        log = Log(x, ys[0], "data/tree_medium.png")
+        log = Log(x, ys[0], "data/log_medium.png")
         river.append(log)
         x += 176
 
@@ -290,9 +300,8 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_SPACE:
-                    frog.death()
 #                     level += 1
-                    print frog.x, frog.y, frog.lives
+                    print frog.x, frog.y
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     frog.left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -302,24 +311,31 @@ def main():
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     frog.back()
 
+        # Ensure that the player is inside the playable zone.
+        frog.rect.clamp_ip(game_zone)
         # Draw the background image.
         window.blit(background, (0, 0))
 
-        # Update all our objects and images.
-        for i in road + river:
+        # First, draw the river obstacles.
+        for i in river:
+            i.update()
+        # Draw the frog so that he appears ontop of river objects but beneath
+        # cars.
+        frog.update()
+
+        for i in road:
             i.update()
 
-        # Update the frog last so that he is on top of other objects.
-        frog.update()
         # If we're out of lives, invoke the game over screen.
         if not frog.lives:
             game_over()
 
 
-        if pygame.sprite.spritecollide(frog, road, False,
-                                       pygame.sprite.collide_circle):
-            frog.death()
-#         hit_list = pygame.sprite.spritecollide(frog, road, True)
+        for i in pygame.sprite.spritecollide(frog, road, False):
+            print "collided with", i, "at", i.x, i.y
+#             frog.death()
+        for i in pygame.sprite.spritecollide(frog, river, False):
+            print "collided with", i, "at", i.x, i.y
 
         # Set the FPS to 30. To implement a rudimentary difficulty system, we
         # increment the FPS by 10 per level to speed up the game.
