@@ -5,6 +5,7 @@
     @author: Max Demian
 
     Todo:
+    * Separate sprites from objects
     * Collision (+Drowning)
     * Home Zone (+img_safe)
     * Timer
@@ -18,21 +19,24 @@ import sys
 from random import choice, randrange, random
 
 
-class StaticObstacle(object):
+class StaticObstacle(pygame.sprite.Sprite):
 
     def __init__(self):
-        self.y = 80
         self.spawns = [420, 320, 220, 120, 20]
+        self.duration = randrange(5, 10)
+        self.x = choice(self.spawns)
+        self.y = 80
         self.imgs = ["data/croc.png", "data/fly.png"]
+        self.img = pygame.image.load(choice(self.imgs))
+        self.rect = self.img.get_rect()
+
 
     def update(self):
         "Draws at a random spawn point for a random duration"
-        self.img = pygame.image.load(choice(self.imgs))
-        self.duration = randrange(5, 10)
-        window.blit(self.img, (choice(self.spawns), self.y))
+        window.blit(self.img, self.x, self.y)
 
 
-class MovingObstacle(object):
+class MovingObstacle(pygame.sprite.Sprite):
     "Base class for all moving obstacles"
     def __init__(self, x, y, img, direction):
         self.speed = 10
@@ -55,6 +59,9 @@ class MovingObstacle(object):
             self.x = -180
         elif self.x < -180:
             self.x = 480
+
+        # Update the rectangle position.
+        self.rect.x, self.rect.y = self.x, self.y
         # And finally draw it.
         window.blit(self.img, (self.x, self.y))
 
@@ -77,26 +84,25 @@ class Log(MovingObstacle):
         super(Log, self).__init__(x, y, img, direction)
 
 
-class Frog(object):
+class Frog(pygame.sprite.Sprite):
 
     def __init__(self):
+        self.x = 200
+        self.y = 560
+        self.lives = 4
         self.img_f = pygame.image.load("data/frog.png")
         self.img_b = pygame.image.load("data/frog_back.png")
         self.img_l = pygame.image.load("data/frog_left.png")
         self.img_r = pygame.image.load("data/frog_right.png")
         self.img_safe = pygame.image.load("data/frog_safe.png")
         self.img_life = pygame.image.load("data/lives.png")
-        self.img_empty = pygame.image.load("data/empty.png")
-        self.death_imgs = ["data/frog_death_1.png", "data/frog_death_2.png",
-                           "data/frog_death_3.png"]
-        self.img_death = pygame.image.load(self.death_imgs[2])
+        self.img_death = pygame.image.load("data/frog_death_3.png")
         self.status = self.img_f
-        self.x = 200
-        self.y = 560
-        self.lives = 4
+        self.rect = self.status.get_rect()
 
     def update(self):
-        self.rect = self.status
+        self.rect.x, self.rect.y = self.x, self.y
+        self.update_lives()
         window.blit(self.status, (self.x, self.y))
 
     def left(self):
@@ -115,9 +121,8 @@ class Frog(object):
         self.status = self.img_b
         self.y += 40
 
-    def update_lives(self, reduction=0):
-        "Deduct/Add lives and draw the life bar"
-        self.lives += reduction
+    def update_lives(self):
+        "Draw the life bar"
         x, y = 0, 40
         for _ in range(self.lives):
             window.blit(self.img_life, (x, y))
@@ -125,13 +130,14 @@ class Frog(object):
 
     def death(self):
         "Update lives, trigger visual clues and reset frog position to default"
-        self.update_lives(-1)
+        # TODO: Update lives display as soon as death occurs.
+        self.lives -= 1
         self.status = self.img_death
         self.update()
         pygame.display.flip()
-        pygame.time.delay(1500)
-        self.status = self.img_f
+        pygame.time.wait(1500)
         self.x, self.y = 200, 560
+        self.status = self.img_f
 
 
 def wait_for_input():
@@ -299,13 +305,15 @@ def main():
         # Update all our objects and images.
         for i in road + river:
             i.update()
+
         # Update the frog last so that he is on top of other objects.
         frog.update()
-
         # If we're out of lives, invoke the game over screen.
-        frog.update_lives()
         if not frog.lives:
             game_over()
+
+
+#         hit_list = pygame.sprite.spritecollide(frog, road, True)
 
         # Set the FPS to 30. To implement a rudimentary difficulty system, we
         # increment the FPS by 10 per level to speed up the game.

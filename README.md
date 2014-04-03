@@ -19,7 +19,7 @@ Language will be Python. Second iteration will be Java with maybe some C and Has
 A sensible goal might be 3 days per project:
   * Day 1: Conceptual design
   * Day 2: Most of the coding
-  * Day 3: Refactorization and Documentation  
+  * Day 3: Refactorization and Documentation   
   
 With one additional day as buffer the outcome should be around 15 projects.
 
@@ -29,9 +29,9 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Hangman**](https://github.com/mikar/60-days-of-code/blob/master/games/hangman/hangman.py) and [**Frogger**](https://github.com/mikar/60-days-of-code/blob/master/games/frogger/frogger.py)
   * IRC Bot
   * Mail Checker, Port Scanner or FTP Client
-  * Text Editor (GUI)
-  * Calculator (GUI)
   * Unit Converter (GUI)
+  * Calculator (both command-line and GUI)
+  * Text Editor (GUI)
   * Website with Flask
   	  * Blog
   	  * Forum
