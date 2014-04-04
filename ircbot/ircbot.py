@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-"""IRCBot (Quizzing, Logging, ...)
+"""IRCBot
 
 Usage:
     bot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <channel>...]
@@ -17,6 +17,22 @@ Options:
     -v, --verbose N          Verbose logging (0-3) [default: 1]
     -q, --quiet              Quiet logging
 """
+# Possible features:
+# HTTP link capture/collection and saving or displaying the title in chat
+# Weather and date/time information (day + week number, too)
+# Quiz
+# Collecting/displaying quotes (Chirpy?)
+# Store notes with keyword and repeat them on demand
+# Google search (or other services, like translate)
+# Operator/Auth features (Kick, Ban, automatically give OP)
+# Disable/enable commands, public ignore
+# Fortune cookies or something like that
+# Seen (track last message by user x)
+# Conduct a poll.
+# Evaluate python/bash
+# Dictionary, wiki
+# Search channel log.
+# Message system (leaving a notification)
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol

@@ -6,7 +6,7 @@
 """
 
 import unittest
-from ..ircbot import LogBot, MessageLogger
+from ircbot.ircbot import LogBot, MessageLogger
 
 
 class TestIRCBot(unittest.TestCase):
