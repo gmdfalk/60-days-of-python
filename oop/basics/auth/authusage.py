@@ -6,6 +6,7 @@
 
 import auth
 
+
 # Set up a test user and permission
 auth.authenticator.add_user("joe", "joepassword")
 auth.authorizor.add_permission("test program")

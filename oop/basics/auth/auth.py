@@ -6,6 +6,7 @@
 
 import hashlib
 
+
 class AuthException(Exception):
 
     def __init__(self, username, user=None):

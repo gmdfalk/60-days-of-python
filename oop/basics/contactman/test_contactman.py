@@ -54,3 +54,6 @@ class TestVarious(unittest.TestCase):
         longkeys['longest yet'] = 5
         longkeys['superlong'] = "world"
         self.assertEqual(longkeys.longest_key(), "longest yet")
+
+if __name__ == "__main__":
+    unittest.main()
