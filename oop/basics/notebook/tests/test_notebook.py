@@ -9,7 +9,7 @@ import unittest
 from ..notebook import Note, Notebook
 
 
-class NoteTest(unittest.TestCase):
+class TestNote(unittest.TestCase):
 
     def test_note(self):
         note = Note()
@@ -23,7 +23,7 @@ class NoteTest(unittest.TestCase):
         note = Note("pen")
         self.assertEqual(note.match("pen"), True)
 
-class NotebookTest(unittest.TestCase):
+class TestNotebook(unittest.TestCase):
     def setUp(self):
         self.book = Notebook()
         self.note = Note("hey", "test")

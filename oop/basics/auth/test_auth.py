@@ -12,7 +12,7 @@ from auth import (Authorizor, Authenticator, PasswordTooShort,
 
 
 # 100% Coverage :o)
-class AuthTest(unittest.TestCase):
+class TestAuth(unittest.TestCase):
 
 
     def setUp(self):

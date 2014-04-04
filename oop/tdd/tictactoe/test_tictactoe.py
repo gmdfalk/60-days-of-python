@@ -7,7 +7,7 @@ import unittest
 from tictactoe import Board
 
 
-class TicTacToeTest(unittest.TestCase):
+class TestTicTacToe(unittest.TestCase):
 
 
     def test_board(self):
@@ -18,4 +18,4 @@ class TicTacToeTest(unittest.TestCase):
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
- 
+

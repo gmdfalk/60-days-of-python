@@ -6,10 +6,10 @@
 """
 
 import unittest
-from ircbot.ircbot import LogBot, MessageLogger
+from ..ircbot import LogBot, MessageLogger
 
 
-class Test(unittest.TestCase):
+class TestIRCBot(unittest.TestCase):
 
 
     def setUp(self):

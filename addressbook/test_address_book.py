@@ -10,7 +10,7 @@ from _sqlite3 import OperationalError
 import os
 
 
-class Test(unittest.TestCase):
+class TestContacts(unittest.TestCase):
 
     def setUp(self):
         self.c = Contacts("test.db")

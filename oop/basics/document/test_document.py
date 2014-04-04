@@ -9,7 +9,7 @@ from os import remove
 from document import Document
 
 
-class Test(unittest.TestCase):
+class TestDocument(unittest.TestCase):
 
     def setUp(self):
         self.d = Document()

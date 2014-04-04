@@ -2,19 +2,20 @@
 """IRCBot (Quizzing, Logging, ...)
 
 Usage:
-  ircbot.py [-h] [-s <server>] [-p <port>] [-c <channel>...] [-n <nick>]
-            [-o <output>] [--max-tries N] [-v N] [-q]
+    bot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <channel>...]
+           [-n <nick>] [-o <output>]  [--max-tries N] [-v N] [-q]
 
 Options:
-  -s, --server=<server>    DNS address [default: irc.freenode.net]
-  -p, --port=<port>        Port number of the IRC server [default: 6667]
-  -c, --channel=<channel>  IRC Channel to join [default: #maxtest]
-  -n, --nick=<nick>        Nickname of the bot [default: maxbot]
-  -o, --output=<output>    Logging file [default: stdout]
-  --max-tries N            Limit retries on network errors [default: 4]
-  -h, --help               Show this help message and exit
-  -v, --verbose N          Verbose logging (0-3) [default: 1]
-  -q, --quiet              Quiet logging
+    -s, --server=<server>    DNS address [default: irc.freenode.net]
+    -p, --port=<port>        Port number of the IRC server [default: 6667]
+    -pw, --password=<pass>   Server password, if required
+    -c, --channel=<channel>  IRC Channel to join [default: #maxtest]
+    -n, --nick=<nick>        Nickname of the bot [default: maxbot]
+    -o, --output=<output>    Logging file [default: stdout]
+    --max-tries N            Limit retries on network errors [default: 4]
+    -h, --help               Show this help message and exit
+    -v, --verbose N          Verbose logging (0-3) [default: 1]
+    -q, --quiet              Quiet logging
 """
 
 from twisted.words.protocols import irc
