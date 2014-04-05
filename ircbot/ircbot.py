@@ -50,17 +50,15 @@ class Protocol(irc.IRCClient):
         self.deferred = defer.Deferred()
         self.nickname = nickname
 
-#     def connectionMade(self):
-#         log.msg("Connected.")
+    def connectionMade(self):
+        log.msg("Connected.")
 
     def connectionLost(self, reason):
-#         log.msg("Connection lost:", reason)
-#         self.deferred.errback(reason)
-        irc.IRCClient.connectionLost(self, reason)
+        log.msg("Connection lost:", reason)
+        self.deferred.errback(reason)
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        print prefix
-        print params
+        self.nickname += "_"
 
     def signedOn(self):
         # This is called once the server has acknowledged that we sent
@@ -68,8 +66,8 @@ class Protocol(irc.IRCClient):
         for channel in self.factory.channels:
             self.join(channel)
 
-#     def joined(self, channel):
-#         log.msg("Joined channel:", channel)
+    def joined(self, channel):
+        log.msg("Joined channel:", channel)
 
     # Obviously, called when a PRIVMSG is received.
     def privmsg(self, user, channel, message):
@@ -103,9 +101,6 @@ class Protocol(irc.IRCClient):
             # as addressing in the message itself:
             d.addCallback(self._sendMessage, channel, nick)
 
-#     def action(self, user, channel, message):
-#         log.msg("Performed {} for {}.".format(message, user))
-
     def _sendMessage(self, msg, target, nick=None):
         if nick:
             msg = "{}, {}".format(nick, msg)
@@ -116,6 +111,9 @@ class Protocol(irc.IRCClient):
 
     def command_ping(self, rest):
         return "Pong."
+
+    def command_pong(self, rest):
+        return "Ping."
 
     def command_saylater(self, rest):
         when, sep, msg = rest.partition(" ")
@@ -143,14 +141,17 @@ class Factory(protocol.ReconnectingClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
+        print connector
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
         print "connection failed:", reason
+        print connector
         reactor.stop()
 
 
 def main(reactor):
+    args = docopt(__doc__, version="0.1")
 
     if not args["--quiet"]:
         log.startLogging(sys.stdout)
@@ -173,5 +174,4 @@ def main(reactor):
 
 
 if __name__ == "__main__":
-    args = docopt(__doc__, version="0.1")
     task.react(main)
