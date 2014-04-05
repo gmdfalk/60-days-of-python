@@ -1,46 +1,6 @@
-#!/usr/bin/env python2
-"""IRCBot
-
-Usage:
-    ircbot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <chans>]
-              [-n <nick>] [-o <file>]  [--max-tries N] [-v N] [-q]
-
-Options:
-    -s, --server=<server>    DNS address [default: irc.freenode.net]
-    -p, --port=<port>        Port number of the IRC server [default: 6667]
-    -pw, --password=<pass>   Server password, if required
-    -c, --channels=<chans>   Channels, comma separated [default: z1,z2,z3]
-    -n, --nick=<nick>        Nickname of the bot [default: maxbot]
-    -o, --output=<file>      Logging file [default: test.log]
-    --max-tries N            Limit retries on network errors [default: 4]
-    -h, --help               Show this help msg and exit
-    -v, --verbose N          Verbose logging (0-3) [default: 1]
-    -q, --quiet              Quiet logging
-"""
-
-# Possible features:
-# HTTP link capture/collection and saving or displaying the title in chat
-# Weather and date/time information (day + week number, too)
-# Quiz
-# Collecting/displaying quotes (Chirpy?)
-# Store notes with keyword and repeat them on demand
-# Google search (or other services, like translate)
-# Operator/Auth features (Kick, Ban, automatically give OP)
-# Disable/enable commands, public ignore
-# Fortune cookies or something like that
-# Seen (track last msg by user x)
-# Conduct a poll.
-# Evaluate python/bash
-# Dictionary, wiki
-# Search channel log.
-# msg system (leaving a notification)
-
-
-# twisted imports
 from twisted.internet import defer, protocol, reactor
 from twisted.words.protocols import irc
 from twisted.python import log
-from docopt import docopt
 import sys
 import time
 import plugins  # Import commands and plugins.
@@ -225,22 +185,3 @@ class Factory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print "connection failed:", reason
         reactor.stop()
-
-
-def main():
-    args = docopt(__doc__, version="0.1")
-
-    if not args["--quiet"]:
-        log.startLogging(sys.stdout)
-
-    # create factory protocol and application, channel, filename
-    factory = Factory(args["--channels"], args["--nick"], args["--output"])
-
-    # connect factory to this host and port
-    reactor.connectTCP(args["--server"], int(args["--port"]), factory)
-
-    # run bot
-    reactor.run()
-
-if __name__ == "__main__":
-    main()
