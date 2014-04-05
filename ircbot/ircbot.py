@@ -38,9 +38,11 @@ Options:
 
 from twisted.internet import defer, endpoints, protocol, reactor, task
 from twisted.words.protocols import irc
+from twisted.python.logfile import DailyLogFile
 from twisted.python import log
 from docopt import docopt
 
+import os
 import sys
 
 
@@ -119,15 +121,22 @@ class Factory(protocol.ReconnectingClientFactory):
 
 def main(reactor):
 
-    # Evaluate the docopt options:
+
+    # Logging.
+    logfile = DailyLogFile.fromFullPath(args["--output"])
+
     if not args["--quiet"]:
         log.startLogging(sys.stdout)
 
-    if args["--output"]:
-        pass
+    log.addObserver(log.FileLogObserver(logfile).emit)
+
+    log.msg("testmsg")
+    print "testprint"
+
 
     Protocol.nickname = args["--nick"]
-    Factory.channels = ["#" + i for i in args["--channel"].split(",")]
+    Factory.channels = [i if i.startswith("#") else "#" + i for i in\
+                        args["--channel"].split(",")]
 
     endpoint = endpoints.clientFromString(
         reactor, "tcp:{}:{}".format(args["--server"], args["--port"]))
