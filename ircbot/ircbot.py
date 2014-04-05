@@ -41,18 +41,26 @@ from twisted.words.protocols import irc
 from twisted.python.logfile import DailyLogFile
 from twisted.python import log
 from docopt import docopt
-
-import os
 import sys
 
 
 class Protocol(irc.IRCClient):
 
-    def __init__(self):
+    def __init__(self, nickname):
         self.deferred = defer.Deferred()
+        self.nickname = nickname
+
+#     def connectionMade(self):
+#         log.msg("Connected.")
 
     def connectionLost(self, reason):
-        self.deferred.errback(reason)
+#         log.msg("Connection lost:", reason)
+#         self.deferred.errback(reason)
+        irc.IRCClient.connectionLost(self, reason)
+
+    def irc_ERR_NICKNAMEINUSE(self, prefix, params):
+        print prefix
+        print params
 
     def signedOn(self):
         # This is called once the server has acknowledged that we sent
@@ -60,15 +68,18 @@ class Protocol(irc.IRCClient):
         for channel in self.factory.channels:
             self.join(channel)
 
+#     def joined(self, channel):
+#         log.msg("Joined channel:", channel)
+
     # Obviously, called when a PRIVMSG is received.
     def privmsg(self, user, channel, message):
-        nick, _, host = user.partition('!')
+        nick, _, host = user.partition("!")
         message = message.strip()
-        if not message.startswith('!'):  # not a trigger command
+        if not message.startswith("!"):  # not a trigger command
             return  # so do nothing
-        command, sep, rest = message.lstrip('!').partition(' ')
+        command, sep, rest = message.lstrip("!").partition(" ")
         # Get the function corresponding to the command given.
-        func = getattr(self, 'command_' + command, None)
+        func = getattr(self, "command_" + command, None)
         # Or, if there was no function, ignore the message.
         if func is None:
             return
@@ -92,19 +103,22 @@ class Protocol(irc.IRCClient):
             # as addressing in the message itself:
             d.addCallback(self._sendMessage, channel, nick)
 
+#     def action(self, user, channel, message):
+#         log.msg("Performed {} for {}.".format(message, user))
+
     def _sendMessage(self, msg, target, nick=None):
         if nick:
-            msg = '%s, %s' % (nick, msg)
+            msg = "{}, {}".format(nick, msg)
         self.msg(target, msg)
 
     def _showError(self, failure):
         return failure.getErrorMessage()
 
     def command_ping(self, rest):
-        return 'Pong.'
+        return "Pong."
 
     def command_saylater(self, rest):
-        when, sep, msg = rest.partition(' ')
+        when, sep, msg = rest.partition(" ")
         when = int(when)
         d = defer.Deferred()
         # A small example of how to defer the reply from a command. callLater
@@ -116,37 +130,45 @@ class Protocol(irc.IRCClient):
 
 
 class Factory(protocol.ReconnectingClientFactory):
-    protocol = Protocol
+
+    def __init__(self, nickname, channels):
+        self.nickname = nickname
+        self.channels = [i if i.startswith("#") else "#" + i\
+                         for i in channels.split(",")]
+
+    def buildProtocol(self, addr):
+        p = Protocol(self.nickname)
+        p.factory = self
+        return p
+
+    def clientConnectionLost(self, connector, reason):
+        """If we get disconnected, reconnect to server."""
+        connector.connect()
+
+    def clientConnectionFailed(self, connector, reason):
+        print "connection failed:", reason
+        reactor.stop()
 
 
 def main(reactor):
 
-
-    # Logging.
-    logfile = DailyLogFile.fromFullPath(args["--output"])
-
     if not args["--quiet"]:
         log.startLogging(sys.stdout)
 
+    logfile = DailyLogFile.fromFullPath(args["--output"])
     log.addObserver(log.FileLogObserver(logfile).emit)
 
-    log.msg("testmsg")
-    print "testprint"
-
-
-    Protocol.nickname = args["--nick"]
-    Factory.channels = [i if i.startswith("#") else "#" + i for i in\
-                        args["--channel"].split(",")]
-
+    # Set the server and port.
     endpoint = endpoints.clientFromString(
         reactor, "tcp:{}:{}".format(args["--server"], args["--port"]))
 
-    # Create the factory and set the channels.
-    factory = Factory()
+    # Create the client/protocol factory.
+    factory = Factory(args["--nick"], args["--channel"])
 
-    # Return the setup to task.react.
+    # Finally, return the protocol so we can start.
     d = endpoint.connect(factory)
     d.addCallback(lambda protocol: protocol.deferred)
+
     return d
 
 
