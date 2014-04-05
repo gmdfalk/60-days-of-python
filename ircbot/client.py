@@ -33,15 +33,15 @@ class Bot(irc.IRCClient):
 
     @property
     def nickname(self):
-        return self.factory.network['identity']['nickname']
+        return self.factory.network["identity"]["nickname"]
 
     @property
     def realname(self):
-        return self.factory.network['identity']['realname']
+        return self.factory.network["identity"]["realname"]
 
     @property
     def username(self):
-        return self.factory.network['identity']['username']
+        return self.factory.network["identity"]["username"]
 
     def _sendmsg(self, msg, target, nick=None):
         if nick:
@@ -71,7 +71,7 @@ class Bot(irc.IRCClient):
 
         network = self.factory.network
 
-        if network['identity']['nickserv_pw']:
+        if network["identity"]["nickserv_pw"]:
             self.msg("NickServ", "IDENTIFY {}"
                      .format(network["identity"]["nickserv_pw"]))
 
@@ -123,7 +123,7 @@ class Bot(irc.IRCClient):
             # as addressing in the msg itself:
             d.addCallback(self._sendmsg, channel, nick)
 
-        # Check to see if they're sending me a private msg
+        # Check to see if they"re sending me a private msg
         if channel == self.nickname:
             message = "It isn't nice to whisper!  Play nice with the group."
             self.msg(nick, message)
@@ -190,9 +190,9 @@ class Factory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
-        print('Client connection lost')
+        print("Client connection lost")
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print('Client connection failed')
+        print("Client connection failed")
         reactor.stop()

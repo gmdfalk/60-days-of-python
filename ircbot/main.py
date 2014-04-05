@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
-"""IRCBot
+"""demibot - A multipurpose IRC bot
 
 Usage:
-    main.py [-h] [-s <server>] [-p <port>] [-c <chans>] [-n <nick>] [-o <file>]
+    demibot [-h] [-s <server>] [-p <port>] [-c <chans>] [-n <nick>] [-o <file>]
             [--password=<pass>] [--max-tries N] [--ssl] [-v...] [-q]
 
 Options:
@@ -10,7 +10,7 @@ Options:
     -p, --port=<port>        Port number of the IRC server. [default: 6667]
     -c, --channels=<chans>   Channels, comma separated. [default: z1,z2]
     -n, --nick=<nick>        Nickname of the bot [default: maxbot]
-    -o, --output=<file>      Name of the logging file. [default: ircbot.log]
+    -o, --output=<file>      Name of the logging file. [default: demibot.log]
     -pw, --password=<pass>   Server password, if required. It rarely is.
     --max-tries N            Limit retries on network errors. [default: 4]
     --ssl                    Whether to use SSL.
@@ -22,19 +22,23 @@ Options:
 # Possible features:
 # HTTP link capture/collection and saving or displaying the title in chat
 # Weather and date/time information (day + week number, too)
-# Quiz
+# Quiz (smart autohinting, highscores, etc)
 # Collecting/displaying quotes (Chirpy?)
-# Store notes with keyword and repeat them on demand
+# Store notes with keyword and repeat them on demand (!give nick note)
 # Google search (or other services, like translate)
 # Operator/Auth features (Kick, Ban, automatically give OP)
 # Disable/enable commands, public ignore
-# Fortune cookies or something like that
+# Fortune cookies, Ron swanson quotes
 # Seen (track last msg by user x)
 # Conduct a poll.
 # Evaluate python/bash
 # Dictionary, wiki
 # Search channel log.
 # msg system (leaving a notification)
+
+# TODO:
+# 1. reading password infomration from a file instead of settings.py
+# 2. log to database
 
 
 from docopt import docopt
@@ -60,27 +64,29 @@ def main():
         channels = [i if i.startswith("#") else "#" + i\
                          for i in args["--channels"].split(",")]
 
-        #
+        # Turn the docopt args dict into the settings.py format.
+        # Editing this is not necessary.
         identities = {
-            'default': {
-                'nickname': args["--nick"],
-                'realname': 'None',
-                'username': 'None',
-                'nickserv_pw': None
+            "default": {
+                "nickname": args["--nick"],
+                "realname": "None",
+                "username": "None",
+                "nickserv_pw": None
             }
         }
         networks = {
-            'default': {
-                'server': args["--server"],
+            "default": {
+                "server": args["--server"],
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],
+                "password": args["--password"],
                 "identity": identities["default"],
                 "channels": tuple(channels)
             }
         }
-    logfile = args["--output"]
 
     # Logging setup.
+    logfile = args["--output"]
     if not args["--quiet"]:
         client.log.startLogging(sys.stdout)
 
@@ -95,10 +101,10 @@ def main():
     for name in networks.keys():
         factory = client.Factory(name, networks[name])
 
-        server = networks[name]['server']
-        port = networks[name]['port']
+        server = networks[name]["server"]
+        port = networks[name]["port"]
 
-        if networks[name]['ssl']:
+        if networks[name]["ssl"]:
             client.reactor.connectSSL(server, port, factory,
                                       client.ssl.ClientContextFactory())
         else:
