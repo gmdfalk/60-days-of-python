@@ -45,7 +45,6 @@ import sys
 
 
 class Protocol(irc.IRCClient):
-    nickname = 'maxbot'
 
     def __init__(self):
         self.deferred = defer.Deferred()
@@ -116,22 +115,32 @@ class Protocol(irc.IRCClient):
 
 class Factory(protocol.ReconnectingClientFactory):
     protocol = Protocol
-    channels = ['#maxtest']
 
 
-def main(reactor, description):
+def main(reactor):
 
-    log.startLogging(sys.stderr)
+    # Evaluate the docopt options:
+    if not args["--quiet"]:
+        log.startLogging(sys.stdout)
 
-    endpoint = endpoints.clientFromString(reactor, description)
+    if args["--output"]:
+        pass
+
+    Protocol.nickname = args["--nick"]
+    Factory.channels = ["#" + i for i in args["--channel"].split(",")]
+
+    endpoint = endpoints.clientFromString(
+        reactor, "tcp:{}:{}".format(args["--server"], args["--port"]))
+
+    # Create the factory and set the channels.
     factory = Factory()
+
+    # Return the setup to task.react.
     d = endpoint.connect(factory)
     d.addCallback(lambda protocol: protocol.deferred)
-
     return d
 
 
 if __name__ == "__main__":
     args = docopt(__doc__, version="0.1")
-    print args
-    task.react(main, ['tcp:irc.freenode.net:6667'])
+    task.react(main)
