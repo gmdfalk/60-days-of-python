@@ -1,8 +1,9 @@
-from twisted.internet import defer, protocol, reactor
+from twisted.internet import defer, protocol, reactor, ssl
 from twisted.words.protocols import irc
 from twisted.python import log
 import sys
 import time
+
 import plugins  # Import commands and plugins.
 
 
@@ -11,32 +12,46 @@ class ChatLogger(object):
     An independent logger class (because separation of application
     and protocol logic is a good thing).
     """
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, logfile):
+        self.logfile = logfile
 
     def log(self, msg):
         """Write a log line to the file with timestamp."""
         timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
-        self.file.write("{} {}\n".format(timestamp, msg))
-        self.file.flush()
+        self.logfile.write("{} {}\n".format(timestamp, msg))
+        self.logfile.flush()
 
     def close(self):
-        self.file.close()
+        self.logfile.close()
 
 
-class Protocol(irc.IRCClient):
-    """A logging IRC bot."""
+class Bot(irc.IRCClient):
 
-    def __init__(self, factory, nickname):
-        self.factory = factory
-        self.nickname = nickname
+    def __init__(self):
         self.logs_enabled = True
+
+    def _get_nickname(self):
+        return self.factory.network['identity']['nickname']
+
+    def _get_realname(self):
+        return self.factory.network['identity']['realname']
+
+    def _get_username(self):
+        return self.factory.network['identity']['username']
+
+    def _sendmsg(self, msg, target, nick=None):
+        if nick:
+            msg = "{}, {}".format(nick, msg)
+        self.msg(target, msg)
+
+    def _showError(self, failure):
+        return failure.getErrorMessage()
 
     def connectionMade(self):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
         now = time.asctime(time.localtime(time.time()))
-        self.logger = ChatLogger(open(self.factory.filename, "a"))
+        self.logger = ChatLogger(open(self.factory.logfile, "a"))
         self.logger.log("Connected at {}".format(now))
 
     def connectionLost(self, reason):
@@ -49,13 +64,22 @@ class Protocol(irc.IRCClient):
 
     def signedOn(self):
         "Called when the bot has successfully signed on to server."
-        for channel in self.factory.channels:
-                    self.join(channel)
+
+        network = self.factory.network
+
+        if network['identity']['nickserv_pw']:
+            self.msg("NickServ", "IDENTIFY {}"
+                     .format(network["identity"]["nickserv_pw"]))
+
+        for channel in network["channels"]:
+            self.join(channel)
+            if self.logs_enabled:
+                self.logger.log("Joined {} on {}"
+                                .format(channel, network["server"]))
 
     def joined(self, channel):
         "Called when the bot joins the channel."
-        if self.logs_enabled:
-            self.logger.log("Joined {}".format(channel))
+        pass
 
     def privmsg(self, user, channel, msg):
         "Called when the bot sees a message (both in the channel or per /msg)."
@@ -108,20 +132,6 @@ class Protocol(irc.IRCClient):
             if self.logs_enabled:
                 self.logger.log("<{}> {}".format(self.nickname, message))
 
-    def _sendmsg(self, msg, target, nick=None):
-        if nick:
-            msg = "{}, {}".format(nick, msg)
-        self.msg(target, msg)
-
-    def _showError(self, failure):
-        return failure.getErrorMessage()
-
-    def action(self, user, channel, msg):
-        """This will get called when the bot sees someone do an action."""
-        user = user.split("!", 1)[0]
-        if self.logs_enabled:
-            self.logger.log("* {} {}".format(user, msg))
-
     def irc_NICK(self, prefix, params):
         """Called when an IRC user changes their nickname."""
         old_nick = prefix.split("!")[0]
@@ -150,7 +160,7 @@ class Protocol(irc.IRCClient):
             self.logs_enabled = False
             return "logs are now disabled."
         elif rest == "on" and not self.logs_enabled:
-            self.logger = ChatLogger(open(self.factory.filename, "a"))
+            self.logger = ChatLogger(open(self.factory.logfile, "a"))
             self.logs_enabled = True
             return "logs are now enabled."
 
@@ -160,6 +170,10 @@ class Protocol(irc.IRCClient):
             else:
                 return "logs are disabled. Use !logs on to enable logging."
 
+    nickname = property(_get_nickname)
+    realname = property(_get_realname)
+    username = property(_get_username)
+
 
 class Factory(protocol.ClientFactory):
     """A factory for LogBots.
@@ -167,21 +181,18 @@ class Factory(protocol.ClientFactory):
     A new protocol instance will be created each time we connect to the server.
     """
 
-    def __init__(self, channels, nickname, filename):
-        self.channels = [i if i.startswith("#") else "#" + i\
-                         for i in channels.split(",")]
-        self.nickname = nickname
-        self.filename = filename
+    protocol = Bot
 
-
-    def buildProtocol(self, addr):
-        p = Protocol(self, self.nickname)
-        return p
+    def __init__(self, network_name, network, logfile="test.log"):
+        self.network_name = network_name
+        self.network = network
+        self.logfile = logfile
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
+        print('Client connection lost')
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print "connection failed:", reason
+        print('Client connection failed')
         reactor.stop()

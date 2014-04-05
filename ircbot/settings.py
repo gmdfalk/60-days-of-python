@@ -14,44 +14,44 @@ identity = {
 }
 networks = {
     'Freenode': {
-        'host': 'irc.freenode.net',
+        'server': 'irc.freenode.net',
         'port': 6667,
         'ssl': False,
         'identity': identity['myownbot'],
-        'autojoin': (
+        'channels': (
             '#z1',
             '#z2',
             '#z3',
         )
     },
     'OFTC': {
-        'host': 'irc.oftc.net',
+        'server': 'irc.oftc.net',
         'port': 6667,
         'ssl': False,
         'identity': identity['myownbot'],
-        'autojoin': (
+        'channels': (
             '#z1',
             '#z2',
             '#z3',
         )
     },
 #     'Rizon': {
-#         'host': 'irc.rizon.net',
+#         'server': 'irc.rizon.net',
 #         'port': 6667,
 #         'ssl': False,
 #         'identity': identity['myownbot'],
-#         'autojoin': (
+#         'channels': (
 #             '#z1',
 #             '#z2',
 #             '#z3',
 #         )
 #     },
 #     'Quakenet': {
-#         'host': 'irc.quakenet.org',
+#         'server': 'irc.quakenet.org',
 #         'port': 6667,
 #         'ssl': False,
 #         'identity': identity['myownbot'],
-#         'autojoin': (
+#         'channels': (
 #             '#z1',
 #             '#z2',
 #             '#z3',

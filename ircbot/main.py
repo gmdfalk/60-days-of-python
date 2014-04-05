@@ -54,8 +54,10 @@ def main():
     if use_settings:
         networks = settings.networks
     else:
+        channels = [i if i.startswith("#") else "#" + i\
+                         for i in args["--channels"].split(",")]
         identity = {
-            args["--nick"]: {
+            'Identity': {
                 'nickname': args["--nick"],
                 'realname': 'None',
                 'username': 'None',
@@ -63,30 +65,31 @@ def main():
             }
         }
         networks = {
-            'Freenode': {
-                'host': args["--server"],
+            'Server': {
+                'server': args["--server"],
                 'port': int(args["--port"]),
                 'ssl': args["--ssl"],
-                'identity': identity[args["--nick"]],
-                'autojoin': (
-                    '#z1',
-                    '#z2',
-                    '#z3',
-                )
+                'identity': identity["Identity"],
+                'channels': tuple(channels)
             }
         }
-        server = args["--server"]
-        channels = args["--channels"]
-        nickname = args["--nick"]
-        port = int(args["--port"])
-        logfile = args["--output"]
+    logfile = args["--output"]
 
     if not args["--quiet"]:
         client.log.startLogging(sys.stdout)
 
-    # Pass the settings to the bot and let's go!
-    factory = client.Factory(channels, nickname, logfile)
-    client.reactor.connectTCP(server, port, factory)
+    for name in networks.keys():
+        factory = client.Factory(name, networks[name])
+
+        server = networks[name]['server']
+        port = networks[name]['port']
+
+        if networks[name]['ssl']:
+            client.reactor.connectSSL(server, port, factory,
+                                      client.ssl.ClientContextFactory())
+        else:
+            client.reactor.connectTCP(server, port, factory)
+
     client.reactor.run()
 
 if __name__ == "__main__":
