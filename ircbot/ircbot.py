@@ -41,12 +41,12 @@ from twisted.internet import defer, protocol, reactor
 from twisted.words.protocols import irc
 from twisted.python import log
 from docopt import docopt
-import plugins
 import sys
 import time
+import plugins  # Import commands and plugins.
 
 
-class MessageLogger(object):
+class ChatLogger(object):
     """
     An independent logger class (because separation of application
     and protocol logic is a good thing).
@@ -64,24 +64,28 @@ class MessageLogger(object):
         self.file.close()
 
 
-class LogBot(irc.IRCClient):
+class Protocol(irc.IRCClient):
     """A logging IRC bot."""
 
-    nickname = "maxtest"
+    def __init__(self, factory, nickname):
+        self.factory = factory
+        self.nickname = nickname
+        self.logs_enabled = True
 
     def connectionMade(self):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
         now = time.asctime(time.localtime(time.time()))
-        self.logger = MessageLogger(open(self.factory.filename, "a"))
+        self.logger = ChatLogger(open(self.factory.filename, "a"))
         self.logger.log("Connected at {}".format(now))
 
     def connectionLost(self, reason):
         "Called when a connection to the server has been lost"
         irc.IRCClient.connectionLost(self, reason)
         now = time.asctime(time.localtime(time.time()))
-        self.logger.log("Disconnected at {}".format(now))
-        self.logger.close()
+        if self.logs_enabled:
+            self.logger.log("Disconnected at {}".format(now))
+            self.logger.close()
 
     def signedOn(self):
         "Called when the bot has successfully signed on to server."
@@ -90,15 +94,21 @@ class LogBot(irc.IRCClient):
 
     def joined(self, channel):
         "Called when the bot joins the channel."
-        self.logger.log("Joined {}".format(channel))
+        if self.logs_enabled:
+            self.logger.log("Joined {}".format(channel))
 
     def privmsg(self, user, channel, msg):
         "Called when the bot sees a message (both in the channel or per /msg)."
         nick, _, host = user.partition("!")
         msg = msg.strip()
-        self.logger.log("<{}> {}".format(nick, msg))
-        if not msg.startswith("!"):  # not a trigger command
-            return  # so do nothing
+
+        # If the message is not a command, log it and do nothing else.
+        if not msg.startswith("!"):
+            if self.logs_enabled:
+                self.logger.log("<{}> {}".format(nick, msg))
+            return
+
+        # If the message is a command, we handle the logic here.
         command, sep, rest = msg.lstrip("!").partition(" ")
         # Get the function corresponding to the command given.
         func = getattr(self, "command_" + command, None)
@@ -135,7 +145,8 @@ class LogBot(irc.IRCClient):
         if msg.startswith(self.nickname + ":"):
             message = "{}: I am not your friend".format(nick)
             self.msg(channel, message)
-            self.logger.log("<{}> {}".format(self.nickname, message))
+            if self.logs_enabled:
+                self.logger.log("<{}> {}".format(self.nickname, message))
 
     def _sendmsg(self, msg, target, nick=None):
         if nick:
@@ -148,18 +159,20 @@ class LogBot(irc.IRCClient):
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
         user = user.split("!", 1)[0]
-        self.logger.log("* {} {}".format(user, msg))
+        if self.logs_enabled:
+            self.logger.log("* {} {}".format(user, msg))
 
     def irc_NICK(self, prefix, params):
         """Called when an IRC user changes their nickname."""
         old_nick = prefix.split("!")[0]
         new_nick = params[0]
-        self.logger.log("{} is now known as {}".format(old_nick, new_nick))
+        if self.logs_enabled:
+            self.logger.log("{} is now known as {}".format(old_nick, new_nick))
 
     def command_ping(self, rest):
         return "Pong."
 
-    def command_saylater(self, rest):
+    def command_timer(self, rest):
         when, sep, msg = rest.partition(" ")
         when = int(when)
         d = defer.Deferred()
@@ -170,8 +183,25 @@ class LogBot(irc.IRCClient):
         # maybeDeferred in privmsg.
         return d
 
+    def command_logs(self, rest):
+        print rest
+        if rest == "off" and self.logs_enabled:
+            self.logger.close()
+            self.logs_enabled = False
+            return "logs are now disabled."
+        elif rest == "on" and not self.logs_enabled:
+            self.logger = ChatLogger(open(self.factory.filename, "a"))
+            self.logs_enabled = True
+            return "logs are now enabled."
 
-class LogBotFactory(protocol.ClientFactory):
+        else:
+            if self.logs_enabled:
+                return "logs are enabled. Use !logs off to disable logging."
+            else:
+                return "logs are disabled. Use !logs on to enable logging."
+
+
+class Factory(protocol.ClientFactory):
     """A factory for LogBots.
 
     A new protocol instance will be created each time we connect to the server.
@@ -185,8 +215,7 @@ class LogBotFactory(protocol.ClientFactory):
 
 
     def buildProtocol(self, addr):
-        p = LogBot()
-        p.factory = self
+        p = Protocol(self, self.nickname)
         return p
 
     def clientConnectionLost(self, connector, reason):
@@ -205,10 +234,10 @@ def main():
         log.startLogging(sys.stdout)
 
     # create factory protocol and application, channel, filename
-    f = LogBotFactory(args["--channels"], args["--nick"], args["--output"])
+    factory = Factory(args["--channels"], args["--nick"], args["--output"])
 
     # connect factory to this host and port
-    reactor.connectTCP(args["--server"], int(args["--port"]), f)
+    reactor.connectTCP(args["--server"], int(args["--port"]), factory)
 
     # run bot
     reactor.run()
