@@ -28,11 +28,11 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Web Crawler**](https://github.com/mikar/60-days-of-code/blob/master/webcrawler)
   * [**Hangman**](https://github.com/mikar/60-days-of-code/blob/master/games/hangman/hangman.py) and [**Frogger**](https://github.com/mikar/60-days-of-code/blob/master/games/frogger/frogger.py)
   * [**IRC-Bot**](https://github.com/mikar/60-days-of-code/blob/master/ircbot)
-  * Mail Checker, Port Scanner or FTP Client
+  * Mail Checker or Port Scanner or FTP Client
   * Unit Converter (GUI)
   * Calculator (both command-line and GUI)
   * Text Editor (GUI)
-  * Website with Flask
+  * [**Website with Flask**](https://github.com/mikar/60-days-of-code/tree/master/website)
   	  * Blog
   	  * Forum
 	  * Drawing Board  and To-Do-List
