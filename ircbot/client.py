@@ -183,7 +183,7 @@ class Factory(protocol.ClientFactory):
 
     protocol = Bot
 
-    def __init__(self, network_name, network, logfile="test.log"):
+    def __init__(self, network_name, network, logfile="demibot.log"):
         self.network_name = network_name
         self.network = network
         self.logfile = logfile

@@ -5,8 +5,8 @@ identities = {
         "username": "examplebot",
         "nickserv_pw": None
     },
-    "maxbot": {
-        "nickname": "maxbot",
+    "demibot": {
+        "nickname": "demibot",
         "realname": "the game",
         "username": "anonymous",
         "nickserv_pw": None
@@ -18,7 +18,7 @@ networks = {
         "port": 6667,
         "ssl": False,
         "password": None,
-        "identity": identities["maxbot"],
+        "identity": identities["demibot"],
         "channels": (
             "#z1",
             "#z2",
@@ -29,32 +29,32 @@ networks = {
         "port": 6667,
         "ssl": False,
         "password": None,
-        "identity": identities["maxbot"],
+        "identity": identities["demibot"],
         "channels": (
             "#z1",
             "#z2",
         )
     },
-    "Rizon": {
-        "server": "irc.rizon.net",
-        "port": 6667,
-        "ssl": False,
-        "password": None,
-        "identity": identities["example"],
-        "channels": (
-            "#z1",
-            "#z2",
-        )
-    },
-    "Quakenet": {
-        "server": "irc.quakenet.org",
-        "port": 6667,
-        "ssl": False,
-        "password": None,
-        "identity": identities["example"],
-        "channels": (
-            "#z1",
-            "#z2",
-        )
-    }
+#     "Rizon": {
+#         "server": "irc.rizon.net",
+#         "port": 6667,
+#         "ssl": False,
+#         "password": None,
+#         "identity": identities["example"],
+#         "channels": (
+#             "#z1",
+#             "#z2",
+#         )
+#     },
+#     "Quakenet": {
+#         "server": "irc.quakenet.org",
+#         "port": 6667,
+#         "ssl": False,
+#         "password": None,
+#         "identity": identities["example"],
+#         "channels": (
+#             "#z1",
+#             "#z2",
+#         )
+#     }
 }

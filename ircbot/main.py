@@ -13,7 +13,7 @@ Arguments:
 
 Options:
     -n, --nick=<nick>  Nickname of the bot [default: demibot]
-    -f, --file=<file>  Name of the logging file. [default: demibot.log]
+    -f, --file=<file>  Name of the logging file.
     -s, --ssl          Enable if the server supports SSL connections.
     -p, --pass=<pass>  NickServ password, if required.
     -m, --max-tries N  Limit retries on network errors. [default: 4]
@@ -93,7 +93,6 @@ def main():
         }
 
     # Logging setup.
-    logfile = args["--file"]
     if not args["--quiet"]:
         client.log.startLogging(sys.stdout)
 
@@ -104,21 +103,27 @@ def main():
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logging.basicConfig(level=levels[args["-v"]])
 
-    print args
     # Set up the connection info for each network.
     for name in networks.keys():
-        factory = client.Factory(name, networks[name])
+        # If we specified a --file command line argument, use that as logfile.
+        if args["--file"]:
+            logfile = "logs/{}.log".format(args["--file"])
+        else:
+            logfile = "logs/{}.log".format(networks[name]["server"])
+
+        factory = client.Factory(name, networks[name], logfile)
 
         server = networks[name]["server"]
         port = networks[name]["port"]
 
+        # Create a connection depending on whether SSL is enabled.
         if networks[name]["ssl"]:
             client.reactor.connectSSL(server, port, factory,
                                       client.ssl.ClientContextFactory())
         else:
             client.reactor.connectTCP(server, port, factory)
 
-    # Run all the factories/bots.
+    # Finally, run all the factories/bots.
     client.reactor.run()
 
 if __name__ == "__main__":
