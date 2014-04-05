@@ -29,6 +29,7 @@ class Bot(irc.IRCClient):
 
     def __init__(self):
         self.logs_enabled = True
+        self.loglevel = 0
 
     @property
     def nickname(self):

@@ -1,4 +1,4 @@
-identity = {
+identities = {
     'myownbot': {
         'nickname': 'myownbot',
         'realname': 'My own bot',
@@ -17,7 +17,7 @@ networks = {
         'server': 'irc.freenode.net',
         'port': 6667,
         'ssl': False,
-        'identity': identity['maxbot'],
+        'identity': identities['maxbot'],
         'channels': (
             '#z1',
             '#z2',
@@ -27,7 +27,7 @@ networks = {
         'server': 'irc.oftc.net',
         'port': 6667,
         'ssl': False,
-        'identity': identity['maxbot'],
+        'identity': identities['maxbot'],
         'channels': (
             '#z1',
             '#z2',
