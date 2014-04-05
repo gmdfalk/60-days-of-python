@@ -2,18 +2,18 @@
 """IRCBot
 
 Usage:
-    ircbot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <channel>]
+    ircbot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <chans>]
               [-n <nick>] [-o <file>]  [--max-tries N] [-v N] [-q]
 
 Options:
     -s, --server=<server>    DNS address [default: irc.freenode.net]
     -p, --port=<port>        Port number of the IRC server [default: 6667]
     -pw, --password=<pass>   Server password, if required
-    -c, --channel=<channel>  Channels, comma separated [default: maxtest]
+    -c, --channels=<chans>   Channels, comma separated [default: z1,z2,z3]
     -n, --nick=<nick>        Nickname of the bot [default: maxbot]
     -o, --output=<file>      Logging file [default: test.log]
     --max-tries N            Limit retries on network errors [default: 4]
-    -h, --help               Show this help message and exit
+    -h, --help               Show this help msg and exit
     -v, --verbose N          Verbose logging (0-3) [default: 1]
     -q, --quiet              Quiet logging
 """
@@ -28,57 +28,81 @@ Options:
 # Operator/Auth features (Kick, Ban, automatically give OP)
 # Disable/enable commands, public ignore
 # Fortune cookies or something like that
-# Seen (track last message by user x)
+# Seen (track last msg by user x)
 # Conduct a poll.
 # Evaluate python/bash
 # Dictionary, wiki
 # Search channel log.
-# Message system (leaving a notification)
+# msg system (leaving a notification)
 
 
-from twisted.internet import defer, endpoints, protocol, reactor, task
+# twisted imports
+from twisted.internet import defer, protocol, reactor
 from twisted.words.protocols import irc
-from twisted.python.logfile import DailyLogFile
 from twisted.python import log
 from docopt import docopt
+import plugins
 import sys
+import time
 
 
-class Protocol(irc.IRCClient):
+class MessageLogger(object):
+    """
+    An independent logger class (because separation of application
+    and protocol logic is a good thing).
+    """
+    def __init__(self, file):
+        self.file = file
 
-    def __init__(self, nickname):
-        self.deferred = defer.Deferred()
-        self.nickname = nickname
+    def log(self, msg):
+        """Write a log line to the file with timestamp."""
+        timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
+        self.file.write("{} {}\n".format(timestamp, msg))
+        self.file.flush()
+
+    def close(self):
+        self.file.close()
+
+
+class LogBot(irc.IRCClient):
+    """A logging IRC bot."""
+
+    nickname = "maxtest"
 
     def connectionMade(self):
-        log.msg("Connected.")
+        "Called when a connection to the server has been established"
+        irc.IRCClient.connectionMade(self)
+        now = time.asctime(time.localtime(time.time()))
+        self.logger = MessageLogger(open(self.factory.filename, "a"))
+        self.logger.log("Connected at {}".format(now))
 
     def connectionLost(self, reason):
-        log.msg("Connection lost:", reason)
-        self.deferred.errback(reason)
-
-    def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.nickname += "_"
+        "Called when a connection to the server has been lost"
+        irc.IRCClient.connectionLost(self, reason)
+        now = time.asctime(time.localtime(time.time()))
+        self.logger.log("Disconnected at {}".format(now))
+        self.logger.close()
 
     def signedOn(self):
-        # This is called once the server has acknowledged that we sent
-        # both NICK and USER.
+        "Called when the bot has successfully signed on to server."
         for channel in self.factory.channels:
-            self.join(channel)
+                    self.join(channel)
 
     def joined(self, channel):
-        log.msg("Joined channel:", channel)
+        "Called when the bot joins the channel."
+        self.logger.log("Joined {}".format(channel))
 
-    # Obviously, called when a PRIVMSG is received.
-    def privmsg(self, user, channel, message):
+    def privmsg(self, user, channel, msg):
+        "Called when the bot sees a message (both in the channel or per /msg)."
         nick, _, host = user.partition("!")
-        message = message.strip()
-        if not message.startswith("!"):  # not a trigger command
+        msg = msg.strip()
+        self.logger.log("<{}> {}".format(nick, msg))
+        if not msg.startswith("!"):  # not a trigger command
             return  # so do nothing
-        command, sep, rest = message.lstrip("!").partition(" ")
+        command, sep, rest = msg.lstrip("!").partition(" ")
         # Get the function corresponding to the command given.
         func = getattr(self, "command_" + command, None)
-        # Or, if there was no function, ignore the message.
+        # Or, if there was no function, ignore the msg.
         if func is None:
             return
         # maybeDeferred will always return a Deferred. It calls func(rest), and
@@ -89,19 +113,31 @@ class Protocol(irc.IRCClient):
         d = defer.maybeDeferred(func, rest)
         # Add callbacks to deal with whatever the command results are.
         # If the command gives error, the _show_error callback will turn the
-        # error into a terse message first:
+        # error into a terse msg first:
         d.addErrback(self._showError)
         # Whatever is returned is sent back as a reply:
         if channel == self.nickname:
-            # When channel == self.nickname, the message was sent to the bot
+            # When channel == self.nickname, the msg was sent to the bot
             # directly and not to a channel. So we will answer directly too:
-            d.addCallback(self._sendMessage, nick)
+            d.addCallback(self._sendmsg, nick)
         else:
             # Otherwise, send the answer to the channel, and use the nick
-            # as addressing in the message itself:
-            d.addCallback(self._sendMessage, channel, nick)
+            # as addressing in the msg itself:
+            d.addCallback(self._sendmsg, channel, nick)
 
-    def _sendMessage(self, msg, target, nick=None):
+        # Check to see if they're sending me a private msg
+        if channel == self.nickname:
+            message = "It isn't nice to whisper!  Play nice with the group."
+            self.msg(nick, message)
+            return
+
+        # Otherwise check to see if it is a msg directed at me
+        if msg.startswith(self.nickname + ":"):
+            message = "{}: I am not your friend".format(nick)
+            self.msg(channel, message)
+            self.logger.log("<{}> {}".format(self.nickname, message))
+
+    def _sendmsg(self, msg, target, nick=None):
         if nick:
             msg = "{}, {}".format(nick, msg)
         self.msg(target, msg)
@@ -109,11 +145,19 @@ class Protocol(irc.IRCClient):
     def _showError(self, failure):
         return failure.getErrorMessage()
 
+    def action(self, user, channel, msg):
+        """This will get called when the bot sees someone do an action."""
+        user = user.split("!", 1)[0]
+        self.logger.log("* {} {}".format(user, msg))
+
+    def irc_NICK(self, prefix, params):
+        """Called when an IRC user changes their nickname."""
+        old_nick = prefix.split("!")[0]
+        new_nick = params[0]
+        self.logger.log("{} is now known as {}".format(old_nick, new_nick))
+
     def command_ping(self, rest):
         return "Pong."
-
-    def command_pong(self, rest):
-        return "Ping."
 
     def command_saylater(self, rest):
         when, sep, msg = rest.partition(" ")
@@ -127,51 +171,47 @@ class Protocol(irc.IRCClient):
         return d
 
 
-class Factory(protocol.ReconnectingClientFactory):
+class LogBotFactory(protocol.ClientFactory):
+    """A factory for LogBots.
 
-    def __init__(self, nickname, channels):
-        self.nickname = nickname
+    A new protocol instance will be created each time we connect to the server.
+    """
+
+    def __init__(self, channels, nickname, filename):
         self.channels = [i if i.startswith("#") else "#" + i\
                          for i in channels.split(",")]
+        self.nickname = nickname
+        self.filename = filename
+
 
     def buildProtocol(self, addr):
-        p = Protocol(self.nickname)
+        p = LogBot()
         p.factory = self
         return p
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
-        print connector
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
         print "connection failed:", reason
-        print connector
         reactor.stop()
 
 
-def main(reactor):
+def main():
     args = docopt(__doc__, version="0.1")
 
     if not args["--quiet"]:
         log.startLogging(sys.stdout)
 
-    logfile = DailyLogFile.fromFullPath(args["--output"])
-    log.addObserver(log.FileLogObserver(logfile).emit)
+    # create factory protocol and application, channel, filename
+    f = LogBotFactory(args["--channels"], args["--nick"], args["--output"])
 
-    # Set the server and port.
-    endpoint = endpoints.clientFromString(
-        reactor, "tcp:{}:{}".format(args["--server"], args["--port"]))
+    # connect factory to this host and port
+    reactor.connectTCP(args["--server"], int(args["--port"]), f)
 
-    # Create the client/protocol factory.
-    factory = Factory(args["--nick"], args["--channel"])
-
-    # Finally, return the protocol so we can start.
-    d = endpoint.connect(factory)
-    d.addCallback(lambda protocol: protocol.deferred)
-
-    return d
-
+    # run bot
+    reactor.run()
 
 if __name__ == "__main__":
-    task.react(main)
+    main()
