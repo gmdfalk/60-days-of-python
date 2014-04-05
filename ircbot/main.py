@@ -47,7 +47,7 @@ import client
 def main():
 
     # For multiple server support, set this to True and modify settings.py.
-    use_settings = False
+    use_settings = True
 
     args = docopt(__doc__, version="0.1")
 

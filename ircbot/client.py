@@ -30,13 +30,16 @@ class Bot(irc.IRCClient):
     def __init__(self):
         self.logs_enabled = True
 
-    def _get_nickname(self):
+    @property
+    def nickname(self):
         return self.factory.network['identity']['nickname']
 
-    def _get_realname(self):
+    @property
+    def realname(self):
         return self.factory.network['identity']['realname']
 
-    def _get_username(self):
+    @property
+    def username(self):
         return self.factory.network['identity']['username']
 
     def _sendmsg(self, msg, target, nick=None):
@@ -169,10 +172,6 @@ class Bot(irc.IRCClient):
                 return "logs are enabled. Use !logs off to disable logging."
             else:
                 return "logs are disabled. Use !logs on to enable logging."
-
-    nickname = property(_get_nickname)
-    realname = property(_get_realname)
-    username = property(_get_username)
 
 
 class Factory(protocol.ClientFactory):

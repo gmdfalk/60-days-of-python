@@ -7,8 +7,8 @@ identity = {
     },
     'maxbot': {
         'nickname': 'maxbot',
-        'realname': "Max' bot",
-        'username': 'maxbot',
+        'realname': "anonymous",
+        'username': 'the game',
         'nickserv_pw': None
     },
 }
@@ -17,22 +17,20 @@ networks = {
         'server': 'irc.freenode.net',
         'port': 6667,
         'ssl': False,
-        'identity': identity['myownbot'],
+        'identity': identity['maxbot'],
         'channels': (
             '#z1',
             '#z2',
-            '#z3',
         )
     },
     'OFTC': {
         'server': 'irc.oftc.net',
         'port': 6667,
         'ssl': False,
-        'identity': identity['myownbot'],
+        'identity': identity['maxbot'],
         'channels': (
             '#z1',
             '#z2',
-            '#z3',
         )
     },
 #     'Rizon': {
@@ -43,7 +41,6 @@ networks = {
 #         'channels': (
 #             '#z1',
 #             '#z2',
-#             '#z3',
 #         )
 #     },
 #     'Quakenet': {
@@ -54,7 +51,6 @@ networks = {
 #         'channels': (
 #             '#z1',
 #             '#z2',
-#             '#z3',
 #         )
 #     }
 }
