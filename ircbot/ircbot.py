@@ -2,21 +2,22 @@
 """IRCBot
 
 Usage:
-    bot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <channel>...]
-           [-n <nick>] [-o <output>]  [--max-tries N] [-v N] [-q]
+    ircbot.py [-h] [-s <server>] [-p <port>] [--password=<pass>] [-c <channel>]
+              [-n <nick>] [-o <file>]  [--max-tries N] [-v N] [-q]
 
 Options:
     -s, --server=<server>    DNS address [default: irc.freenode.net]
     -p, --port=<port>        Port number of the IRC server [default: 6667]
     -pw, --password=<pass>   Server password, if required
-    -c, --channel=<channel>  IRC Channel to join [default: #maxtest]
+    -c, --channel=<channel>  Channels, comma separated [default: maxtest]
     -n, --nick=<nick>        Nickname of the bot [default: maxbot]
-    -o, --output=<output>    Logging file [default: stdout]
+    -o, --output=<file>      Logging file [default: test.log]
     --max-tries N            Limit retries on network errors [default: 4]
     -h, --help               Show this help message and exit
     -v, --verbose N          Verbose logging (0-3) [default: 1]
     -q, --quiet              Quiet logging
 """
+
 # Possible features:
 # HTTP link capture/collection and saving or displaying the title in chat
 # Weather and date/time information (day + week number, too)
@@ -34,106 +35,103 @@ Options:
 # Search channel log.
 # Message system (leaving a notification)
 
+
+from twisted.internet import defer, endpoints, protocol, reactor, task
 from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol
 from twisted.python import log
 from docopt import docopt
 
-import time
 import sys
-import logging
 
 
-class MessageLogger(object):
+class Protocol(irc.IRCClient):
+    nickname = 'maxbot'
 
-    def __init__(self, file):
-        self.file = file
+    def __init__(self):
+        self.deferred = defer.Deferred()
 
-    def log(self, message):
-        timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
-        self.file.write("{} {}\n".format(timestamp, message))
-        self.file.flush()
+    def connectionLost(self, reason):
+        self.deferred.errback(reason)
 
-    def close(self):
-        self.file.close()
+    def signedOn(self):
+        # This is called once the server has acknowledged that we sent
+        # both NICK and USER.
+        for channel in self.factory.channels:
+            self.join(channel)
 
-
-class LogBot(irc.IRCClient):
-
-    nickname = "maxbot"
-
-    def connection_made(self):
-        now = time.asctime(time.localtime(time.time()))
-        irc.IRCClient.connectionMade(self)
-        self.logger = MessageLogger(open(self.factory.filename, "a"))
-        self.logger.log("[connected at {}]".format(now))
-
-    def connection_lost(self, reason):
-        now = time.asctime(time.localtime(time.time()))
-        irc.IRCClient.connectionLost(self, reason)
-        self.logger.log("[disconnected at {}]".format(now))
-        self.logger.close()
-
-    def signed_on(self):
-        self.join(self.factory.channel)
-
-    def joined(self, channel):
-        self.logger.log("[I have joined {}".format(channel))
-
-
-    def privmsg(self, user, channel, msg):
-        user = user.split("!", 1)[0]
-        self.logger.log("<{}> {}".format(user, msg))
-
-        # Check to see if they're sending me a private message
-        if channel == self.nickname:
-            msg = "It isn't nice to whisper! Play nice with the group."
-            self.msg(user, msg)
+    # Obviously, called when a PRIVMSG is received.
+    def privmsg(self, user, channel, message):
+        nick, _, host = user.partition('!')
+        message = message.strip()
+        if not message.startswith('!'):  # not a trigger command
+            return  # so do nothing
+        command, sep, rest = message.lstrip('!').partition(' ')
+        # Get the function corresponding to the command given.
+        func = getattr(self, 'command_' + command, None)
+        # Or, if there was no function, ignore the message.
+        if func is None:
             return
+        # maybeDeferred will always return a Deferred. It calls func(rest), and
+        # if that returned a Deferred, return that. Otherwise, return the
+        # return value of the function wrapped in
+        # twisted.internet.defer.succeed. If an exception was raised, wrap the
+        # traceback in twisted.internet.defer.fail and return that.
+        d = defer.maybeDeferred(func, rest)
+        # Add callbacks to deal with whatever the command results are.
+        # If the command gives error, the _show_error callback will turn the
+        # error into a terse message first:
+        d.addErrback(self._showError)
+        # Whatever is returned is sent back as a reply:
+        if channel == self.nickname:
+            # When channel == self.nickname, the message was sent to the bot
+            # directly and not to a channel. So we will answer directly too:
+            d.addCallback(self._sendMessage, nick)
+        else:
+            # Otherwise, send the answer to the channel, and use the nick
+            # as addressing in the message itself:
+            d.addCallback(self._sendMessage, channel, nick)
 
-        if msg.startswith(self.nickname + ":"):
-            msg = "{}: I am a log bot".format(user)
-            self.msg(channel, msg)
-            self.logger.log("<{}> {}".format(self.nickname, msg))
+    def _sendMessage(self, msg, target, nick=None):
+        if nick:
+            msg = '%s, %s' % (nick, msg)
+        self.msg(target, msg)
+
+    def _showError(self, failure):
+        return failure.getErrorMessage()
+
+    def command_ping(self, rest):
+        return 'Pong.'
+
+    def command_saylater(self, rest):
+        when, sep, msg = rest.partition(' ')
+        when = int(when)
+        d = defer.Deferred()
+        # A small example of how to defer the reply from a command. callLater
+        # will callback the Deferred with the reply after so many seconds.
+        reactor.callLater(when, d.callback, msg)
+        # Returning the Deferred here means that it'll be returned from
+        # maybeDeferred in privmsg.
+        return d
 
 
-    def action(self, user, channel, msg):
-        user = user.split("!", 1)[0]
+class Factory(protocol.ReconnectingClientFactory):
+    protocol = Protocol
+    channels = ['#maxtest']
 
-class Empty(object):
-    pass
 
-def main():
-    "Parse arguments, set up event loop, run crawler and print a report."
+def main(reactor, description):
 
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    if args["--quiet"]:
-        logging.basicConfig(level=levels[0])
-    else:
-        logging.basicConfig(level=levels[int(args["--verbose"])])
+    log.startLogging(sys.stderr)
 
-    # Instantiating the crawler with our arguments.
-    bot = Empty(server=args["--server"],
-                port=args["--port"],
-                channel=args["--channel"],
-                nick=int(args["--nick"]),
-                output=int(args["--output"]),
-                max_tries=int(args["--max-tries"])
-                )
+    endpoint = endpoints.clientFromString(reactor, description)
+    factory = Factory()
+    d = endpoint.connect(factory)
+    d.addCallback(lambda protocol: protocol.deferred)
 
-    # "And this is where the magic happens."
-#     try:
-#         loop.run_until_complete(crawler.crawl())
-#     except KeyboardInterrupt:
-#         sys.stderr.flush()
-#         print('\nInterrupted\n')
-#     finally:
-#         reporting.report(crawler)
-#         crawler.close()
-#         loop.close()
+    return d
 
 
 if __name__ == "__main__":
     args = docopt(__doc__, version="0.1")
     print args
-#     main()
+    task.react(main, ['tcp:irc.freenode.net:6667'])
