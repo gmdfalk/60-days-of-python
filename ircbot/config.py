@@ -7,8 +7,8 @@ identities = {
     },
     "maxbot": {
         "nickname": "maxbot",
-        "realname": "anonymous",
-        "username": "the game",
+        "realname": "the game",
+        "username": "anonymous",
         "nickserv_pw": None
     },
 }
@@ -35,24 +35,26 @@ networks = {
             "#z2",
         )
     },
-#     "Rizon": {
-#         "server": "irc.rizon.net",
-#         "port": 6667,
-#         "ssl": False,
-#         "identity": identities["example"],
-#         "channels": (
-#             "#z1",
-#             "#z2",
-#         )
-#     },
-#     "Quakenet": {
-#         "server": "irc.quakenet.org",
-#         "port": 6667,
-#         "ssl": False,
-#         "identity": identities["example"],
-#         "channels": (
-#             "#z1",
-#             "#z2",
-#         )
-#     }
+    "Rizon": {
+        "server": "irc.rizon.net",
+        "port": 6667,
+        "ssl": False,
+        "password": None,
+        "identity": identities["example"],
+        "channels": (
+            "#z1",
+            "#z2",
+        )
+    },
+    "Quakenet": {
+        "server": "irc.quakenet.org",
+        "port": 6667,
+        "ssl": False,
+        "password": None,
+        "identity": identities["example"],
+        "channels": (
+            "#z1",
+            "#z2",
+        )
+    }
 }

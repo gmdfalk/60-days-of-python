@@ -2,21 +2,29 @@
 """demibot - A multipurpose IRC bot
 
 Usage:
-    demibot [-h] [-s <server>] [-p <port>] [-c <chans>] [-n <nick>] [-o <file>]
-            [--password=<pass>] [--max-tries N] [--ssl] [-v...] [-q]
+    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
+            [-m N] [-s] [-q] [-h] [-v...]
+
+Arguments:
+    server:port        Server to connect to, default port is 6667.
+                       If you don't specify a server, demibot will use
+                       config.py as connection information instead.
+    channels           Channels to join, comma separated.
 
 Options:
-    -s, --server=<server>    DNS address of server. [default: irc.freenode.net]
-    -p, --port=<port>        Port number of the IRC server. [default: 6667]
-    -c, --channels=<chans>   Channels, comma separated. [default: z1,z2]
-    -n, --nick=<nick>        Nickname of the bot [default: maxbot]
-    -o, --output=<file>      Name of the logging file. [default: demibot.log]
-    -pw, --password=<pass>   Server password, if required. It rarely is.
-    --max-tries N            Limit retries on network errors. [default: 4]
-    --ssl                    Whether to use SSL.
-    -h, --help               Show this help msg and exit.
-    -q, --quiet              Do not pipe log messages to stdout.
-    -v                       Logging verbosity, up to -vvv.
+    -n, --nick=<nick>  Nickname of the bot [default: demibot]
+    -f, --file=<file>  Name of the logging file. [default: demibot.log]
+    -s, --ssl          Enable if the server supports SSL connections.
+    -p, --pass=<pass>  NickServ password, if required.
+    -m, --max-tries N  Limit retries on network errors. [default: 4]
+    -h, --help         Show this help message and exit.
+    -q, --quiet        Do not pipe log messages to stdout.
+    -v                 Logging verbosity, up to -vvv.
+
+Examples:
+    demibot irc.freenode.net:6667 freenode,archlinux
+    demibot irc.freenode.net #django,#python -n demibot --ssl
+    demibot    (will use information in config.py to connect)
 """
 
 # Possible features:
@@ -37,7 +45,7 @@ Options:
 # msg system (leaving a notification)
 
 # TODO:
-# 1. reading password infomration from a file instead of settings.py
+# 1. reading password information from a file instead of config.py
 # 2. log to database
 
 
@@ -45,58 +53,58 @@ from docopt import docopt
 import logging
 import sys
 
-import settings
+import config
 import client
 
 
 def main():
 
-    # For multiple server support, set this to True and modify settings.py.
-    use_settings = True
-
-    args = docopt(__doc__, version="0.1")
-
-    # Establish the settings.
-    if use_settings:
-        networks = settings.networks
+    # Establish the configuration.
+    if not args["<server>"]:
+        networks = config.networks
     else:
-        # Fix channel names if necessary.
+        # Fix channel names, if a hash is missing.
         channels = [i if i.startswith("#") else "#" + i\
-                         for i in args["--channels"].split(",")]
+                    for i in args["<channels>"].split(",")]
+        # Split server argument into server and port, if necessary.
+        if ":" in args["<server>"]:
+            args["<server>"], args["--port"] = args["<server>"].split(":")
+        else:
+            args["--port"] = "6667"
 
-        # Turn the docopt args dict into the settings.py format.
-        # Editing this is not necessary.
+        # Turn the docopt args dict into a config.py compatible format.
+        # Editing this is only necessary if yo
         identities = {
             "default": {
                 "nickname": args["--nick"],
-                "realname": "None",
-                "username": "None",
-                "nickserv_pw": None
+                "realname": "Anyonymous",
+                "username": args["--nick"],
+                "nickserv_pw": args["--pass"],
             }
         }
         networks = {
             "default": {
-                "server": args["--server"],
+                "server": args["<server>"],
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],
-                "password": args["--password"],
                 "identity": identities["default"],
                 "channels": tuple(channels)
             }
         }
 
     # Logging setup.
-    logfile = args["--output"]
+    logfile = args["--file"]
     if not args["--quiet"]:
         client.log.startLogging(sys.stdout)
 
     # Cap verbosity count at 3 so we don't get index errors.
-    if args["--verbose"] > 3:
-        args["--verbose"] = 3
+    if args["-v"] > 3:
+        args["-v"] = 3
     # Set the log level according to verbosity count.
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logging.basicConfig(level=levels[args["--verbose"]])
+    logging.basicConfig(level=levels[args["-v"]])
 
+    print args
     # Set up the connection info for each network.
     for name in networks.keys():
         factory = client.Factory(name, networks[name])
@@ -115,5 +123,4 @@ def main():
 
 if __name__ == "__main__":
     args = docopt(__doc__, version="0.1")
-    print args
-#     main()
+    main()
