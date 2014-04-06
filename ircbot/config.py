@@ -18,6 +18,7 @@ networks = {
         "port": 6667,
         "ssl": False,
         "password": None,
+        "admins": "mikar"
         "identity": identities["demibot"],
         "channels": (
             "#z1",
@@ -29,6 +30,7 @@ networks = {
         "port": 6667,
         "ssl": False,
         "password": None,
+        "admins": "mikar"
         "identity": identities["demibot"],
         "channels": (
             "#z1",
@@ -40,6 +42,7 @@ networks = {
 #         "port": 6667,
 #         "ssl": False,
 #         "password": None,
+#         "admins": "mikar"
 #         "identity": identities["example"],
 #         "channels": (
 #             "#z1",
@@ -51,6 +54,7 @@ networks = {
 #         "port": 6667,
 #         "ssl": False,
 #         "password": None,
+#         "admins": "mikar"
 #         "identity": identities["example"],
 #         "channels": (
 #             "#z1",

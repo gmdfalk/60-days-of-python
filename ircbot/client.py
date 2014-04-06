@@ -30,18 +30,49 @@ class Bot(irc.IRCClient):
     def __init__(self):
         self.logs_enabled = True
         self.loglevel = 0
+        self.lead = "."
 
     @property
     def nickname(self):
-        return self.factory.network["identity"]["nickname"]
+        return self.factory.identity["nickname"]
 
     @property
     def realname(self):
-        return self.factory.network["identity"]["realname"]
+        return self.factory.identity["realname"]
 
     @property
     def username(self):
-        return self.factory.network["identity"]["username"]
+        return self.factory.identity["username"]
+
+    def irc_ERR_NICKNAMEINUSE(self, prefix, params):
+        self.factory.identity["nickname"] += "_"
+
+    def _command(self, user, channel, cmnd):
+        # Split arguments from the command part
+        try:
+            cmnd, args = cmnd.split(" ", 1)
+        except ValueError:
+            args = ""
+
+        # core commands
+        method = getattr(self, "command_%s" % cmnd, None)
+        if method is not None:
+            log.info("internal command %s called by %s (%s) on %s" % (cmnd, user, self.factory.isAdmin(user), channel))
+            method(user, channel, args)
+            return
+
+        # module commands
+        for module, env in self.factory.ns.items():
+            myglobals, mylocals = env
+            # find all matching command functions
+            commands = [(c, ref) for c, ref in mylocals.items() if c == "command_%s" % cmnd]
+
+            for cname, command in commands:
+                log.info("module command %s called by %s (%s) on %s" % (cname, user, self.factory.isAdmin(user), channel))
+                # Defer commands to threads
+                d = threads.deferToThread(command, self, user, channel, self.factory.to_unicode(args.strip()))
+                d.addCallback(self.printResult, "command %s completed" % cname)
+                d.addErrback(self.printError, "command %s error" % cname)
 
     def _sendmsg(self, msg, target, nick=None):
         if nick:
@@ -91,13 +122,13 @@ class Bot(irc.IRCClient):
         msg = msg.strip()
 
         # If the message is not a command, log it and do nothing else.
-        if not msg.startswith("!"):
+        if not msg.startswith(self.lead):
             if self.logs_enabled:
                 self.logger.log("<{}> {}".format(nick, msg))
             return
 
         # If the message is a command, we handle the logic here.
-        command, sep, rest = msg.lstrip("!").partition(" ")
+        command, sep, rest = msg.lstrip(self.lead).partition(" ")
         # Get the function corresponding to the command given.
         func = getattr(self, "command_" + command, None)
         # Or, if there was no function, ignore the msg.
@@ -157,6 +188,31 @@ class Bot(irc.IRCClient):
         # maybeDeferred in privmsg.
         return d
 
+    def command_rehash(self, user, channel, args):
+        """Reload modules and optionally the configuration file. Usage: rehash [conf]"""
+
+        if self.factory.isAdmin(user):
+            try:
+                # rebuild core & update
+                log.info("rebuilding %r" % self)
+                rebuild.updateInstance(self)
+
+                # reload config file
+                if args == 'conf':
+                    self.factory.reload_config()
+                    self.say(channel, 'Configuration reloaded.')
+
+                # unload removed modules
+                self.factory._unload_removed_modules()
+                # reload modules
+                self.factory._loadmodules()
+            except Exception, e:
+                self.say(channel, "Rehash error: %s" % e)
+                log.error("Rehash error: %s" % e)
+            else:
+                self.say(channel, "Rehash OK")
+                log.info("Rehash OK")
+
     def command_logs(self, rest):
         print rest
         if rest == "off" and self.logs_enabled:
@@ -187,6 +243,7 @@ class Factory(protocol.ClientFactory):
         self.network_name = network_name
         self.network = network
         self.logfile = logfile
+        self.identity = self.network["identity"]
 
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""

@@ -14,4 +14,4 @@ class QuotePicker(object):
 
 def main():
     q = QuotePicker()
-    q.pick()
+    return q.pick()

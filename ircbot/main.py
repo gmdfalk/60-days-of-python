@@ -43,10 +43,13 @@ Examples:
 # Dictionary, wiki
 # Search channel log.
 # msg system (leaving a notification)
+# Tomorrow is . command
+# Markov-Chain
 
 # TODO:
-# 1. reading password information from a file instead of config.py
-# 2. log to database
+# 1. Store admins, passwords etc in a database, maybe involve some hashing.
+# 2. log to database?
+# 3. YAML for config files?
 
 
 from docopt import docopt
@@ -77,7 +80,7 @@ def main():
         identities = {
             "default": {
                 "nickname": args["--nick"],
-                "realname": "Anyonymous",
+                "realname": "Anonymous",
                 "username": args["--nick"],
                 "nickserv_pw": args["--pass"],
             }
