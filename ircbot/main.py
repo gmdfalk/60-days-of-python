@@ -27,25 +27,6 @@ Examples:
     demibot    (will use information in config.py to connect)
 """
 
-# Possible features:
-# HTTP link capture/collection and saving or displaying the title in chat
-# Weather and date/time information (day + week number, too)
-# Quiz (smart autohinting, highscores, etc)
-# Collecting/displaying quotes (Chirpy?)
-# Store notes with keyword and repeat them on demand (!give nick note)
-# Google search (or other services, like translate)
-# Operator/Auth features (Kick, Ban, automatically give OP)
-# Disable/enable commands, public ignore
-# Fortune cookies, Ron swanson quotes
-# Seen (track last msg by user x)
-# Conduct a poll.
-# Evaluate python/bash
-# Dictionary, wiki
-# Search channel log.
-# msg system (leaving a notification)
-# Tomorrow is . command
-# Markov-Chain
-
 # TODO:
 # 1. Store admins, passwords etc in a database, maybe involve some hashing.
 # 2. log to database?
@@ -62,6 +43,7 @@ from factory import Factory
 
 
 def main():
+    args = docopt(__doc__, version="0.1")
 
     # Establish the configuration.
     if not args["<server>"]:
@@ -132,5 +114,4 @@ def main():
     reactor.run()
 
 if __name__ == "__main__":
-    args = docopt(__doc__, version="0.1")
     main()

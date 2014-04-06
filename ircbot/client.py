@@ -1,4 +1,3 @@
-# coding: utf-8
 from twisted.internet import defer, protocol, reactor, ssl, threads
 from twisted.words.protocols import irc
 from twisted.python import rebuild
