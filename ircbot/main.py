@@ -57,7 +57,8 @@ import logging
 import sys
 
 import config
-import client
+from client import Client, reactor, ssl
+from factory import Factory
 
 
 def main():
@@ -97,11 +98,12 @@ def main():
 
     # Logging setup.
     if not args["--quiet"]:
-        client.log.startLogging(sys.stdout)
+        pass
 
     # Cap verbosity count at 3 so we don't get index errors.
     if args["-v"] > 3:
         args["-v"] = 3
+
     # Set the log level according to verbosity count.
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logging.basicConfig(level=levels[args["-v"]])
@@ -114,20 +116,20 @@ def main():
         else:
             logfile = "logs/{}.log".format(networks[name]["server"])
 
-        factory = client.Factory(name, networks[name], logfile)
+        factory = Factory(name, networks[name], logfile)
 
         server = networks[name]["server"]
         port = networks[name]["port"]
 
         # Create a connection depending on whether SSL is enabled.
         if networks[name]["ssl"]:
-            client.reactor.connectSSL(server, port, factory,
-                                      client.ssl.ClientContextFactory())
+            reactor.connectSSL(server, port, factory,
+                               ssl.ClientContextFactory())
         else:
-            client.reactor.connectTCP(server, port, factory)
+            reactor.connectTCP(server, port, factory)
 
     # Finally, run all the factories/bots.
-    client.reactor.run()
+    reactor.run()
 
 if __name__ == "__main__":
     args = docopt(__doc__, version="0.1")
