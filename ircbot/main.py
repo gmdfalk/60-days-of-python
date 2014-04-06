@@ -31,6 +31,7 @@ Examples:
 # 1. Store admins, passwords etc in a database, maybe involve some hashing.
 # 2. log to database?
 # 3. YAML for config files?
+# webhook test
 
 
 from docopt import docopt
