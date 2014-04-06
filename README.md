@@ -25,7 +25,7 @@ With one additional day as buffer the outcome should be around 15 projects.
 **Projects**:  
   * [**Address Book**](https://github.com/mikar/60-days-of-python/blob/master/addressbook)
   * [**Web Crawler**](https://github.com/mikar/60-days-of-python/blob/master/webcrawler)
-  * [**Hangman**](https://github.com/mikar/60-days-of-python/blob/master/games/hangman/hangman.py) and [**Frogger**](https://github.com/mikar/60-days-of-python/blob/master/games/frogger/frogger.py)
+  * [**Hangman**](https://github.com/mikar/60-days-of-python/blob/master/games/hangman) and [**Frogger**](https://github.com/mikar/60-days-of-python/blob/master/games/frogger
   * [**IRC-Bot**](https://github.com/mikar/60-days-of-python/blob/master/ircbot)
   * Mail Checker or Port Scanner or FTP Client
   * Unit Converter (GUI)
