@@ -31,8 +31,7 @@ class Client(irc.IRCClient):
     # Core
     def printResult(self, msg, info):
         # Don't print results if there is nothing to say (usually non-operation on module)
-#         if msg:
-#             log.debug("Result %s %s" % (msg, info))
+#         log.debug("Result %s %s" % (msg, info))
         pass
 
     def printError(self, msg, info):
@@ -70,7 +69,7 @@ class Client(irc.IRCClient):
                 d.addErrback(self.printError, "command %s error" % cname)
 
     def say(self, channel, message, length=None):
-        """Override default say to make replying to private messages easier"""
+        "Override default say to make replying to private messages easier"
 
         # Encode channel
         # (for cases where channel is specified in code instead of "answering")
@@ -110,7 +109,7 @@ class Client(irc.IRCClient):
             self.logger.close()
 
     def signedOn(self):
-        "Called when the bot has successfully signed on to server."
+        "Called when the bot has successfully signed on to server"
 
         network = self.factory.network
 
@@ -125,11 +124,11 @@ class Client(irc.IRCClient):
                                 .format(channel, network["server"]))
 
     def joined(self, channel):
-        "Called when the bot joins the channel."
+        "Called when the bot joins a channel"
         pass
 
     def privmsg(self, user, channel, msg):
-        "This will get called when the bot receives a message"
+        "Called when the bot receives a message"
 
         channel = channel.lower()
         lmsg = msg.lower()
@@ -142,11 +141,13 @@ class Client(irc.IRCClient):
                 msg = self.lead + msg
             elif lmsg.startswith(lnick):
                 msg = self.lead + msg[nickl:].lstrip()
-            elif lmsg.startswith(lnick) and len(lmsg) > nickl and lmsg[nickl] in string.punctuation:
+            elif lmsg.startswith(lnick) and len(lmsg) > nickl and\
+                                            lmsg[nickl] in string.punctuation:
                 msg = self.lead + msg[nickl + 1:].lstrip()
         else:
             # Turn 'nick:' prefixes into self.lead prefixes
-            if lmsg.startswith(lnick) and len(lmsg) > nickl and lmsg[nickl] in string.punctuation:
+            if lmsg.startswith(lnick) and len(lmsg) > nickl and\
+                                            lmsg[nickl] in string.punctuation:
                 msg = self.lead + msg[len(self.nickname) + 1:].lstrip()
         reply = (channel == lnick) and user or channel
 
@@ -158,7 +159,7 @@ class Client(irc.IRCClient):
         self._runhandler("privmsg", user, reply, self.factory.to_utf8(msg))
 
     def _runhandler(self, handler, *args, **kwargs):
-        """Run a handler for an event"""
+
         handler = "handle_%s" % handler
         # module commands
         for module, env in self.factory.ns.items():
