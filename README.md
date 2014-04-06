@@ -1,4 +1,4 @@
-60 Days of Code
+60 Days of Python
 ==================
 
 A Private Programming Boot-Camp
@@ -14,7 +14,6 @@ Use Test-Driven Development and some form of code review (IRC, StackOverflow, St
 
 **Planning**:  
 Time frame will be 24.03.2014 - 23.05.2014.  
-Language will be Python. Second iteration will be Java with maybe some C and Haskell thrown in.  
 
 A sensible goal might be 3 days per project:
   * Day 1: Conceptual design
@@ -24,15 +23,15 @@ A sensible goal might be 3 days per project:
 With one additional day as buffer the outcome should be around 15 projects.
 
 **Projects**:  
-  * [**Address Book**](https://github.com/mikar/60-days-of-code/blob/master/addressbook)
-  * [**Web Crawler**](https://github.com/mikar/60-days-of-code/blob/master/webcrawler)
-  * [**Hangman**](https://github.com/mikar/60-days-of-code/blob/master/games/hangman/hangman.py) and [**Frogger**](https://github.com/mikar/60-days-of-code/blob/master/games/frogger/frogger.py)
-  * [**IRC-Bot**](https://github.com/mikar/60-days-of-code/blob/master/ircbot)
+  * [**Address Book**](https://github.com/mikar/60-days-of-python/blob/master/addressbook)
+  * [**Web Crawler**](https://github.com/mikar/60-days-of-python/blob/master/webcrawler)
+  * [**Hangman**](https://github.com/mikar/60-days-of-python/blob/master/games/hangman/hangman.py) and [**Frogger**](https://github.com/mikar/60-days-of-python/blob/master/games/frogger/frogger.py)
+  * [**IRC-Bot**](https://github.com/mikar/60-days-of-python/blob/master/ircbot)
   * Mail Checker or Port Scanner or FTP Client
   * Unit Converter (GUI)
   * Calculator (both command-line and GUI)
   * Text Editor (GUI)
-  * [**Website with Flask**](https://github.com/mikar/60-days-of-code/tree/master/website)
+  * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
   	  * Forum
 	  * Drawing Board  and To-Do-List
@@ -43,5 +42,5 @@ With one additional day as buffer the outcome should be around 15 projects.
   * optional: IMDB Browser 
   * optional: File Browser (Mass Renaming with Simulation)
   * optional: Chess
-  * [**Py3: OOP**](https://github.com/mikar/60-days-of-code/tree/master/oop) (working through the book)
+  * [**Py3: OOP**](https://github.com/mikar/60-days-of-python/tree/master/oop) (working through the book)
  
