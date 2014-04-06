@@ -11,8 +11,7 @@ What it currently does:
     * whatshesaid: quotes from emancipated women ([**collected by jessamynsmith**](https://github.com/jessamynsmith/talkbackbot)).
     * swanson: quotes from the one and only Ron Swanson.  
     
-The modularity feature is shamelessly adopted from [**Pyfibot**](https://github.com/lepinkainen/pyfibot), including the BMI-module.  
-  
+Quite a bit of the code is adopted from [**Pyfibot**](https://github.com/lepinkainen/pyfibot), including the BMI-module.  
   
 Features and modules I'd like to introduce:  
   * Quiz (with a database. smart autohinting, highscores, etc)
