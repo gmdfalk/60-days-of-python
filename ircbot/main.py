@@ -41,6 +41,20 @@ from client import Client, reactor, ssl
 from factory import Factory
 
 
+def init_logging(level):
+    logger = logging.getLogger()
+
+    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
+    logger.setLevel(levels[level])
+
+    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
+    formatter = logging.Formatter(default)
+    # Append file name + number if debug is enabled
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
 def main():
     args = docopt(__doc__, version="0.1")
 
@@ -85,6 +99,9 @@ def main():
     # Cap verbosity count at 3 so we don't get index errors.
     if args["-v"] > 3:
         args["-v"] = 3
+
+    # Set up our logger.
+    init_logging(args["-v"])
 
     # Set up the connection info for each network.
     for name in networks.keys():

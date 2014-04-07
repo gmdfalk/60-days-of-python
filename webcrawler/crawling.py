@@ -26,7 +26,7 @@ class ConnectionPool:
     lists of Connections.  The currently active connections are *not*
     in the data structure; get_connection() takes the connection out,
     and recycle_connection() puts it back in.  To recycle a
-    connection, call conn.close_logs(recycle=True).
+    connection, call conn.close(recycle=True).
 
     There are limits to both the overall pool and the per-key pool.
     """
@@ -38,11 +38,11 @@ class ConnectionPool:
         self.connections = {}  # {(host, port, ssl): [Connection, ...], ...}
         self.queue = []  # [Connection, ...]
 
-    def close_logs(self):
+    def close(self):
         """Close all connections available for reuse."""
         for conns in self.connections.values():
             for conn in conns:
-                conn.close_logs()
+                conn.close()
         self.connections.clear()
         self.queue.clear()
 
@@ -70,7 +70,7 @@ class ConnectionPool:
                     del self.connections[key]
                 if conn.stale():
                     logger.warn('closing stale connection %r', key)
-                    conn.close_logs()  # Just in case.
+                    conn.close()  # Just in case.
                 else:
                     logger.warn('* Reusing pooled connection %r', key)
                     return conn
@@ -110,7 +110,7 @@ class ConnectionPool:
         if not conns:
             del self.connections[victim.key]
         self.queue.remove(victim)
-        victim.close_logs()
+        victim.close()
 
 
 class Connection:
@@ -139,11 +139,11 @@ class Connection:
             logger.warn('NO PEERNAME %r %r %r', self.host, self.port, self.ssl)
         self.key = self.host, self.port, self.ssl
 
-    def close_logs(self, recycle=False):
+    def close(self, recycle=False):
         if recycle and not self.stale():
             self.pool.recycle_connection(self)
         else:
-            self.writer.close_logs()
+            self.writer.close()
             self.pool = self.reader = self.writer = None
 
 

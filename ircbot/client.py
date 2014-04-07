@@ -69,11 +69,11 @@ class CoreCommands(object):
     def command_logs(self, rest):
         print rest
         if rest == "off" and self.logs_enabled:
-            self.logger.close_logs()
+            self.chatlogger.close_logs()
             self.logs_enabled = False
             return "logs are now disabled."
         elif rest == "on" and not self.logs_enabled:
-            self.logger.open_logs()
+            self.chatlogger.open_logs()
             self.logs_enabled = True
             return "logs are now enabled."
 
@@ -102,9 +102,9 @@ class Client(irc.IRCClient, CoreCommands):
 
     def __init__(self, factory):
         self.factory = factory
-        self.nickname = self.identity["nickname"]
-        self.realname = self.identity["realname"]
-        self.username = self.identity["username"]
+        self.nickname = self.factory.identity["nickname"]
+        self.realname = self.factory.identity["realname"]
+        self.username = self.factory.identity["username"]
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.logs_enabled = True
         self.loglevel = 0
@@ -124,7 +124,7 @@ class Client(irc.IRCClient, CoreCommands):
         log.error("ERROR %s %s" % (msg, info))
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.identity["nickname"] += "_"
+        self.factory.identity["nickname"] += "_"
 
     def _command(self, user, channel, cmnd):
         # Split arguments from the command part
@@ -182,17 +182,19 @@ class Client(irc.IRCClient, CoreCommands):
     def connectionMade(self):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
-        now = time.asctime(time.localtime(time.time()))
-        self.logger = ChatLogger(open(self.factory.logfile, "a"))
-        self.logger.log("Connected at {}".format(now))
+        if self.logs_enabled:
+            now = time.asctime(time.localtime(time.time()))
+            self.chatlogger = ChatLogger(self.factory.network_name)
+            self.chatlogger.open_logs(self.factory.network["channels"])
+            self.chatlogger.log("Connected at {}".format(now))
 
     def connectionLost(self, reason):
         "Called when a connection to the server has been lost"
         irc.IRCClient.connectionLost(self, reason)
         now = time.asctime(time.localtime(time.time()))
         if self.logs_enabled:
-            self.logger.log("Disconnected at {}".format(now))
-            self.logger.close_logs()
+            self.chatlogger.log("Disconnected at {}".format(now))
+            self.chatlogger.close_logs()
 
     def signedOn(self):
         "Called when the bot has successfully signed on to server"
@@ -205,20 +207,18 @@ class Client(irc.IRCClient, CoreCommands):
 
         for channel in network["channels"]:
             self.join(channel)
-            if self.logs_enabled:
-                self.logger.log("Joined {} on {}"
-                                .format(channel, network["server"]))
+#             if self.logs_enabled:
+#                 self.chatlogger.log("Joined {} on {}"
+#                                 .format(channel, network["server"]))
 
     def joined(self, channel):
         "Called when the bot joins a channel"
-        chatlog = "{}-{}.log".format(channel, self.server)
-        self.logger = ChatLogger(open(chatlog, "a"))
+        chatlog = "{}-{}.log".format(channel, self.factory.network_name)
 
 
     def privmsg(self, user, channel, msg):
         "Called when the bot receives a message"
 
-        chatlog = "{}-{}.log".format(channel, self.server)
         channel = channel.lower()
         lmsg = msg.lower()
         lnick = self.nickname.lower()
@@ -267,7 +267,7 @@ class Client(irc.IRCClient, CoreCommands):
         old_nick = prefix.split("!")[0]
         new_nick = params[0]
         if self.logs_enabled:
-            self.logger.log("{} is now known as {}".format(old_nick, new_nick))
+            self.chatlogger.log("{} is now known as {}".format(old_nick, new_nick))
 
     def noticed(self, user, channel, message):
         """I received a notice"""

@@ -55,7 +55,7 @@ def main():
         args["--strict"] = False
     else:
         args["--strict"] = True
-        
+
     if args["--iocp"]:
         from asyncio.windows_events import ProactorEventLoop
         loop = ProactorEventLoop()
@@ -87,8 +87,8 @@ def main():
         print('\nInterrupted\n')
     finally:
         reporting.report(crawler)
-        crawler.close_logs()
-        loop.close_logs()
+        crawler.close()
+        loop.close()
 
 
 if __name__ == "__main__":

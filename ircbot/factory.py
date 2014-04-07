@@ -16,7 +16,8 @@ class Factory(protocol.ClientFactory):
     def __init__(self, network_name, network, loglevel):
         self.network_name = network_name
         self.network = network
-        self.loglevel = int(loglevel)
+        self.identity = self.network["identity"]
+        self.loglevel = loglevel
         # Namespace for modules
         self.ns = {}
         # Connection retry delays
@@ -30,13 +31,13 @@ class Factory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost"
         log.info("connection lost (%s): reconnecting in %d seconds" %
-                    (reason, self.lostDelay))
+                    (reason, self.lost_delay))
         reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
         "Reconnect after 30 seconds if the connection to the network fails"
         log.info("connection failed (%s): reconnecting in %d seconds" %
-                   (reason, self.failedDelay))
+                   (reason, self.failed_delay))
         reactor.callLater(self.failed_delay, connector.connect)
 
     def buildProtocol(self, address):
@@ -138,18 +139,3 @@ class Factory(protocol.ClientFactory):
                 except:
                     _string = _string.decode('iso-8859-1')
         return _string
-
-
-def init_logging(level):
-    logger = logging.getLogger()
-
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logger.setLevel(levels[level])
-
-    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
-    formatter = logging.Formatter(default)
-    # Append file name + number if debug is enabled
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
