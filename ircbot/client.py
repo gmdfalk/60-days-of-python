@@ -246,8 +246,8 @@ class Client(irc.IRCClient, CoreCommands):
         "Called when the bot joins a channel"
         log.info("Joined {} on {}".format(channel,
                                           self.factory.network["server"]))
-        if channel not in self.factory.network["channels"]:
-            self.factory.network["channels"].append(channel)
+
+        self.factory.network["channels"].add(channel)
         if self.logs_enabled:
             self.chatlogger.add_channel(channel)
 
@@ -256,8 +256,8 @@ class Client(irc.IRCClient, CoreCommands):
         log.info("Left {} on {}".format(channel,
                                           self.factory.network["server"]))
 
-        # Remove the channel from the channel list.
-        self.factory.network["channels"].pop(channel, None)
+        # Remove the channel from the channel set.
+        self.factory.network["channels"].discard(channel)
         if self.logs_enabled:
             self.chatlogger.del_channel(channel)
 

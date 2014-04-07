@@ -4,7 +4,7 @@ import time
 
 
 class ChatLogger(object):
-    "Logs chat messages only"
+    "The logger for chat messages and urls"
     def __init__(self, server):
         self.logfiles = {}
         self.server = server
@@ -45,17 +45,25 @@ class ChatLogger(object):
         self.logfiles = {}
 
 
-def init_logging(level):
-    "Initializes the logger for system messages (to stdout only, currently)"
+def init_logging(quiet, loglevel, logfile):
+    "Initializes the logger for system messages"
     logger = logging.getLogger()
 
+    # Set the loglevel.
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG][::-1]
-    logger.setLevel(levels[level])
+    logger.setLevel(levels[loglevel])
 
-    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
-    formatter = logging.Formatter(default)
-    # Append file name + number if debug is enabled
+    logformat = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
+#     s = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    formatter = logging.Formatter(logformat)
+
+    # By default, we log to both a file and stdout, unless quiet is enabled.
+    if not quiet:
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
+    file_handler = logging.FileHandler(logfile)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)

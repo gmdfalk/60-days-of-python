@@ -2,8 +2,8 @@
 """demibot - A multipurpose IRC bot
 
 Usage:
-    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-m N] [-s]
-            [-q] [-h] [-v...]
+    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
+            [-s] [-q] [-h] [-v...]
 
 Arguments:
     server:port        Server to connect to, default port is 6667.
@@ -14,8 +14,8 @@ Arguments:
 Options:
     -n, --nick=<nick>  Nickname of the bot [default: demibot]
     -p, --pass=<pass>  NickServ password, if required.
+    -f, --file=<file>  File to log bot events to [default: logs/system.log]
     -s, --ssl          Enable if the server supports SSL connections.
-    -m, --max-tries N  Limit retries on network errors. [default: 4]
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not pipe log messages to stdout.
     -v                 Logging verbosity, up to -vvv.
@@ -42,52 +42,51 @@ log = logging.getLogger("main")
 
 def main():
     args = docopt(__doc__, version="0.1")
-    print args["-v"]
-    # Establish the configuration.
+
+    # If there is no server argument, read the connection infos from config.py.
     if not args["<server>"]:
         networks = config.networks
+    # Otherwise we turn the docopt args into a config.py compatible format.
     else:
-        # Fix channel names, if a hash is missing.
-        channels = [i if i.startswith("#") else "#" + i\
-                    for i in args["<channels>"].split(",")]
+        # The default identity to connect with if we're not using config.py.
+        identities = {
+            "default": {
+                "nickname": args["--nick"],
+                "realname": "Anonymous",
+                "username": args["--nick"],
+                "nickserv_pw": args["--pass"],
+            }
+        }
         # Split server argument into server and port, if necessary.
         if ":" in args["<server>"]:
             args["<server>"], args["--port"] = args["<server>"].split(":")
         else:
             args["--port"] = "6667"
-
-        # Turn the docopt args dict into a config.py compatible format.
-        # Editing this is only necessary if yo
-        identities = {
-            "default": {
-                "nickname": args["--nick"],
-                "realname": "Anonymous",
-                "username": "test",  # args["--nick"],
-                "nickserv_pw": args["--pass"],
-            }
-        }
-        servername = args["<server>"].split(".")[1]  # Let's hope this works.
+        # Use the longest string in the <server> arg as name for the network.
+        # Let's hope this doesn't produce unexpected results.
+        network_name = max(args["<server>"].split("."), key=len)
+        # Fix channel names, if a hash is missing.
+        channels = {i if i.startswith("#") else "#" + i\
+                    for i in args["<channels>"].split(",")}
         networks = {
-            servername: {
+            network_name: {
                 "server": args["<server>"],
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],
+                "password": None,  # Server password goes here.
                 "identity": identities["default"],
-                "admins": ["mikar", "pld"],
+                "superadmins": ("pld",),
+                "admins": {"pld", "mikar"},
                 "channels": channels,
             }
         }
-
-    # Logging setup.
-    if not args["--quiet"]:
-        pass
 
     # Cap verbosity count at 3 so we don't get index errors.
     if args["-v"] > 3:
         args["-v"] = 3
 
-    # Set up our logger.
-    init_logging(args["-v"])
+    # Set up our logger. We pass on the quiet, loglevel and logfile arguments.
+    init_logging(args["--quiet"], args["-v"], args["--file"])
 
     # Set up the connection info for each network.
     for name in networks.keys():
