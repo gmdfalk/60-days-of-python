@@ -45,25 +45,26 @@ class ChatLogger(object):
         self.logfiles = {}
 
 
-def init_logging(quiet, loglevel, logfile):
+def init_syslog(logfile, loglevel, nologs, quiet):
     "Initializes the logger for system messages"
     logger = logging.getLogger()
 
     # Set the loglevel.
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG][::-1]
+    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logger.setLevel(levels[loglevel])
 
-    logformat = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
+    logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
 #     s = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
 
     formatter = logging.Formatter(logformat)
 
-    # By default, we log to both a file and stdout, unless quiet is enabled.
-    if not quiet:
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
+    if not nologs:
+        # By default, we log to both a file and stdout, unless quiet is enabled.
+        if not quiet:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
 
-    file_handler = logging.FileHandler(logfile)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+        file_handler = logging.FileHandler(logfile)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)

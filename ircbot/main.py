@@ -3,7 +3,7 @@
 
 Usage:
     demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
-            [-s] [-q] [-h] [-v...]
+            [-s] [-q] [--no-logs] [-h] [-v...]
 
 Arguments:
     server:port        Server to connect to, default port is 6667.
@@ -17,7 +17,8 @@ Options:
     -f, --file=<file>  File to log bot events to [default: logs/system.log]
     -s, --ssl          Enable if the server supports SSL connections.
     -h, --help         Show this help message and exit.
-    -q, --quiet        Do not pipe log messages to stdout.
+    -q, --quiet        Do not log bot events to stdout (only to a file).
+    --no-logs          Turns off all logging. Includes quiet.
     -v                 Logging verbosity, up to -vvv.
 
 Examples:
@@ -26,18 +27,12 @@ Examples:
     demibot  (uses config.py for multiserver support with detailed settings)
 """
 
-import logging
-import sys
-
 from docopt import docopt
 from twisted.internet import reactor, ssl
 
 import config
 from factory import Factory
-from reporting import init_logging
-
-
-log = logging.getLogger("main")
+from reporting import init_syslog
 
 
 def main():
@@ -81,12 +76,13 @@ def main():
             }
         }
 
-    # Cap verbosity count at 3 so we don't get index errors.
+    # Cap verbosity count at 3 to avoid index errors.
     if args["-v"] > 3:
         args["-v"] = 3
 
-    # Set up our logger. We pass on the quiet, loglevel and logfile arguments.
-    init_logging(args["--quiet"], args["-v"], args["--file"])
+    # Set up our logger for system events. Chat is logged separately.
+    # Both will be disabled if --no-logs is True.
+    init_syslog(args["-v"], args["--file"], args["--no-logs"], args["--quiet"])
 
     # Set up the connection info for each network.
     for name in networks.keys():

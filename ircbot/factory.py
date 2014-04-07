@@ -15,17 +15,17 @@ class Factory(protocol.ClientFactory):
     clients = {}
     moduledir = os.path.join(sys.path[0], "modules/")
 
-    def __init__(self, network_name, network, loglevel):
+    def __init__(self, network_name, network, loglevel, nologs):
         self.network_name = network_name
         self.network = network
-        self.identity = self.network["identity"]
-        self.loglevel = loglevel
         # Namespace for modules
         self.ns = {}
+        # Use XOR to set this to False if nologs is True. Could also use
+        # not and or is not.
+        self.logs_enabled = True ^ nologs
         # Connection retry delays
         self.lost_delay = 10
         self.failed_delay = 30
-#         init_logging(loglevel)
 
     def startFactory(self):
         self._loadmodules()

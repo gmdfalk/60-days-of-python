@@ -51,8 +51,8 @@ class CoreCommands(object):
                 log.debug("Channels I'm on this network: {}"
                           .format(", ".join(network["channels"])))
             else:
+                self.say(channel, "Joining {}.".format(c))
                 self.join(c)
-                log.debug("Joined {}".format(c))
 
     def command_leave(self, user, channel, args):
         "Usage: leave <channel>"
@@ -108,17 +108,18 @@ class CoreCommands(object):
             self.say(channel, "Available commands: {}".format(commandlist))
 
     def command_logs(self, user, channel, args):
-        if args == "off" and self.logs_enabled:
+        if args == "off" and self.factory.logs_enabled:
             self.chatlogger.close_logs()
-            self.logs_enabled = False
-            return self.say(channel, "Logs are now disabled.")
-        elif args == "on" and not self.logs_enabled:
-            self.chatlogger.open_logs()
-            self.logs_enabled = True
-            return self.say(channel, "Logs are now enabled.")
-
+            self.factory.logs_enabled = False
+            log.debug("Chatlogs enabled")
+            return self.say(channel, "Chatlogs are now disabled.")
+        elif args == "on" and not self.factory.logs_enabled:
+            self.chatlogger.open_logs(self.factory.network["channels"])
+            self.factory.logs_enabled = True
+            log.debug("Chatlogs disabled")
+            return self.say(channel, "Chatlogs are now enabled.")
         else:
-            if self.logs_enabled:
+            if self.factory.logs_enabled:
                 return self.say(channel,
                     "Logs are enabled. Use !logs off to disable logging.")
             else:
@@ -135,12 +136,10 @@ class Client(irc.IRCClient, CoreCommands):
     def __init__(self, factory):
         super
         self.factory = factory
-        self.nickname = self.factory.identity["nickname"]
-        self.realname = self.factory.identity["realname"]
-        self.username = self.factory.identity["username"]
+        self.nickname = self.factory.network.identity["nickname"]
+        self.realname = self.factory.network.identity["realname"]
+        self.username = self.factory.network.identity["username"]
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
-        self.logs_enabled = True
-        self.loglevel = 0
         self.lead = "."
         log.info("Bot initialized")
 
@@ -157,7 +156,7 @@ class Client(irc.IRCClient, CoreCommands):
         log.error("ERROR {} {}".format(msg, info))
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.factory.identity["nickname"] += "_"
+        self.factory.network.identity["nickname"] += "_"
 
     def _command(self, user, channel, cmnd):
         # Split arguments from the command part
@@ -220,14 +219,14 @@ class Client(irc.IRCClient, CoreCommands):
     def connectionMade(self):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
-        if self.logs_enabled:
+        if self.factory.logs_enabled:
             self.chatlogger = ChatLogger(self.factory.network_name)
             self.chatlogger.open_logs(self.factory.network["channels"])
 
     def connectionLost(self, reason):
         "Called when a connection to the server has been lost"
         irc.IRCClient.connectionLost(self, reason)
-        if self.logs_enabled:
+        if self.factory.logs_enabled:
             self.chatlogger.close_logs()
 
     def signedOn(self):
@@ -247,8 +246,9 @@ class Client(irc.IRCClient, CoreCommands):
         log.info("Joined {} on {}".format(channel,
                                           self.factory.network["server"]))
 
+        # Adds the channel to the relevant sets/dicts.
         self.factory.network["channels"].add(channel)
-        if self.logs_enabled:
+        if self.factory.logs_enabled:
             self.chatlogger.add_channel(channel)
 
     def left(self, channel):
@@ -258,7 +258,7 @@ class Client(irc.IRCClient, CoreCommands):
 
         # Remove the channel from the channel set.
         self.factory.network["channels"].discard(channel)
-        if self.logs_enabled:
+        if self.factory.logs_enabled:
             self.chatlogger.del_channel(channel)
 
     def privmsg(self, user, channel, msg):
@@ -269,8 +269,8 @@ class Client(irc.IRCClient, CoreCommands):
         lnick = self.nickname.lower()
         nickl = len(lnick)
 
-        # Log the message to a chatfile.
-        if self.logs_enabled:
+        # Log the message to a chatfile but ignore private messages.
+        if self.factory.logs_enabled and channel != lnick:
             self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
                                                  msg), channel)
             # If there is a url in the message, log it to logs/url-server.log.
