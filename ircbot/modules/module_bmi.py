@@ -21,7 +21,7 @@ def print_bmi(bmi):
     else:
         weight_category = "obese class III (over 40)"
 
-    return("your bmi is %.2f which is %s" % (bmi, weight_category))
+    return("your bmi is {0:.2f} which is {1}" % (bmi, weight_category))
 
 
 def command_bmi(bot, user, channel, args):

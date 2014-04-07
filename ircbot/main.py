@@ -41,6 +41,10 @@ from client import Client, reactor, ssl
 from factory import Factory
 
 
+log = logging.getLogger("main")
+
+
+
 def init_logging(level):
     logger = logging.getLogger()
 
@@ -103,7 +107,6 @@ def main():
 
     # Set up our logger.
     init_logging(args["-v"])
-    log = logging.getLogger("main")
     log.info("test")
 
     # Set up the connection info for each network.

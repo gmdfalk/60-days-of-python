@@ -30,18 +30,18 @@ class Factory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost"
-        log.info("connection lost (%s): reconnecting in %d seconds" %
-                    (reason, self.lost_delay))
+        log.info("connection lost ({}): reconnecting in {} seconds"
+                 .format(reason, self.lost_delay))
         reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
         "Reconnect after 30 seconds if the connection to the network fails"
-        log.info("connection failed (%s): reconnecting in %d seconds" %
-                   (reason, self.failed_delay))
+        log.info("connection failed ({}): reconnecting in {} seconds"
+                 .format(reason, self.failed_delay))
         reactor.callLater(self.failed_delay, connector.connect)
 
     def buildProtocol(self, address):
-        log.info("Building protocol for %s", address)
+        log.info("Building protocol for {}".format(address))
         p = Client(self)
         self.clients[self.network_name] = p
         return p
@@ -53,7 +53,7 @@ class Factory(protocol.ClientFactory):
             # finalize the old instance first.
             if module in self.ns:
                 if 'finalize' in self.ns[module][0]:
-                    log.info("finalize - %s" % module)
+                    log.info("Finalize - {}".format(module))
                     self.ns[module][0]['finalize']()
 
     def _loadmodules(self):
@@ -61,12 +61,12 @@ class Factory(protocol.ClientFactory):
         self._finalize_modules()
         for module in self._findmodules():
             env = self._getGlobals()
-            log.info("load module - %s" % module)
+            log.info("Load module - {}".format(module))
             # Load new version of the module
             execfile(os.path.join(self.moduledir, module), env, env)
             # Initialize module
             if 'init' in env:
-                log.info("initialize module - %s" % module)
+                log.info("initialize module - {}".format(module))
                 env['init'](self)
             # Add to namespace so we can find it later
             self.ns[module] = (env, env)
@@ -80,10 +80,10 @@ class Factory(protocol.ClientFactory):
             # finalize module before deleting it
             # TODO: use general _finalize_modules instead of copy-paste
             if 'finalize' in self.ns[m][0]:
-                log.info("finalize - %s" % m)
+                log.info("Finalize - {}".format(m))
                 self.ns[m][0]['finalize']()
             del self.ns[m]
-            log.info('removed module - %s' % m)
+            log.info("Removed module - {}".format(m))
 
     def _findmodules(self):
         "Find all modules"

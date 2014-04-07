@@ -19,6 +19,7 @@ networks = {
         "ssl": False,
         "password": None,
         "identity": identities["demibot"],
+        "superadmin": "mikar",
         "admins": [
             "mikar",
             "pld",

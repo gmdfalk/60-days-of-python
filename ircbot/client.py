@@ -22,7 +22,7 @@ class CoreCommands(object):
         if self.factory.is_admin(user):
             try:
                 # rebuild core & update
-                log.info("rebuilding %r" % self)
+                log.info("Rebuilding {}".format(self))
                 rebuild.updateInstance(self)
 
                 # reload config file
@@ -35,20 +35,23 @@ class CoreCommands(object):
                 # reload modules
                 self.factory._loadmodules()
             except Exception, e:
-                self.say(channel, "Rehash error: %s" % e)
-                log.error("Rehash error: %s" % e)
+                self.say(channel, "Rehash error: {}".format(e))
+                log.error("Rehash error: {}".format(e))
             else:
                 self.say(channel, "Rehash OK")
                 log.info("Rehash OK")
+        else:
+                self.say(channel, "Requires admin rights")
 
     def command_channels(self, user, channel, args):
         "Usage: channels <network> - List channels the bot is on"
         if not args:
-            self.say(channel, "Please specify a network: %s"
-                     % ", ".join(self.factory.clients.keys()))
+            self.say(channel, "Please specify a network: {}"
+                     .format(", ".join(self.factory.clients.keys())))
             return
 
-        self.say(channel, "I am on %s" % self.factory.network.channels)
+        self.say(channel, "I am on {}".format(", ".join(
+                                            self.factory.network["channels"])))
 
     def command_help(self, user, channel, cmnd):
         "Get help on all commands or a specific one. Usage: help [<command>]"
@@ -68,7 +71,7 @@ class CoreCommands(object):
         # Generic help
         else:
             commandlist = ", ".join([c for c, ref in commands])
-            self.say(channel, "Available commands: %s" % commandlist)
+            self.say(channel, "Available commands: {}".format(commandlist))
 
     def command_logs(self, user, channel, args):
         if args == "off" and self.logs_enabled:
@@ -119,8 +122,8 @@ class Client(irc.IRCClient, CoreCommands):
         log.info("Bot initialized")
 
     def __repr__(self):
-        return "demibot(%r, %r)" % (self.nickname,
-                                    self.factory.network["server"])
+        return "demibot({}, {})".format(self.nickname,
+                                        self.factory.network["server"])
 
     # Core
     def printResult(self, msg, info):
@@ -228,8 +231,9 @@ class Client(irc.IRCClient, CoreCommands):
         nickl = len(lnick)
 
         # Log the message to a chatfile.
-        self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
-                                             msg), channel)
+        if self.logs_enabled:
+            self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
+                                                 msg), channel)
 
         if channel == lnick:
             # Turn private queries into a format we can understand

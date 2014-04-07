@@ -17,6 +17,7 @@ class ChatLogger(object):
 
     def add_channel(self, channel):
         if channel in self.logfiles:
+            channel = channel.strip("#")  # I hate escape characters.
             log.info("{} already exists: {}".format(channel,
                                                     self.logfiles[channel]))
         self.logfiles[channel] = open("logs/{}-{}.log"
