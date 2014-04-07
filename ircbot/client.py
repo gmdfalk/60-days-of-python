@@ -1,4 +1,5 @@
 import logging
+import re
 import string
 import textwrap
 from types import FunctionType
@@ -278,6 +279,16 @@ class Client(irc.IRCClient, CoreCommands):
         if self.factory.logs_enabled and channel != lnick:
             self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
                                                  msg), channel)
+
+        # URL Handling.
+        url = re.search("(?P<url>https?://[^\s]+)", msg).group("url")
+        if url:
+            log.debug("URL detected.")
+            self.say(channel, self.factory.get_title(url))
+            if self.factory.logs_enabled:
+                self.chatlogger.log_url("<{}> {}"
+                                    .format(self.factory.get_nick(user), msg),
+                                            channel)
 
         if channel == lnick:
             # Turn private queries into a format we can understand

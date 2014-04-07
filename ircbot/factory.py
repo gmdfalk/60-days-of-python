@@ -1,8 +1,12 @@
 import logging
 import os
+import re
 import sys
+import urllib2
 
 from twisted.internet import protocol, reactor
+# from lxml import html
+# from BeautifulSoup import BeautifulSoup as bs
 
 from client import Client
 
@@ -99,6 +103,7 @@ class Factory(protocol.ClientFactory):
         g = {}
 
         g['get_nick'] = self.get_nick
+        g['get_title'] = self.get_title
         g['is_admin'] = self.is_admin
         g['is_superadmin'] = self.is_superadmin
         g['to_utf8'] = self.to_utf8
@@ -138,3 +143,17 @@ class Factory(protocol.ClientFactory):
                 except:
                     _string = _string.decode('iso-8859-1')
         return _string
+
+    def get_title(self, url):
+        """Gets data, bs and headers for the given url, using the internal cache if necessary"""
+#         # Three ways to do this. Speed: regex > lxml > beautifulsoup
+#         return html.parse(url).find(".//title").text
+#         return bs(urllib2.urlopen(url)).title.string
+        # Note: http://stackoverflow.com/questions/1732348/regex-match-open-\
+        # tags-except-xhtml-self-contained-tags/1732454#1732454
+        # Using regex with htmls is usually a bad idea.
+        regex = re.compile('<title>(.*?)</title>', re.IGNORECASE | re.DOTALL)
+        htmlstring = urllib2.urlopen(url)
+        title = regex.search(htmlstring.read()).group(1)
+        htmlstring.close()
+        return title

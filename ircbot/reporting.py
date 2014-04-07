@@ -17,18 +17,9 @@ class ChatLogger(object):
         self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))
         self.logfiles[channel].flush()
 
-        if "http://" in msg or "www." in msg:
-            log.debug("URL detected.")
-            self.log_url(msg, channel, timestamp)
-
-    def log_url(self, msg, channel, timestamp):
+    def log_url(self, msg, channel):
         "Messages that contain urls are logged separately. Why not?"
-
-#         # This used to extract only the url but a little context is better.
-#         splitmsg = msg.lower().split()
-#         for i in splitmsg:
-#             if i.startswith("www") or i.startswith("http://"):
-
+        timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
         self.logfiles["urls"].write("[{}] ({}) {}\n".format(timestamp,
                                                             channel, msg))
         self.logfiles["urls"].flush()

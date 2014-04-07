@@ -1,16 +1,14 @@
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 
 
-def command_timer(self, user, channel, args):
+def command_timer(bot, user, channel, args):
     "Repeats a message after n seconds. Usage: timer <n> <message>"
     delay, _, msg = args.partition(" ")
 
     try:
         delay = int(delay)
     except ValueError:
-        pass
+        return bot.say(channel, "Error: Need a number as first argument.")
 
-    d = defer.Deferred()
-    msg = self.say(channel, "{}, {}".format(get_nick(user), msg))
-
-    return reactor.callLater(delay, d.callback, msg)
+    reactor.callLater(delay, bot.say, channel, "{}, {}.".format(get_nick(user),
+                                                                msg))

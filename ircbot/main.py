@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-"""demibot - A multipurpose IRC bot
+"""demibot - A multipurpose IRC bot (depends on twisted and requests)
 
 Usage:
     demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
