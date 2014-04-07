@@ -58,8 +58,12 @@ def init_syslog(logfile, loglevel, nologs, quiet):
 
     formatter = logging.Formatter(logformat)
 
-    if not nologs:
-        # By default, we log to both a file and stdout, unless quiet is enabled.
+    # If nologs is True, we do not log anything.
+    if nologs:
+        # This discards all logging messages of ERROR and below.
+        logging.disable(logging.ERROR)
+    else:
+        # By default, we log to both file and stdout, unless quiet is enabled.
         if not quiet:
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)

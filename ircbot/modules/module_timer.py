@@ -11,6 +11,6 @@ def command_timer(self, user, channel, args):
         pass
 
     d = defer.Deferred()
-#     msg = self.say(channel, "{}, {}".format(get_nick(user), msg))
+    msg = self.say(channel, "{}, {}".format(get_nick(user), msg))
 
     return reactor.callLater(delay, d.callback, msg)

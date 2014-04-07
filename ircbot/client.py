@@ -76,7 +76,8 @@ class CoreCommands(object):
                 self.part(c)
             else:
                 self.say(channel, "I am not in {}".format(c))
-                log.debug("Attempted to leave a channel i'm not in: {}".format(c))
+                log.debug("Attempted to leave a channel i'm not in: {}"
+                          .format(c))
 
             log.debug("Channels I'm in: {}"
                       .format(", ".join(network["channels"])))
@@ -126,6 +127,10 @@ class CoreCommands(object):
                 return self.say(channel,
                     "Logs are disabled. Use !logs on to enable logging.")
 
+    def command_loglevel(self, user, channel, args):
+        return self.say(channel, "Log level is {}."
+                        .format(log.getEffectiveLevel()))
+
     def command_ping(self, user, channel, args):
         return self.say(channel,
                         "{}, Pong.".format(self.factory.get_nick(user)))
@@ -134,11 +139,10 @@ class CoreCommands(object):
 class Client(irc.IRCClient, CoreCommands):
 
     def __init__(self, factory):
-        super
         self.factory = factory
-        self.nickname = self.factory.network.identity["nickname"]
-        self.realname = self.factory.network.identity["realname"]
-        self.username = self.factory.network.identity["username"]
+        self.nickname = self.factory.network["identity"]["nickname"]
+        self.realname = self.factory.network["identity"]["realname"]
+        self.username = self.factory.network["identity"]["username"]
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.lead = "."
         log.info("Bot initialized")
@@ -147,16 +151,16 @@ class Client(irc.IRCClient, CoreCommands):
         return "demibot({}, {})".format(self.nickname,
                                         self.factory.network["server"])
 
-    # Core
     def printResult(self, msg, info):
-        # Don't print results if there is nothing to say (usually non-operation on module)
+        # Don't print results if there is nothing to say (usually non-operation
+        # on module)
         log.debug("Result {} {}".format(msg, info))
 
     def printError(self, msg, info):
         log.error("ERROR {} {}".format(msg, info))
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.factory.network.identity["nickname"] += "_"
+        self.factory.network["identity"]["nickname"] += "_"
 
     def _command(self, user, channel, cmnd):
         # Split arguments from the command part
@@ -310,17 +314,20 @@ class Client(irc.IRCClient, CoreCommands):
         for module, env in self.factory.ns.items():
             myglobals, mylocals = env
             # find all matching command functions
-            handlers = [(h, ref) for h, ref in mylocals.items() if h == handler and type(ref) == FunctionType]
+            handlers = [(h, ref) for h, ref in mylocals.items()\
+                        if h == handler and type(ref) == FunctionType]
 
             for hname, func in handlers:
-                # defer each handler to a separate thread, assign callbacks to see when they end
+                # Defer each handler to a separate thread, assign callbacks to
+                # see when they end.
                 d = threads.deferToThread(func, self, *args, **kwargs)
                 d.addCallback(self.printResult, "handler %s completed" % hname)
                 d.addErrback(self.printError, "handler %s error" % hname)
 
     def noticed(self, user, channel, message):
         "I received a notice"
-        self._runhandler("noticed", user, channel, self.factory.to_utf8(message))
+        self._runhandler("noticed", user, channel,
+                         self.factory.to_utf8(message))
 
     def action(self, user, channel, data):
         "An action"

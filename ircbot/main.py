@@ -82,12 +82,12 @@ def main():
 
     # Set up our logger for system events. Chat is logged separately.
     # Both will be disabled if --no-logs is True.
-    init_syslog(args["-v"], args["--file"], args["--no-logs"], args["--quiet"])
+    init_syslog(args["--file"], args["-v"], args["--no-logs"], args["--quiet"])
 
     # Set up the connection info for each network.
     for name in networks.keys():
 
-        factory = Factory(name, networks[name], args["-v"])
+        factory = Factory(name, networks[name], args["-v"], args["--no-logs"])
 
         server = networks[name]["server"]
         port = networks[name]["port"]
