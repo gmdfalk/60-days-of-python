@@ -1,14 +1,14 @@
-from twisted.internet import defer, protocol, reactor, ssl, threads
-from twisted.words.protocols import irc
-from twisted.python import rebuild
-from types import FunctionType
-from reporting import ChatLogger
-
-import sys
-import time
 import logging
 import string
 import textwrap
+from types import FunctionType
+
+from twisted.internet import threads
+from twisted.python import rebuild
+from twisted.words.protocols import irc
+
+from reporting import ChatLogger
+
 
 log = logging.getLogger("client")
 
@@ -16,23 +16,13 @@ log = logging.getLogger("client")
 class CoreCommands(object):
 
     def command_rehash(self, user, channel, args):
-        """Reload modules and optionally the configuration file.
-        Usage: rehash [conf]"""
+        "Rehashes all available modules to reflect any changes."
 
         if self.factory.is_superadmin(user):
             try:
-                # rebuild core & update
                 log.info("Rebuilding {}".format(self))
                 rebuild.updateInstance(self)
-
-                # reload config file
-                if args == 'conf':
-                    self.factory.reload_config()
-                    self.say(channel, 'Configuration reloaded.')
-
-                # unload removed modules
                 self.factory._unload_removed_modules()
-                # reload modules
                 self.factory._loadmodules()
             except Exception, e:
                 log.error("Rehash error: {}".format(e))
@@ -41,15 +31,55 @@ class CoreCommands(object):
                 log.info("Rehash OK")
                 return self.say(channel, "Rehash OK")
         else:
-                return self.say(channel, "Requires admin rights")
+            return self.say(channel, "Requires admin rights")
 
     def command_join(self, user, channel, args):
-        "Usage: join <channel>..."
-        if not args:
-            return self.say(channel, "")
+        "Usage: join <channel>... (Comma separated, hash not required)"
+
+        if not self.factory.is_admin(user):
+            return
+
+        channels = [i if i.startswith("#") else "#" + i\
+                    for i in args.split(",")]
+        network = self.factory.network
+
+        for c in channels:
+            log.debug("Attempting to join channel {}.".format(c))
+            if c in network["channels"]:
+                self.say(channel, "I am already in {}".format(c))
+                log.debug("Already on channel {}".format(c))
+                log.debug("Channels I'm on this network: {}"
+                          .format(", ".join(network["channels"])))
+            else:
+                self.join(c)
+                log.debug("Joined {}".format(c))
 
     def command_leave(self, user, channel, args):
-        pass
+        "Usage: leave <channel>"
+
+        if not self.factory.is_admin(user):
+            return
+
+        network = self.factory.network
+
+        # No arguments, so we leave the current channel.
+        if not args:
+            self.part(channel)
+            return
+
+        # We have input, so split it into channels.
+        channels = [i if i.startswith("#") else "#" + i\
+                    for i in args.split(",")]
+
+        for c in channels:
+            if c in network["channels"]:
+                self.part(c)
+            else:
+                self.say(channel, "I am not in {}".format(c))
+                log.debug("Attempted to leave a channel i'm not in: {}".format(c))
+
+            log.debug("Channels I'm in: {}"
+                      .format(", ".join(network["channels"])))
 
     def command_channels(self, user, channel, args):
         "List channels the bot is on. No arguments."
@@ -103,6 +133,7 @@ class CoreCommands(object):
 class Client(irc.IRCClient, CoreCommands):
 
     def __init__(self, factory):
+        super
         self.factory = factory
         self.nickname = self.factory.identity["nickname"]
         self.realname = self.factory.identity["realname"]
@@ -138,7 +169,7 @@ class Client(irc.IRCClient, CoreCommands):
         # core commands
         method = getattr(self, "command_{}".format(cmnd), None)
         if method is not None:
-            log.info("internal command {} called by {} ({}) on {}"
+            log.info("Internal command {} called by {} ({}) on {}"
                      .format(cmnd, user, self.factory.is_admin(user), channel))
             method(user, channel, args)
             return
@@ -207,7 +238,6 @@ class Client(irc.IRCClient, CoreCommands):
         if network["identity"]["nickserv_pw"]:
             self.msg("NickServ", "IDENTIFY {}"
                      .format(network["identity"]["nickserv_pw"]))
-            print "authentified"
 
         for channel in network["channels"]:
             self.join(channel)
@@ -216,9 +246,20 @@ class Client(irc.IRCClient, CoreCommands):
         "Called when the bot joins a channel"
         log.info("Joined {} on {}".format(channel,
                                           self.factory.network["server"]))
+        if channel not in self.factory.network["channels"]:
+            self.factory.network["channels"].append(channel)
         if self.logs_enabled:
             self.chatlogger.add_channel(channel)
 
+    def left(self, channel):
+        "Called when the bot has left a channel"
+        log.info("Left {} on {}".format(channel,
+                                          self.factory.network["server"]))
+
+        # Remove the channel from the channel list.
+        self.factory.network["channels"].pop(channel, None)
+        if self.logs_enabled:
+            self.chatlogger.del_channel(channel)
 
     def privmsg(self, user, channel, msg):
         "Called when the bot receives a message"

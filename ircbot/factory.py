@@ -1,8 +1,11 @@
-from twisted.internet import protocol, reactor
-from client import Client
-import os
 import logging
+import os
 import sys
+
+from twisted.internet import protocol, reactor
+
+from client import Client
+
 
 log = logging.getLogger("factory")
 
@@ -22,7 +25,7 @@ class Factory(protocol.ClientFactory):
         # Connection retry delays
         self.lost_delay = 10
         self.failed_delay = 30
-        init_logging(loglevel)
+#         init_logging(loglevel)
 
     def startFactory(self):
         self._loadmodules()
@@ -135,18 +138,3 @@ class Factory(protocol.ClientFactory):
                 except:
                     _string = _string.decode('iso-8859-1')
         return _string
-
-
-def init_logging(loglevel):
-    logger = logging.getLogger()
-
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logger.setLevel(levels[loglevel])
-
-    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
-    formatter = logging.Formatter(default)
-    # Append file name + number if debug is enabled
-
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)

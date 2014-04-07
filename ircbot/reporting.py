@@ -1,7 +1,7 @@
-import time
 import logging
+import sys
+import time
 
-log = logging.getLogger("reporting")
 
 class ChatLogger(object):
     "Logs chat messages only"
@@ -21,12 +21,17 @@ class ChatLogger(object):
 
     def add_channel(self, channel):
 #         channel = channel.strip("#")  # I hate escape characters.
-        if channel in self.logfiles:
-            # FIXME: Where do the attempted duplicate dict entries come from?
-            print "been here before"
-        else:
+        if channel not in self.logfiles:
             self.logfiles[channel] = open("logs/{}-{}.log"
-                                      .format(channel, self.server), "a")
+                                          .format(channel, self.server), "a")
+        else:
+            # FIXME: Where do the attempted duplicate dict entries come from?
+            pass
+
+    def del_channel(self, channel):
+        "Removes a channel from the logfiles dictionary"
+        # To avoid a keyerror, pop will return None if the key is not found.
+        self.logfiles.pop(channel, None)
 
     def open_logs(self, channels):
         for channel in channels:
@@ -38,3 +43,19 @@ class ChatLogger(object):
         for i in self.logfiles.values():
             i.close()
         self.logfiles = {}
+
+
+def init_logging(level):
+    "Initializes the logger for system messages (to stdout only, currently)"
+    logger = logging.getLogger()
+
+    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG][::-1]
+    logger.setLevel(levels[level])
+
+    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
+    formatter = logging.Formatter(default)
+    # Append file name + number if debug is enabled
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)

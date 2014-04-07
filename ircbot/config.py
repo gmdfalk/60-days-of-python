@@ -10,8 +10,9 @@ def get_auth_info(authfile):
 authfile = ".auth"
 auth = get_auth_info(authfile)
 
+# Use a tuple for superadmins and sets for admins & channels.
 superadmins = ("pld",)  # The comma is important.
-channels = ["#z1", "#z2"]
+channels = {"#z1", "#z2"}
 
 identities = {
     "example": {
@@ -35,7 +36,7 @@ networks = {
         "password": auth.get("freenode"),
         "identity": identities["demibot"],
         "superadmins": superadmins,
-        "admins": list(superadmins) + ["mikar"],
+        "admins": set(superadmins) | {"mikar"},  # | is short for set.union().
         "channels": channels,
     },
     "oftc": {
@@ -45,7 +46,7 @@ networks = {
         "password": auth.get("oftc"),
         "identity": identities["demibot"],
         "superadmins": superadmins,
-        "admins": list(superadmins) + ["mikar"],
+        "admins": set(superadmins) | {"mikar"},
         "channels": channels,
     },
 #     "rizon": {
@@ -54,18 +55,19 @@ networks = {
 #         "ssl": False,
 #         "password": auth.get("oftc"),
 #         "identity": identities["example"],
+#         # It's also possible to list superadmins, admins and channels:
 #         "superadmins": (
 #             "nick1",
 #             "nick2"
 #         ),
-#         "admins": [
+#         "admins": {
 #             "nick1",
 #             "nick2",
-#         ],
-#         "channels": [
+#         },
+#         "channels": {
 #             "#z1",
 #             "#z2",
-#         ],
+#         },
 #     },
 #     "quakenet": {
 #         "server": "irc.quakenet.org",
@@ -77,13 +79,13 @@ networks = {
 #             "nick1",
 #             "nick2"
 #         ),
-#         "admins": [
+#         "admins": {
 #             "nick1",
 #             "nick2",
-#         ],
-#         "channels": [
+#         },
+#         "channels": {
 #             "#z1",
 #             "#z2",
-#         ],
+#         },
 #     },
 }

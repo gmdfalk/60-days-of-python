@@ -2,66 +2,47 @@
 """demibot - A multipurpose IRC bot
 
 Usage:
-    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-m N]
-            [-s] [-q] [-h] [-v...]
+    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-m N] [-s]
+            [-q] [-h] [-v...]
 
 Arguments:
     server:port        Server to connect to, default port is 6667.
                        If you don't specify a server, demibot will use
                        config.py as connection information instead.
-    channels           Channels to join, comma separated.
+    channels           Channels to join, comma separated. Hash not necessary.
 
 Options:
     -n, --nick=<nick>  Nickname of the bot [default: demibot]
-    -s, --ssl          Enable if the server supports SSL connections.
     -p, --pass=<pass>  NickServ password, if required.
+    -s, --ssl          Enable if the server supports SSL connections.
     -m, --max-tries N  Limit retries on network errors. [default: 4]
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not pipe log messages to stdout.
-    -v                 Logging verbosity, up to -vvv. [default: 0]
+    -v                 Logging verbosity, up to -vvv.
 
 Examples:
     demibot irc.freenode.net:6667 freenode,archlinux
     demibot irc.freenode.net #django,#python -n demibot --ssl
-    demibot    (will use information in config.py to connect)
+    demibot  (uses config.py for multiserver support with detailed settings)
 """
 
-# TODO:
-# 1. Store admins, passwords etc in a database, maybe involve some hashing.
-# 2. log to database?
-# 3. YAML for config files?
-
-
-from docopt import docopt
 import logging
 import sys
 
+from docopt import docopt
+from twisted.internet import reactor, ssl
+
 import config
-from client import Client, reactor, ssl
 from factory import Factory
+from reporting import init_logging
 
 
 log = logging.getLogger("main")
 
 
-
-def init_logging(level):
-    logger = logging.getLogger()
-
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logger.setLevel(levels[level])
-
-    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
-    formatter = logging.Formatter(default)
-    # Append file name + number if debug is enabled
-
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
 def main():
     args = docopt(__doc__, version="0.1")
-
+    print args["-v"]
     # Establish the configuration.
     if not args["<server>"]:
         networks = config.networks
@@ -107,7 +88,6 @@ def main():
 
     # Set up our logger.
     init_logging(args["-v"])
-    log.info("test")
 
     # Set up the connection info for each network.
     for name in networks.keys():
