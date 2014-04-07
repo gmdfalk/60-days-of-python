@@ -3,26 +3,26 @@ import time
 class ChatLogger(object):
     "Only logs chat events"
     def __init__(self, server):
-        self.logfiles = []
+        self.logfiles = {}
         self.server = server
-
-    def add_channel(self, chatlog):
-
-        self.logfiles.append(chatlog)
 
     def log(self, msg, channel):
         "Write a log line with a timestamp to the logfile of the channel"
-        chatlog = "{}-{}.log".format(channel, self.server)
         timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
-        chatlog.write("{} {}\n".format(timestamp, msg))
-        chatlog.flush()
+        self.logfiles[channel].write("{} {}\n".format(timestamp, msg))
+        self.logfiles[channel].flush()
+
+    def add_channel(self, channel):
+        if channel in self.logfiles:
+            print channel, "already exists:", self.logfiles[channel]
+        self.logfiles[channel] = open("{}-{}.log".format(channel,
+                                                         self.server), "a")
 
     def open_logs(self, channels):
-        chatlogs = ["{}-{}.log".format(i, self.server) for i in channels]
-        for chatlog in chatlogs:
-            chatlog = open(chatlog, "a")
-            self.logfiles.append(chatlog)
+        for channel in channels:
+            self.add_channel(channel)
 
     def close_logs(self):
-        for i in self.logfiles:
+        for i in self.logfiles.values():
             i.close()
+        self.logfiles = {}

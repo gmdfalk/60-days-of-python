@@ -18,7 +18,7 @@ Options:
     -m, --max-tries N  Limit retries on network errors. [default: 4]
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not pipe log messages to stdout.
-    -v                 Logging verbosity, up to -vvv.
+    -v                 Logging verbosity, up to -vvv [default: 3]
 
 Examples:
     demibot irc.freenode.net:6667 freenode,archlinux
@@ -51,7 +51,7 @@ def init_logging(level):
     formatter = logging.Formatter(default)
     # Append file name + number if debug is enabled
 
-    handler = logging.StreamHandler()
+    handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
@@ -81,8 +81,9 @@ def main():
                 "nickserv_pw": args["--pass"],
             }
         }
+        servername = args["<server>"].split(".")[1]  # Let's hope this works.
         networks = {
-            "default": {
+            servername: {
                 "server": args["<server>"],
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],

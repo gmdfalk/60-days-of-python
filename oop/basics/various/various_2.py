@@ -254,7 +254,7 @@ def zip_processing():
             try:
                 zip.extractall(self.temp_directory)
             finally:
-                zip.close_logs()
+                zip.close()
 
         def zip_files(self):
             file = zipfile.ZipFile(self.zipname, "w")
@@ -316,7 +316,7 @@ def zip_processing():
             try:
                 zip.extractall(self.temp_directory)
             finally:
-                zip.close_logs()
+                zip.close()
 
         def zip_files(self):
             file = zipfile.ZipFile(self.zipname, "w")

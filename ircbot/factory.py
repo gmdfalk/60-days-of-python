@@ -1,6 +1,5 @@
 from twisted.internet import protocol, reactor
 from client import Client
-import fnmatch
 import os
 import logging
 import sys
@@ -26,7 +25,7 @@ class Factory(protocol.ClientFactory):
 
     def startFactory(self):
         self._loadmodules()
-        log.info("Factory started")
+        log.info("Factory started.")
 
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost"
@@ -96,8 +95,6 @@ class Factory(protocol.ClientFactory):
         g = {}
 
         g['get_nick'] = self.get_nick
-        g['get_ident'] = self.get_ident
-        g['get_host'] = self.get_host
         g['is_admin'] = self.is_admin
         g['to_utf8'] = self.to_utf8
         g['to_unicode'] = self.to_unicode
@@ -107,18 +104,9 @@ class Factory(protocol.ClientFactory):
         "Parses nick from nick!user@host"
         return user.split('!', 1)[0]
 
-    def get_ident(self, user):
-        "Parses ident from nick!user@host"
-        return user.split('!', 1)[1].split('@')[0]
-
-    def get_host(self, user):
-        "Parses host from nick!user@host"
-        return user.split('@', 1)[1]
-
     def is_admin(self, user):
         "Check if an user has admin privileges."
-        for pattern in self.config['admins']:
-            if fnmatch.fnmatch(user, pattern):
+        if user in self.network["admins"]:
                 return True
         return False
 

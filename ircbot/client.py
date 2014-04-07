@@ -183,17 +183,13 @@ class Client(irc.IRCClient, CoreCommands):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
         if self.logs_enabled:
-            now = time.asctime(time.localtime(time.time()))
             self.chatlogger = ChatLogger(self.factory.network_name)
             self.chatlogger.open_logs(self.factory.network["channels"])
-            self.chatlogger.log("Connected at {}".format(now))
 
     def connectionLost(self, reason):
         "Called when a connection to the server has been lost"
         irc.IRCClient.connectionLost(self, reason)
-        now = time.asctime(time.localtime(time.time()))
         if self.logs_enabled:
-            self.chatlogger.log("Disconnected at {}".format(now))
             self.chatlogger.close_logs()
 
     def signedOn(self):
@@ -207,13 +203,13 @@ class Client(irc.IRCClient, CoreCommands):
 
         for channel in network["channels"]:
             self.join(channel)
-#             if self.logs_enabled:
-#                 self.chatlogger.log("Joined {} on {}"
-#                                 .format(channel, network["server"]))
 
     def joined(self, channel):
         "Called when the bot joins a channel"
-        chatlog = "{}-{}.log".format(channel, self.factory.network_name)
+        log.info("Joined {} on {}".format(channel,
+                                          self.factory.network["server"]))
+        if self.logs_enabled:
+            self.chatlogger.add_channel(channel)
 
 
     def privmsg(self, user, channel, msg):
@@ -223,6 +219,8 @@ class Client(irc.IRCClient, CoreCommands):
         lmsg = msg.lower()
         lnick = self.nickname.lower()
         nickl = len(lnick)
+
+        self.chatlogger.log("<{}> {}".format(user, msg), channel)
 
         if channel == lnick:
             # Turn private queries into a format we can understand
@@ -261,13 +259,6 @@ class Client(irc.IRCClient, CoreCommands):
                 d = threads.deferToThread(func, self, *args, **kwargs)
                 d.addCallback(self.printResult, "handler %s completed" % hname)
                 d.addErrback(self.printError, "handler %s error" % hname)
-
-    def irc_NICK(self, prefix, params):
-        """Called when an IRC user changes their nickname."""
-        old_nick = prefix.split("!")[0]
-        new_nick = params[0]
-        if self.logs_enabled:
-            self.chatlogger.log("{} is now known as {}".format(old_nick, new_nick))
 
     def noticed(self, user, channel, message):
         """I received a notice"""
