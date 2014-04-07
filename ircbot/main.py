@@ -18,7 +18,7 @@ Options:
     -m, --max-tries N  Limit retries on network errors. [default: 4]
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not pipe log messages to stdout.
-    -v                 Logging verbosity, up to -vvv [default: 3]
+    -v                 Logging verbosity, up to -vvv. [default: 0]
 
 Examples:
     demibot irc.freenode.net:6667 freenode,archlinux
@@ -103,6 +103,8 @@ def main():
 
     # Set up our logger.
     init_logging(args["-v"])
+    log = logging.getLogger("main")
+    log.info("test")
 
     # Set up the connection info for each network.
     for name in networks.keys():

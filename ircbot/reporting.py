@@ -1,7 +1,10 @@
 import time
+import logging
+
+log = logging.getLogger("reporting")
 
 class ChatLogger(object):
-    "Only logs chat events"
+    "Logs chat messages only"
     def __init__(self, server):
         self.logfiles = {}
         self.server = server
@@ -14,9 +17,10 @@ class ChatLogger(object):
 
     def add_channel(self, channel):
         if channel in self.logfiles:
-            print channel, "already exists:", self.logfiles[channel]
-        self.logfiles[channel] = open("{}-{}.log".format(channel,
-                                                         self.server), "a")
+            log.info("{} already exists: {}".format(channel,
+                                                    self.logfiles[channel]))
+        self.logfiles[channel] = open("logs/{}-{}.log"
+                                      .format(channel, self.server), "a")
 
     def open_logs(self, channels):
         for channel in channels:

@@ -16,7 +16,8 @@ log = logging.getLogger("client")
 class CoreCommands(object):
 
     def command_rehash(self, user, channel, args):
-        """Reload modules and optionally the configuration file. Usage: rehash [conf]"""
+        """Reload modules and optionally the configuration file.
+        Usage: rehash [conf]"""
 
         if self.factory.is_admin(user):
             try:
@@ -39,21 +40,24 @@ class CoreCommands(object):
             else:
                 self.say(channel, "Rehash OK")
                 log.info("Rehash OK")
+
     def command_channels(self, user, channel, args):
-        """Usage: channels <network> - List channels the bot is on"""
+        "Usage: channels <network> - List channels the bot is on"
         if not args:
-            self.say(channel, "Please specify a network: %s" % ", ".join(self.factory.clients.keys()))
+            self.say(channel, "Please specify a network: %s"
+                     % ", ".join(self.factory.clients.keys()))
             return
 
         self.say(channel, "I am on %s" % self.factory.network.channels)
 
     def command_help(self, user, channel, cmnd):
-        """Get help on all commands or a specific one. Usage: help [<command>]"""
+        "Get help on all commands or a specific one. Usage: help [<command>]"
 
         commands = []
         for module, env in self.factory.ns.items():
             myglobals, mylocals = env
-            commands += [(c.replace("command_", ""), ref) for c, ref in mylocals.items() if c.startswith("command_%s" % cmnd)]
+            commands += [(c.replace("command_", ""), ref) for c, ref in\
+                         mylocals.items() if c.startswith("command_%s" % cmnd)]
         # Help for a specific command
         if len(cmnd):
             for cname, ref in commands:
@@ -66,25 +70,27 @@ class CoreCommands(object):
             commandlist = ", ".join([c for c, ref in commands])
             self.say(channel, "Available commands: %s" % commandlist)
 
-    def command_logs(self, rest):
-        print rest
-        if rest == "off" and self.logs_enabled:
+    def command_logs(self, user, channel, args):
+        if args == "off" and self.logs_enabled:
             self.chatlogger.close_logs()
             self.logs_enabled = False
-            return "logs are now disabled."
-        elif rest == "on" and not self.logs_enabled:
+            return self.say(channel, "Logs are now disabled.")
+        elif args == "on" and not self.logs_enabled:
             self.chatlogger.open_logs()
             self.logs_enabled = True
-            return "logs are now enabled."
+            return self.say(channel, "Logs are now enabled.")
 
         else:
             if self.logs_enabled:
-                return "logs are enabled. Use !logs off to disable logging."
+                return self.say(channel,
+                    "Logs are enabled. Use !logs off to disable logging.")
             else:
-                return "logs are disabled. Use !logs on to enable logging."
+                return self.say(channel,
+                    "Logs are disabled. Use !logs on to enable logging.")
 
     def command_ping(self, user, channel, args):
-        return self.say(channel, "{}, Pong".format(self.factory.get_nick(user)))
+        return self.say(channel,
+                        "{}, Pong".format(self.factory.get_nick(user)))
 
     def command_timer(self, user, channel, args):
         when, sep, msg = args.partition(" ")
@@ -96,7 +102,8 @@ class CoreCommands(object):
         # Returning the Deferred here means that it'll be returned from
         # maybeDeferred in privmsg.
 #         return r
-        return self.say(channel, "{}, {}".format(self.factory.get_nick(user), d))
+        return self.say(channel, "{}, {}"
+                        .format(self.factory.get_nick(user), d))
 
 class Client(irc.IRCClient, CoreCommands):
 
@@ -220,7 +227,9 @@ class Client(irc.IRCClient, CoreCommands):
         lnick = self.nickname.lower()
         nickl = len(lnick)
 
-        self.chatlogger.log("<{}> {}".format(user, msg), channel)
+        # Log the message to a chatfile.
+        self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
+                                             msg), channel)
 
         if channel == lnick:
             # Turn private queries into a format we can understand
@@ -261,9 +270,9 @@ class Client(irc.IRCClient, CoreCommands):
                 d.addErrback(self.printError, "handler %s error" % hname)
 
     def noticed(self, user, channel, message):
-        """I received a notice"""
+        "I received a notice"
         self._runhandler("noticed", user, channel, self.factory.to_utf8(message))
 
     def action(self, user, channel, data):
-        """An action"""
+        "An action"
         self._runhandler("action", user, channel, self.factory.to_utf8(data))
