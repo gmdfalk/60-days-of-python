@@ -19,7 +19,7 @@ class CoreCommands(object):
         """Reload modules and optionally the configuration file.
         Usage: rehash [conf]"""
 
-        if self.factory.is_admin(user):
+        if self.factory.is_superadmin(user):
             try:
                 # rebuild core & update
                 log.info("Rebuilding {}".format(self))
@@ -35,23 +35,27 @@ class CoreCommands(object):
                 # reload modules
                 self.factory._loadmodules()
             except Exception, e:
-                self.say(channel, "Rehash error: {}".format(e))
                 log.error("Rehash error: {}".format(e))
+                return self.say(channel, "Rehash error: {}".format(e))
             else:
-                self.say(channel, "Rehash OK")
                 log.info("Rehash OK")
+                return self.say(channel, "Rehash OK")
         else:
-                self.say(channel, "Requires admin rights")
+                return self.say(channel, "Requires admin rights")
+
+    def command_join(self, user, channel, args):
+        "Usage: join <channel>..."
+        if not args:
+            return self.say(channel, "")
+
+    def command_leave(self, user, channel, args):
+        pass
 
     def command_channels(self, user, channel, args):
-        "Usage: channels <network> - List channels the bot is on"
-        if not args:
-            self.say(channel, "Please specify a network: {}"
-                     .format(", ".join(self.factory.clients.keys())))
-            return
+        "List channels the bot is on. No arguments."
 
-        self.say(channel, "I am on {}".format(", ".join(
-                                            self.factory.network["channels"])))
+        return self.say(channel, "I am on {}"
+                        .format(", ".join(self.factory.network["channels"])))
 
     def command_help(self, user, channel, cmnd):
         "Get help on all commands or a specific one. Usage: help [<command>]"
@@ -93,20 +97,8 @@ class CoreCommands(object):
 
     def command_ping(self, user, channel, args):
         return self.say(channel,
-                        "{}, Pong".format(self.factory.get_nick(user)))
+                        "{}, Pong.".format(self.factory.get_nick(user)))
 
-    def command_timer(self, user, channel, args):
-        when, sep, msg = args.partition(" ")
-        when = int(when)
-        d = defer.Deferred()
-        # A small example of how to defer the reply from a command. callLater
-        # will callback the Deferred with the reply after so many seconds.
-        r = reactor.callLater(when, d.callback, msg)
-        # Returning the Deferred here means that it'll be returned from
-        # maybeDeferred in privmsg.
-#         return r
-        return self.say(channel, "{}, {}"
-                        .format(self.factory.get_nick(user), d))
 
 class Client(irc.IRCClient, CoreCommands):
 
@@ -128,10 +120,10 @@ class Client(irc.IRCClient, CoreCommands):
     # Core
     def printResult(self, msg, info):
         # Don't print results if there is nothing to say (usually non-operation on module)
-        log.debug("Result %s %s" % (msg, info))
+        log.debug("Result {} {}".format(msg, info))
 
     def printError(self, msg, info):
-        log.error("ERROR %s %s" % (msg, info))
+        log.error("ERROR {} {}".format(msg, info))
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
         self.factory.identity["nickname"] += "_"
@@ -144,9 +136,10 @@ class Client(irc.IRCClient, CoreCommands):
             args = ""
 
         # core commands
-        method = getattr(self, "command_%s" % cmnd, None)
+        method = getattr(self, "command_{}".format(cmnd), None)
         if method is not None:
-            log.info("internal command %s called by %s (%s) on %s" % (cmnd, user, self.factory.is_admin(user), channel))
+            log.info("internal command {} called by {} ({}) on {}"
+                     .format(cmnd, user, self.factory.is_admin(user), channel))
             method(user, channel, args)
             return
 
@@ -154,12 +147,16 @@ class Client(irc.IRCClient, CoreCommands):
         for module, env in self.factory.ns.items():
             myglobals, mylocals = env
             # find all matching command functions
-            commands = [(c, ref) for c, ref in mylocals.items() if c == "command_%s" % cmnd]
+            commands = [(c, ref) for c, ref in mylocals.items() if\
+                        c == "command_{}".format(cmnd)]
 
             for cname, command in commands:
-                log.info("module command %s called by %s (%s) on %s" % (cname, user, self.factory.is_admin(user), channel))
+                log.info("Module command {} called by {} ({}) on {}"
+                         .format(cname, user, self.factory.is_admin(user),
+                                 channel))
                 # Defer commands to threads
-                d = threads.deferToThread(command, self, user, channel, self.factory.to_utf8(args.strip()))
+                d = threads.deferToThread(command, self, user, channel,
+                                          self.factory.to_utf8(args.strip()))
                 d.addCallback(self.printResult, "command %s completed" % cname)
                 d.addErrback(self.printError, "command %s error" % cname)
 
@@ -210,6 +207,7 @@ class Client(irc.IRCClient, CoreCommands):
         if network["identity"]["nickserv_pw"]:
             self.msg("NickServ", "IDENTIFY {}"
                      .format(network["identity"]["nickserv_pw"]))
+            print "authentified"
 
         for channel in network["channels"]:
             self.join(channel)
@@ -266,7 +264,7 @@ class Client(irc.IRCClient, CoreCommands):
 
     def _runhandler(self, handler, *args, **kwargs):
 
-        handler = "handle_%s" % handler
+        handler = "handle_{}".format(handler)
         # module commands
         for module, env in self.factory.ns.items():
             myglobals, mylocals = env

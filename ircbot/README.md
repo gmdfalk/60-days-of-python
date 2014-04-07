@@ -6,11 +6,18 @@ An IRCBot written in Python.
 What it currently does:  
   * Logs chat messages.
   * Splits urls into a separate logfile (why not?).
+  * Basic commands:
+    * join: Join one or more channels, comma separated.
+    * leave: Leave one or more channels.
+    * rehash: Reload modules.
+    * me: Shows how you are registered with the bot (superadmin, admin, none).  
+          Might be expanded to include various stats, e.g. your ping or score.  
   * Provides modules:
-    * timer: pings you with a message after n seconds.
     * bmi: calculate the body mass index with height/weight.
     * whatshesaid: quotes from emancipated women ([**collected by jessamynsmith**](https://github.com/jessamynsmith/talkbackbot)).
     * swanson: quotes from the one and only Ron Swanson.  
+    * timer: pings you with a message after n seconds.
+    * quiz: asks questions, gives hints and takes answers.
     
 Quite a bit of the code is adopted from [**Pyfibot**](https://github.com/lepinkainen/pyfibot), including the BMI-module.  
   

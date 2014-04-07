@@ -10,8 +10,7 @@ def get_auth_info(authfile):
 authfile = ".auth"
 auth = get_auth_info(authfile)
 
-# These are only here for convenience and as an example.
-superadmins = ("pld")
+superadmins = ("pld",)  # The comma is important.
 channels = ["#z1", "#z2"]
 
 identities = {

@@ -97,6 +97,7 @@ class Factory(protocol.ClientFactory):
 
         g['get_nick'] = self.get_nick
         g['is_admin'] = self.is_admin
+        g['is_superadmin'] = self.is_superadmin
         g['to_utf8'] = self.to_utf8
         g['to_unicode'] = self.to_unicode
         return g
@@ -107,7 +108,13 @@ class Factory(protocol.ClientFactory):
 
     def is_admin(self, user):
         "Check if an user has admin privileges."
-        if user in self.network["admins"]:
+        if self.get_nick(user) in self.network["admins"]:
+                return True
+        return False
+
+    def is_superadmin(self, user):
+        "Check if an user has superadmin privileges."
+        if self.get_nick(user) in self.network["superadmins"]:
                 return True
         return False
 
