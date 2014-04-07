@@ -2,6 +2,8 @@ import logging
 import sys
 import time
 
+log = logging.getLogger("report")
+
 
 class ChatLogger(object):
     "The logger for chat messages and urls"
@@ -11,12 +13,24 @@ class ChatLogger(object):
 
     def log(self, msg, channel):
         "Write a log line with a timestamp to the logfile of the channel"
-        timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
-        self.logfiles[channel].write("{} {}\n".format(timestamp, msg))
+        timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
+        self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))
         self.logfiles[channel].flush()
 
-    def log_url(self, url):
-        self.logfiles["urls"].write("{}\n".format(url))
+        if "http://" in msg or "www." in msg:
+            log.debug("URL detected.")
+            self.log_url(msg, channel, timestamp)
+
+    def log_url(self, msg, channel, timestamp):
+        "Messages that contain urls are logged separately. Why not?"
+
+#         # This used to extract only the url but a little context is better.
+#         splitmsg = msg.lower().split()
+#         for i in splitmsg:
+#             if i.startswith("www") or i.startswith("http://"):
+
+        self.logfiles["urls"].write("[{}] ({}) {}\n".format(timestamp,
+                                                            channel, msg))
         self.logfiles["urls"].flush()
 
     def add_channel(self, channel):
@@ -25,8 +39,8 @@ class ChatLogger(object):
             self.logfiles[channel] = open("logs/{}-{}.log"
                                           .format(channel, self.server), "a")
         else:
-            # FIXME: Where do the attempted duplicate dict entries come from?
-            pass
+            # Track redundant channel additions here.
+            log.debug("Tried to add an existing channel: {}".format(channel))
 
     def del_channel(self, channel):
         "Removes a channel from the logfiles dictionary"

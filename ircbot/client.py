@@ -18,6 +18,7 @@ class CoreCommands(object):
     def command_rehash(self, user, channel, args):
         "Rehashes all available modules to reflect any changes."
 
+        # Only allow superadmins to reload modules.
         if self.factory.is_superadmin(user):
             try:
                 log.info("Rebuilding {}".format(self))
@@ -55,7 +56,7 @@ class CoreCommands(object):
                 self.join(c)
 
     def command_leave(self, user, channel, args):
-        "Usage: leave <channel>"
+        "Usage: leave <channel>... (Comma separated, hash not required)"
 
         if not self.factory.is_admin(user):
             return
@@ -86,7 +87,7 @@ class CoreCommands(object):
         "List channels the bot is on. No arguments."
 
         return self.say(channel, "I am on {}"
-                        .format(", ".join(self.factory.network["channels"])))
+                        .format(",".join(self.factory.network["channels"])))
 
     def command_help(self, user, channel, cmnd):
         "Get help on all commands or a specific one. Usage: help [<command>]"
@@ -273,16 +274,10 @@ class Client(irc.IRCClient, CoreCommands):
         lnick = self.nickname.lower()
         nickl = len(lnick)
 
-        # Log the message to a chatfile but ignore private messages.
+        # Log messages to a chatfile except private ones.
         if self.factory.logs_enabled and channel != lnick:
             self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
                                                  msg), channel)
-            # If there is a url in the message, log it to logs/url-server.log.
-            if "http://" or "www." in msg:
-                splitmsg = msg.lower().split()
-                for i in splitmsg:
-                    if i.startswith("www") or i.startswith("http://"):
-                        self.chatlogger.log_url(i)
 
         if channel == lnick:
             # Turn private queries into a format we can understand
