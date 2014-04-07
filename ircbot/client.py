@@ -236,8 +236,8 @@ class Client(irc.IRCClient, CoreCommands):
                                                  msg), channel)
             # If there is a url in the message, log it to logs/url-server.log.
             if "http://" or "www." in msg:
-                msg = msg.lower().split()
-                for i in msg:
+                splitmsg = msg.lower().split()
+                for i in splitmsg:
                     if i.startswith("www") or i.startswith("http://"):
                         self.chatlogger.log_url(i)
 

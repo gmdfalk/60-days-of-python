@@ -1,15 +1,31 @@
+def get_auth_info(authfile):
+    "Reads authentication info from a file"
+    auth = {}
+    with open(authfile) as f:
+        for line in f:
+            name, password = line.split()
+            auth[name] = password
+    return auth
+
+authfile = ".auth"
+auth = get_auth_info(authfile)
+
+# These are only here for convenience and as an example.
+superadmins = ("pld")
+channels = ["#z1", "#z2"]
+
 identities = {
     "example": {
         "nickname": "examplebot",
         "realname": "I'm a bot",
         "username": "examplebot",
-        "nickserv_pw": None
+        "nickserv_pw": auth.get("example")
     },
     "demibot": {
         "nickname": "demibot",
         "realname": "the game",
         "username": "anonymous",
-        "nickserv_pw": None
+        "nickserv_pw": auth.get("demibot")
     },
 }
 networks = {
@@ -17,61 +33,58 @@ networks = {
         "server": "irc.freenode.net",
         "port": 6667,
         "ssl": False,
-        "password": None,
+        "password": auth.get("freenode"),
         "identity": identities["demibot"],
-        "superadmin": "mikar",
-        "admins": [
-            "mikar",
-            "pld",
-        ],
-        "channels": [
-            "#z1",
-            "#z2",
-        ]
+        "superadmins": superadmins,
+        "admins": list(superadmins) + ["mikar"],
+        "channels": channels,
     },
     "oftc": {
         "server": "irc.oftc.net",
         "port": 6667,
         "ssl": False,
-        "password": None,
+        "password": auth.get("oftc"),
         "identity": identities["demibot"],
-        "admins": [
-            "mikar",
-            "pld",
-        ],
-        "channels": [
-            "#z1",
-            "#z2",
-        ]
+        "superadmins": superadmins,
+        "admins": list(superadmins) + ["mikar"],
+        "channels": channels,
     },
 #     "rizon": {
 #         "server": "irc.rizon.net",
 #         "port": 6667,
 #         "ssl": False,
-#         "password": None,
+#         "password": auth.get("oftc"),
 #         "identity": identities["example"],
-#         "admins": (
-#             "mikar",
-#             "pld",
+#         "superadmins": (
+#             "nick1",
+#             "nick2"
 #         ),
-#         "channels": (
+#         "admins": [
+#             "nick1",
+#             "nick2",
+#         ],
+#         "channels": [
 #             "#z1",
 #             "#z2",
-#         )
+#         ],
 #     },
 #     "quakenet": {
 #         "server": "irc.quakenet.org",
 #         "port": 6667,
 #         "ssl": False,
-#         "password": None,
+#         "password": auth.get("oftc"),
 #         "identity": identities["example"],
-#         "admins": (
-#             "mikar",
-#             "pld",
+#         "superadmins": (
+#             "nick1",
+#             "nick2"
 #         ),
-#         "channels": (
+#         "admins": [
+#             "nick1",
+#             "nick2",
+#         ],
+#         "channels": [
 #             "#z1",
 #             "#z2",
-#         )
-#     }
+#         ],
+#     },
 }
