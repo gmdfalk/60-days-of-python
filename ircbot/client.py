@@ -234,6 +234,12 @@ class Client(irc.IRCClient, CoreCommands):
         if self.logs_enabled:
             self.chatlogger.log("<{}> {}".format(self.factory.get_nick(user),
                                                  msg), channel)
+            # If there is a url in the message, log it to logs/url-server.log.
+            if "http://" or "www." in msg:
+                msg = msg.lower().split()
+                for i in msg:
+                    if i.startswith("www") or i.startswith("http://"):
+                        self.chatlogger.log_url(i)
 
         if channel == lnick:
             # Turn private queries into a format we can understand

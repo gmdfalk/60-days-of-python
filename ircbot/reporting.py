@@ -15,17 +15,24 @@ class ChatLogger(object):
         self.logfiles[channel].write("{} {}\n".format(timestamp, msg))
         self.logfiles[channel].flush()
 
+    def log_url(self, url):
+        self.logfiles["urls"].write("{}\n".format(url))
+        self.logfiles["urls"].flush()
+
     def add_channel(self, channel):
+#         channel = channel.strip("#")  # I hate escape characters.
         if channel in self.logfiles:
-            channel = channel.strip("#")  # I hate escape characters.
-            log.info("{} already exists: {}".format(channel,
-                                                    self.logfiles[channel]))
-        self.logfiles[channel] = open("logs/{}-{}.log"
+            # FIXME: Where do the attempted duplicate dict entries come from?
+            print "been here before"
+        else:
+            self.logfiles[channel] = open("logs/{}-{}.log"
                                       .format(channel, self.server), "a")
 
     def open_logs(self, channels):
         for channel in channels:
             self.add_channel(channel)
+        self.logfiles["urls"] = open("logs/urls-{}.log"
+                                     .format(self.server), "a")
 
     def close_logs(self):
         for i in self.logfiles.values():

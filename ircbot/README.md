@@ -4,7 +4,8 @@ An IRCBot written in Python.
 --
   
 What it currently does:  
-  * Logs chat activities.
+  * Logs chat messages.
+  * Splits urls into a separate logfile (why not?).
   * Provides modules:
     * timer: pings you with a message after n seconds.
     * bmi: calculate the body mass index with height/weight.
