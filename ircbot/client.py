@@ -10,19 +10,106 @@ import logging
 import string
 import textwrap
 
+log = logging.getLogger("client")
 
-class Client(irc.IRCClient):
+
+class CoreCommands(object):
+
+    def command_rehash(self, user, channel, args):
+        """Reload modules and optionally the configuration file. Usage: rehash [conf]"""
+
+        if self.factory.is_admin(user):
+            try:
+                # rebuild core & update
+                log.info("rebuilding %r" % self)
+                rebuild.updateInstance(self)
+
+                # reload config file
+                if args == 'conf':
+                    self.factory.reload_config()
+                    self.say(channel, 'Configuration reloaded.')
+
+                # unload removed modules
+                self.factory._unload_removed_modules()
+                # reload modules
+                self.factory._loadmodules()
+            except Exception, e:
+                self.say(channel, "Rehash error: %s" % e)
+                log.error("Rehash error: %s" % e)
+            else:
+                self.say(channel, "Rehash OK")
+                log.info("Rehash OK")
+    def command_channels(self, user, channel, args):
+        """Usage: channels <network> - List channels the bot is on"""
+        if not args:
+            self.say(channel, "Please specify a network: %s" % ", ".join(self.factory.clients.keys()))
+            return
+
+        self.say(channel, "I am on %s" % self.factory.network.channels)
+
+    def command_help(self, user, channel, cmnd):
+        """Get help on all commands or a specific one. Usage: help [<command>]"""
+
+        commands = []
+        for module, env in self.factory.ns.items():
+            myglobals, mylocals = env
+            commands += [(c.replace("command_", ""), ref) for c, ref in mylocals.items() if c.startswith("command_%s" % cmnd)]
+        # Help for a specific command
+        if len(cmnd):
+            for cname, ref in commands:
+                if cname == cmnd:
+                    helptext = ref.__doc__.split("\n", 1)[0]
+                    self.say(channel, "Help for %s: %s" % (cmnd, helptext))
+                    return
+        # Generic help
+        else:
+            commandlist = ", ".join([c for c, ref in commands])
+            self.say(channel, "Available commands: %s" % commandlist)
+
+    def command_logs(self, rest):
+        print rest
+        if rest == "off" and self.logs_enabled:
+            self.logger.close_logs()
+            self.logs_enabled = False
+            return "logs are now disabled."
+        elif rest == "on" and not self.logs_enabled:
+            self.logger.open_logs()
+            self.logs_enabled = True
+            return "logs are now enabled."
+
+        else:
+            if self.logs_enabled:
+                return "logs are enabled. Use !logs off to disable logging."
+            else:
+                return "logs are disabled. Use !logs on to enable logging."
+
+    def command_ping(self, user, channel, args):
+        return self.say(channel, "{}, Pong".format(self.factory.get_nick(user)))
+
+    def command_timer(self, user, channel, args):
+        when, sep, msg = args.partition(" ")
+        when = int(when)
+        d = defer.Deferred()
+        # A small example of how to defer the reply from a command. callLater
+        # will callback the Deferred with the reply after so many seconds.
+        r = reactor.callLater(when, d.callback, msg)
+        # Returning the Deferred here means that it'll be returned from
+        # maybeDeferred in privmsg.
+#         return r
+        return self.say(channel, "{}, {}".format(self.factory.get_nick(user), d))
+
+class Client(irc.IRCClient, CoreCommands):
 
     def __init__(self, factory):
         self.factory = factory
+        self.nickname = self.identity["nickname"]
+        self.realname = self.identity["realname"]
+        self.username = self.identity["username"]
+        self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.logs_enabled = True
         self.loglevel = 0
         self.lead = "."
-        self.tw = textwrap.TextWrapper(width=400, break_long_words=True)
-        self.nickname = self.factory.identity["nickname"]
-        self.realname = self.factory.identity["realname"]
-        self.username = self.factory.identity["username"]
-#         log.info("Bot initialized")
+        log.info("Bot initialized")
 
     def __repr__(self):
         return "demibot(%r, %r)" % (self.nickname,
@@ -31,15 +118,13 @@ class Client(irc.IRCClient):
     # Core
     def printResult(self, msg, info):
         # Don't print results if there is nothing to say (usually non-operation on module)
-#         log.debug("Result %s %s" % (msg, info))
-        pass
+        log.debug("Result %s %s" % (msg, info))
 
     def printError(self, msg, info):
-#         log.error("ERROR %s %s" % (msg, info))
-        pass
+        log.error("ERROR %s %s" % (msg, info))
 
     def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.factory.identity["nickname"] += "_"
+        self.identity["nickname"] += "_"
 
     def _command(self, user, channel, cmnd):
         # Split arguments from the command part
@@ -51,7 +136,7 @@ class Client(irc.IRCClient):
         # core commands
         method = getattr(self, "command_%s" % cmnd, None)
         if method is not None:
-#             log.info("internal command %s called by %s (%s) on %s" % (cmnd, user, self.factory.isAdmin(user), channel))
+            log.info("internal command %s called by %s (%s) on %s" % (cmnd, user, self.factory.is_admin(user), channel))
             method(user, channel, args)
             return
 
@@ -62,7 +147,7 @@ class Client(irc.IRCClient):
             commands = [(c, ref) for c, ref in mylocals.items() if c == "command_%s" % cmnd]
 
             for cname, command in commands:
-#                 log.info("module command %s called by %s (%s) on %s" % (cname, user, self.factory.isAdmin(user), channel))
+                log.info("module command %s called by %s (%s) on %s" % (cname, user, self.factory.is_admin(user), channel))
                 # Defer commands to threads
                 d = threads.deferToThread(command, self, user, channel, self.factory.to_utf8(args.strip()))
                 d.addCallback(self.printResult, "command %s completed" % cname)
@@ -77,12 +162,13 @@ class Client(irc.IRCClient):
         # Encode all outgoing messages to UTF-8
         message = self.factory.to_utf8(message)
 
-        # Change nick!user@host -> nick, since all servers don't support full hostmask messaging
+        # Change nick!user@host -> nick, since all servers don't support full
+        # hostmask messaging
         if "!" and "@" in channel:
-            channel = self.factory.getNick(channel)
+            channel = self.factory.get_nick(channel)
 
         # wrap long text into suitable fragments
-        msg = self.tw.wrap(message)
+        msg = self.wrap.wrap(message)
         cont = False
 
         for m in msg:
@@ -91,7 +177,7 @@ class Client(irc.IRCClient):
             self.msg(channel, m, length)
             cont = True
 
-        return ('botcore.say', channel, message)
+        return ('client.say', channel, message)
 
     def connectionMade(self):
         "Called when a connection to the server has been established"
@@ -106,7 +192,7 @@ class Client(irc.IRCClient):
         now = time.asctime(time.localtime(time.time()))
         if self.logs_enabled:
             self.logger.log("Disconnected at {}".format(now))
-            self.logger.close()
+            self.logger.close_logs()
 
     def signedOn(self):
         "Called when the bot has successfully signed on to server"
@@ -125,11 +211,14 @@ class Client(irc.IRCClient):
 
     def joined(self, channel):
         "Called when the bot joins a channel"
-        pass
+        chatlog = "{}-{}.log".format(channel, self.server)
+        self.logger = ChatLogger(open(chatlog, "a"))
+
 
     def privmsg(self, user, channel, msg):
         "Called when the bot receives a message"
 
+        chatlog = "{}-{}.log".format(channel, self.server)
         channel = channel.lower()
         lmsg = msg.lower()
         lnick = self.nickname.lower()
@@ -187,59 +276,3 @@ class Client(irc.IRCClient):
     def action(self, user, channel, data):
         """An action"""
         self._runhandler("action", user, channel, self.factory.to_utf8(data))
-
-    def command_ping(self, user, channel, args):
-        return self.say(channel, "{}, Pong".format(self.factory.getNick(user)))
-
-    def command_timer(self, user, channel, args):
-        when, sep, msg = args.partition(" ")
-        when = int(when)
-        d = defer.Deferred()
-        # A small example of how to defer the reply from a command. callLater
-        # will callback the Deferred with the reply after so many seconds.
-        reactor.callLater(when, d.callback, msg)
-        # Returning the Deferred here means that it'll be returned from
-        # maybeDeferred in privmsg.
-        return self.say(channel, "{}, {}".format(self.factory.getNick(user), d))
-
-    def command_rehash(self, user, channel, args):
-        """Reload modules and optionally the configuration file. Usage: rehash [conf]"""
-
-        if self.factory.isAdmin(user):
-            try:
-                # rebuild core & update
-#                 log.info("rebuilding %r" % self)
-                rebuild.updateInstance(self)
-
-                # reload config file
-                if args == 'conf':
-                    self.factory.reload_config()
-                    self.say(channel, 'Configuration reloaded.')
-
-                # unload removed modules
-                self.factory._unload_removed_modules()
-                # reload modules
-                self.factory._loadmodules()
-            except Exception, e:
-                self.say(channel, "Rehash error: %s" % e)
-#                 log.error("Rehash error: %s" % e)
-            else:
-                self.say(channel, "Rehash OK")
-#                 log.info("Rehash OK")
-
-    def command_logs(self, rest):
-        print rest
-        if rest == "off" and self.logs_enabled:
-            self.logger.close()
-            self.logs_enabled = False
-            return "logs are now disabled."
-        elif rest == "on" and not self.logs_enabled:
-            self.logger = ChatLogger(open(self.factory.logfile, "a"))
-            self.logs_enabled = True
-            return "logs are now enabled."
-
-        else:
-            if self.logs_enabled:
-                return "logs are enabled. Use !logs off to disable logging."
-            else:
-                return "logs are disabled. Use !logs on to enable logging."

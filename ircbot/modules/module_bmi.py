@@ -31,4 +31,4 @@ def command_bmi(bot, user, channel, args):
         return bot.say(channel, "Usage: bmi height(cm)/weight(kg)")
     else:
         bmi = print_bmi(calc_bmi(int(data[0]), int(data[1])))
-        return bot.say(channel, "{}, {}".format(getNick(user), bmi))
+        return bot.say(channel, "{}, {}".format(get_nick(user), bmi))

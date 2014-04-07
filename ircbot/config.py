@@ -13,49 +13,61 @@ identities = {
     },
 }
 networks = {
-    "Freenode": {
+    "freenode": {
         "server": "irc.freenode.net",
         "port": 6667,
         "ssl": False,
         "password": None,
-        "admins": "mikar",
         "identity": identities["demibot"],
-        "channels": (
+        "admins": [
+            "mikar",
+            "pld",
+        ],
+        "channels": [
             "#z1",
             "#z2",
-        )
+        ]
     },
-    "OFTC": {
+    "oftc": {
         "server": "irc.oftc.net",
         "port": 6667,
         "ssl": False,
         "password": None,
-        "admins": "mikar",
         "identity": identities["demibot"],
-        "channels": (
+        "admins": [
+            "mikar",
+            "pld",
+        ],
+        "channels": [
             "#z1",
             "#z2",
-        )
+        ]
     },
-#     "Rizon": {
+#     "rizon": {
 #         "server": "irc.rizon.net",
 #         "port": 6667,
 #         "ssl": False,
 #         "password": None,
-#         "admins": "mikar"
 #         "identity": identities["example"],
+#         "admins": (
+#             "mikar",
+#             "pld",
+#         ),
 #         "channels": (
 #             "#z1",
 #             "#z2",
 #         )
 #     },
-#     "Quakenet": {
+#     "quakenet": {
 #         "server": "irc.quakenet.org",
 #         "port": 6667,
 #         "ssl": False,
 #         "password": None,
-#         "admins": "mikar"
 #         "identity": identities["example"],
+#         "admins": (
+#             "mikar",
+#             "pld",
+#         ),
 #         "channels": (
 #             "#z1",
 #             "#z2",

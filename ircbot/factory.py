@@ -5,106 +5,116 @@ import os
 import logging
 import sys
 
+log = logging.getLogger("factory")
+
 
 class Factory(protocol.ClientFactory):
 
+    clients = {}
     moduledir = os.path.join(sys.path[0], "modules/")
 
-    def __init__(self, network_name, network, logfile="demibot.log"):
+    def __init__(self, network_name, network, loglevel):
         self.network_name = network_name
         self.network = network
-        self.logfile = logfile
-        self.identity = self.network["identity"]
+        self.loglevel = int(loglevel)
+        # Namespace for modules
         self.ns = {}
-
+        # Connection retry delays
+        self.lost_delay = 10
+        self.failed_delay = 30
 
     def startFactory(self):
         self._loadmodules()
-#         log.info("Factory started")
+        log.info("Factory started")
 
     def clientConnectionLost(self, connector, reason):
-        """If we get disconnected, reconnect to server."""
-#         log.warn("Client connection lost")
-        connector.connect()
+        "Reconnect after 10 seconds if the connection to the network is lost"
+        log.info("connection lost (%s): reconnecting in %d seconds" %
+                    (reason, self.lostDelay))
+        reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
-#         log.warn("Client connection failed")
-        reactor.stop()
+        "Reconnect after 30 seconds if the connection to the network fails"
+        log.info("connection failed (%s): reconnecting in %d seconds" %
+                   (reason, self.failedDelay))
+        reactor.callLater(self.failed_delay, connector.connect)
 
     def buildProtocol(self, address):
-        # we are connecting to a server, don't know which yet
-#         log.info("Building protocol for %s", address)
+        log.info("Building protocol for %s", address)
         p = Client(self)
+        self.clients[self.network_name] = p
         return p
 
     def _finalize_modules(self):
-        """Call all module finalizers"""
+        "Call all module finalizers"
         for module in self._findmodules():
-            # if rehashing (module already in namespace), finalize the old instance first
+            # If rehashing (module already in namespace),
+            # finalize the old instance first.
             if module in self.ns:
                 if 'finalize' in self.ns[module][0]:
-#                     log.info("finalize - %s" % module)
+                    log.info("finalize - %s" % module)
                     self.ns[module][0]['finalize']()
 
     def _loadmodules(self):
-        """Load all modules"""
+        "Load all modules"
         self._finalize_modules()
         for module in self._findmodules():
             env = self._getGlobals()
-#             log.info("load module - %s" % module)
+            log.info("load module - %s" % module)
             # Load new version of the module
             execfile(os.path.join(self.moduledir, module), env, env)
             # Initialize module
             if 'init' in env:
-#                 log.info("initialize module - %s" % module)
+                log.info("initialize module - %s" % module)
                 env['init'](self)
             # Add to namespace so we can find it later
             self.ns[module] = (env, env)
 
     def _unload_removed_modules(self):
-        """Unload modules removed from modules -directory"""
-        # find all modules in namespace, which aren't present in modules -directory
+        "Unload modules removed from modules -directory"
+        # Find all modules in namespace that aren't present in moduledir
         removed_modules = [m for m in self.ns if not m in self._findmodules()]
 
         for m in removed_modules:
             # finalize module before deleting it
             # TODO: use general _finalize_modules instead of copy-paste
             if 'finalize' in self.ns[m][0]:
-#                 log.info("finalize - %s" % m)
+                log.info("finalize - %s" % m)
                 self.ns[m][0]['finalize']()
             del self.ns[m]
-#             log.info('removed module - %s' % m)
+            log.info('removed module - %s' % m)
 
     def _findmodules(self):
-        """Find all modules"""
-        modules = [m for m in os.listdir(self.moduledir) if m.startswith("module_") and m.endswith(".py")]
+        "Find all modules"
+        modules = [m for m in os.listdir(self.moduledir) if\
+                   m.startswith("module_") and m.endswith(".py")]
         return modules
 
     def _getGlobals(self):
-        """Global methods for modules"""
+        "Global methods for modules"
         g = {}
 
-        g['getNick'] = self.getNick
-        g['getIdent'] = self.getIdent
-        g['getHost'] = self.getHost
-        g['isAdmin'] = self.isAdmin
+        g['get_nick'] = self.get_nick
+        g['get_ident'] = self.get_ident
+        g['get_host'] = self.get_host
+        g['is_admin'] = self.is_admin
         g['to_utf8'] = self.to_utf8
         g['to_unicode'] = self.to_unicode
         return g
 
-    def getNick(self, user):
+    def get_nick(self, user):
         "Parses nick from nick!user@host"
         return user.split('!', 1)[0]
 
-    def getIdent(self, user):
+    def get_ident(self, user):
         "Parses ident from nick!user@host"
         return user.split('!', 1)[1].split('@')[0]
 
-    def getHost(self, user):
+    def get_host(self, user):
         "Parses host from nick!user@host"
         return user.split('@', 1)[1]
 
-    def isAdmin(self, user):
+    def is_admin(self, user):
         "Check if an user has admin privileges."
         for pattern in self.config['admins']:
             if fnmatch.fnmatch(user, pattern):
@@ -130,20 +140,15 @@ class Factory(protocol.ClientFactory):
         return _string
 
 
-def init_logging(config):
+def init_logging(level):
     logger = logging.getLogger()
 
-    if config.get('debug', False):
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
+    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
+    logger.setLevel(levels[level])
 
-
-    FORMAT = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
-    formatter = logging.Formatter(FORMAT)
+    default = "%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s"
+    formatter = logging.Formatter(default)
     # Append file name + number if debug is enabled
-    if config.get('debug', False):
-        FORMAT = "%s %s" % (FORMAT, " (%(filename)s:%(lineno)d)")
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)

@@ -2,8 +2,8 @@
 """demibot - A multipurpose IRC bot
 
 Usage:
-    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
-            [-m N] [-s] [-q] [-h] [-v...]
+    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-m N]
+            [-s] [-q] [-h] [-v...]
 
 Arguments:
     server:port        Server to connect to, default port is 6667.
@@ -13,7 +13,6 @@ Arguments:
 
 Options:
     -n, --nick=<nick>  Nickname of the bot [default: demibot]
-    -f, --file=<file>  Name of the logging file.
     -s, --ssl          Enable if the server supports SSL connections.
     -p, --pass=<pass>  NickServ password, if required.
     -m, --max-tries N  Limit retries on network errors. [default: 4]
@@ -64,7 +63,7 @@ def main():
             "default": {
                 "nickname": args["--nick"],
                 "realname": "Anonymous",
-                "username": args["--nick"],
+                "username": "test",  # args["--nick"],
                 "nickserv_pw": args["--pass"],
             }
         }
@@ -74,7 +73,8 @@ def main():
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],
                 "identity": identities["default"],
-                "channels": tuple(channels)
+                "admins": ["mikar", "pld"],
+                "channels": channels,
             }
         }
 
@@ -86,19 +86,10 @@ def main():
     if args["-v"] > 3:
         args["-v"] = 3
 
-    # Set the log level according to verbosity count.
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logging.basicConfig(level=levels[args["-v"]])
-
     # Set up the connection info for each network.
     for name in networks.keys():
-        # If we specified a --file command line argument, use that as logfile.
-        if args["--file"]:
-            logfile = "logs/{}.log".format(args["--file"])
-        else:
-            logfile = "logs/{}.log".format(networks[name]["server"])
 
-        factory = Factory(name, networks[name], logfile)
+        factory = Factory(name, networks[name], args["-v"])
 
         server = networks[name]["server"]
         port = networks[name]["port"]

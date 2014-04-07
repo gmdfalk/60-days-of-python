@@ -87,8 +87,8 @@ def main():
         print('\nInterrupted\n')
     finally:
         reporting.report(crawler)
-        crawler.close()
-        loop.close()
+        crawler.close_logs()
+        loop.close_logs()
 
 
 if __name__ == "__main__":

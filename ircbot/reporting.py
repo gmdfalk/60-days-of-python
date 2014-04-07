@@ -1,18 +1,25 @@
 import time
 
 class ChatLogger(object):
-    """
-    An independent logger class (because separation of application
-    and protocol logic is a good thing).
-    """
-    def __init__(self, logfile):
-        self.logfile = logfile
+    "Only logs chat events"
+    def __init__(self):
+        self.logfiles = []
 
-    def log(self, msg):
-        """Write a log line to the file with timestamp."""
+    def add_channel(self, chatlog):
+
+        self.logfiles.append(chatlog)
+
+    def log(self, msg, chatlog):
+        "Write a log line with a timestamp to the channelfile"
         timestamp = time.strftime("[%H:%M:%S]", time.localtime(time.time()))
-        self.logfile.write("{} {}\n".format(timestamp, msg))
-        self.logfile.flush()
+        chatlog.write("{} {}\n".format(timestamp, msg))
+        chatlog.flush()
 
-    def close(self):
-        self.logfile.close()
+    def open_logs(self, channels, server):
+        chatlogs = ["{}-{}.log".format(i, server) for i in channels]
+        for chatlog in chatlogs:
+            open(chatlog, "a")
+
+    def close_logs(self):
+        for i in self.logfiles:
+            i.close_logs()
