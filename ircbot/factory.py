@@ -29,6 +29,7 @@ class Factory(protocol.ClientFactory):
         # not and or is not.
         self.logs_enabled = True ^ nologs
         self.titles_enabled = False
+        self.retry_enabled = True
         # Connection retry delays
         self.lost_delay = 10
         self.failed_delay = 30
@@ -39,15 +40,17 @@ class Factory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost"
-        log.info("connection lost ({}): reconnecting in {} seconds"
-                 .format(reason, self.lost_delay))
-        reactor.callLater(self.lost_delay, connector.connect)
+        if self.retry_enabled:
+            log.info("connection lost ({}): reconnecting in {} seconds"
+                     .format(reason, self.lost_delay))
+            reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
         "Reconnect after 30 seconds if the connection to the network fails"
-        log.info("connection failed ({}): reconnecting in {} seconds"
-                 .format(reason, self.failed_delay))
-        reactor.callLater(self.failed_delay, connector.connect)
+        if self.retry_enabled:
+            log.info("connection failed ({}): reconnecting in {} seconds"
+                     .format(reason, self.failed_delay))
+            reactor.callLater(self.failed_delay, connector.connect)
 
     def buildProtocol(self, address):
         log.info("Building protocol for {}".format(address))

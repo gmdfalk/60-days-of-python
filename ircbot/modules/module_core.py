@@ -1,30 +1,45 @@
+"""Core Commands
+
+    The basic bot commands.
+        * rehash
+        * quit
+        * join
+        * leave
+        * help
+        * channels
+        * logs
+
+    Most of these require admin rights.
+
+    Having these here increases rehash time but for now I'll take that penalty.
+"""
+
 import logging
 
 from twisted.python import rebuild
 
 
-log = logging.getLogger("client")
+log = logging.getLogger("core")
 
 
 
 def command_rehash(bot, user, channel, args):
     "Rehashes all available modules to reflect any changes."
 
-    # Only allow superadmins to reload modules.
-    if bot.factory.is_superadmin(user):
-        try:
-            log.info("Rebuilding {}".format(bot))
-            rebuild.updateInstance(bot)
-            bot.factory._unload_removed_modules()
-            bot.factory._loadmodules()
-        except Exception, e:
-            log.error("Rehash error: {}".format(e))
-            return bot.say(channel, "Rehash error: {}".format(e))
-        else:
-            log.info("Rehash OK")
-            return bot.say(channel, "Rehash OK")
+    if not is_superadmin(user):
+        return
+
+    try:
+        log.info("Rebuilding {}".format(bot))
+        rebuild.updateInstance(bot)
+        bot.factory._unload_removed_modules()
+        bot.factory._loadmodules()
+    except Exception, e:
+        log.error("Rehash error: {}".format(e))
+        return bot.say(channel, "Rehash error: {}".format(e))
     else:
-        return bot.say(channel, "Requires admin rights")
+        log.info("Rehash OK")
+        return bot.say(channel, "Rehash OK")
 
 
 def command_quit(bot, user, channel, args):
@@ -33,7 +48,7 @@ def command_quit(bot, user, channel, args):
     if not bot.factory.is_superadmin(user):
         return
 
-    bot.factory.lost_delay = 0
+    bot.factory.retry_enabled = False
     bot.quit()
 
 
@@ -90,6 +105,8 @@ def command_leave(bot, user, channel, args):
 
 def command_channels(bot, user, channel, args):
     "List channels the bot is on. No arguments."
+    if not is_admin(user):
+        return
 
     return bot.say(channel, "I am on {}"
                     .format(",".join(bot.factory.network["channels"])))
@@ -118,6 +135,9 @@ def command_help(bot, user, channel, cmnd):
 
 def command_logs(bot, user, channel, args):
     "Usage: logs [<on>|<off>|<level>]"
+    if not is_superadmin(user):
+        return
+
     if args == "off" and bot.factory.logs_enabled:
         bot.chatlogger.close_logs()
         bot.factory.logs_enabled = False
@@ -131,7 +151,8 @@ def command_logs(bot, user, channel, args):
     elif args == "level":
         # FIXME: Somehow, this shows WARN even though -vvv is enabled.
         level = logging.getLogger().getEffectiveLevel()
-        levels = ["ERROR (default)", "WARN [-v]", "INFO [-vv]", "DEBUG [-vvv]"]
+        levels = ["notset", "debug [-vvv]", "info [-vv]",
+                  "warn [-v]", "error, least verbose"]
         label = levels[level / 10]
         return bot.say(channel, "Log level is {} ({})."
                         .format(level / 10, label))

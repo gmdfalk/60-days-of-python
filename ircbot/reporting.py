@@ -6,13 +6,15 @@ log = logging.getLogger("report")
 
 
 class ChatLogger(object):
-    "The logger for chat messages and urls"
+    "The logger for chat messages and URLs"
     def __init__(self, server):
         self.logfiles = {}
         self.server = server
+        self.prefix = "logs/"  # Path goes here.
+        self.suffix = ".log"
 
     def log(self, msg, channel):
-        "Write a log line with a timestamp to the logfile of the channel"
+        "Write a log line with a time stamp to the logfile of the channel"
         timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
         self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))
         self.logfiles[channel].flush()
@@ -27,8 +29,9 @@ class ChatLogger(object):
     def add_channel(self, channel):
 #         channel = channel.strip("#")  # I hate escape characters.
         if channel not in self.logfiles:
-            self.logfiles[channel] = open("logs/{}-{}.log"
-                                          .format(channel, self.server), "a")
+            self.logfiles[channel] = open("{}{}-{}{}" .format(self.prefix,
+                                          channel, self.server, self.suffix),
+                                          "a")
         else:
             # Track redundant channel additions here.
             log.debug("Tried to add an existing channel: {}".format(channel))
@@ -41,8 +44,8 @@ class ChatLogger(object):
     def open_logs(self, channels):
         for channel in channels:
             self.add_channel(channel)
-        self.logfiles["urls"] = open("logs/urls-{}.log"
-                                     .format(self.server), "a")
+        self.logfiles["urls"] = open("{}urls-{}{}".format(self.prefix,
+                                     self.server, self.suffix), "a")
 
     def close_logs(self):
         for i in self.logfiles.values():
@@ -59,7 +62,6 @@ def init_syslog(logfile, loglevel, nologs, quiet):
     logger.setLevel(levels[loglevel])
 
     logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
-#     s = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
 
     formatter = logging.Formatter(logformat)
 
@@ -73,7 +75,9 @@ def init_syslog(logfile, loglevel, nologs, quiet):
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
+            log.debug("Added logging console handler.")
 
         file_handler = logging.FileHandler(logfile)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+        log.debug("Added logging file handler.")

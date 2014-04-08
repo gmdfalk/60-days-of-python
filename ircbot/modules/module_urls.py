@@ -1,9 +1,11 @@
 import logging
-log = logging.getLogger("titles")
 
 
-def command_titles(bot, user, channel, args):
-    "Prints the titles of URLs linked in the channel. Usage: titles [on|off]"
+log = logging.getLogger("urls")
+
+
+def command_urls(bot, user, channel, args):
+    "Prints the titles of URLs linked in the channel. Usage: urls [<on>|<off>]"
     if args == "off" and bot.factory.titles_enabled:
         bot.factory.titles_enabled = False
         log.debug("URL title display disabled.")
@@ -15,9 +17,9 @@ def command_titles(bot, user, channel, args):
     else:
         if bot.factory.titles_enabled:
             return bot.say(channel,
-                "URL title display is enabled. Use {}titles off to disable."
+                "URL title display is enabled. Use {}urls off to disable."
                 .format(bot.lead))
         else:
             return bot.say(channel,
-                "URL title display is disabled. Use {}titles on to enable."
+                "URL title display is disabled. Use {}urls on to enable."
                 .format(bot.lead))
