@@ -2,22 +2,29 @@ import logging
 import sys
 import time
 
+
 log = logging.getLogger("report")
 
 
 class ChatLogger(object):
     "The logger for chat messages and URLs"
-    def __init__(self, server):
+    def __init__(self, factory):
         self.logfiles = {}
-        self.server = server
+        self.factory = factory
+        self.server = self.factory.network_name
         self.prefix = "logs/"  # Path goes here.
         self.suffix = ".log"
 
     def log(self, msg, channel):
         "Write a log line with a time stamp to the logfile of the channel"
         timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
-        self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))
-        self.logfiles[channel].flush()
+        try:
+            self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))
+            self.logfiles[channel].flush()
+        except KeyError as e:
+            log.error("KeyError: {}. Missing write permissions?".format(e))
+            if self.factory.logs_enabled:
+                self.factory.logs_enabled = False
 
     def log_url(self, msg, channel):
         "Messages that contain urls are logged separately. Why not?"
@@ -27,14 +34,18 @@ class ChatLogger(object):
         self.logfiles["urls"].flush()
 
     def add_channel(self, channel):
-#         channel = channel.strip("#")  # I hate escape characters.
-        if channel not in self.logfiles:
-            self.logfiles[channel] = open("{}{}-{}{}" .format(self.prefix,
-                                          channel, self.server, self.suffix),
-                                          "a")
-        else:
-            # Track redundant channel additions here.
-            log.debug("Tried to add an existing channel: {}".format(channel))
+#       channel = channel.strip("#")  # I hate escape characters.
+        try:
+            if channel not in self.logfiles:
+                self.logfiles[channel] = open("{}{}-{}{}" .format(self.prefix,
+                                              channel, self.server, self.suffix),
+                                              "a")
+        except IOError as e:
+            err_str = "IOError: Disabling chatlogs. Missing write permissions?"
+            log.error("{}".format(e))
+            if self.factory.logs_enabled:
+                self.factory.logs_enabled = False
+                log.error("{}".format(err_str))
 
     def del_channel(self, channel):
         "Removes a channel from the logfiles dictionary"
@@ -42,10 +53,14 @@ class ChatLogger(object):
         self.logfiles.pop(channel, None)
 
     def open_logs(self, channels):
-        for channel in channels:
-            self.add_channel(channel)
-        self.logfiles["urls"] = open("{}urls-{}{}".format(self.prefix,
-                                     self.server, self.suffix), "a")
+        try:
+            for channel in channels:
+                self.add_channel(channel)
+
+            self.logfiles["urls"] = open("{}urls-{}{}".format(self.prefix,
+                                         self.server, self.suffix), "a")
+        except IOError as e:
+            return
 
     def close_logs(self):
         for i in self.logfiles.values():
@@ -77,7 +92,10 @@ def init_syslog(logfile, loglevel, nologs, quiet):
             logger.addHandler(console_handler)
             log.debug("Added logging console handler.")
 
-        file_handler = logging.FileHandler(logfile)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-        log.debug("Added logging file handler.")
+        try:
+            file_handler = logging.FileHandler(logfile)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+            log.debug("Added logging file handler.")
+        except IOError:
+            log.error("Could not attach file handler. Only logging to stdout.")

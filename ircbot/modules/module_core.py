@@ -189,6 +189,30 @@ def command_settopic(bot, user, channel, args):
     bot.topic(channel, args)
     log.info("Changed {}'s topic to {}".format(channel, args))
 
+
+def command_join(bot, user, channel, args):
+    "Usage: join <channel>,... (Comma separated, hash not required)."
+
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    channels = [i if i.startswith("#") else "#" + i\
+                for i in args.split(",")]
+    network = bot.factory.network
+
+    for c in channels:
+        log.debug("Attempting to join channel {}.".format(c))
+        if c in network["channels"]:
+            bot.say(channel, "I am already in {}".format(c))
+            log.debug("Already on channel {}".format(c))
+            log.debug("Channels I'm on this network: {}"
+                      .format(", ".join(network["channels"])))
+        else:
+            bot.say(channel, "Joining {}.".format(c))
+            bot.join(c)
+
+
 def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."
 

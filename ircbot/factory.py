@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import urllib2
+print
 
 from twisted.internet import protocol, reactor
 # from lxml import html
@@ -20,7 +21,7 @@ class Factory(protocol.ClientFactory):
     VERSION = "0.1"  # current demibot version
     URL = "https://github.com/mikar/demibot"
     clients = {}
-    moduledir = os.path.join(sys.path[0], "modules/")
+    moduledir = os.path.dirname(os.path.realpath(__file__)) + "/modules/"
 
     def __init__(self, network_name, network, loglevel, nologs):
         self.network_name = network_name
