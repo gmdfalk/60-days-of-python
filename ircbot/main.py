@@ -28,8 +28,10 @@ Examples:
 """
 # TODO:
 # Database (User info, quiz), replace logging with syslog
-# Weather, Quiz, Seen, RSS and IMDB/TVcal modules
-# Twitter (punga?)
+# Modules: Weather, Quiz, Say (maybe include timer), Seen+Tell, RSS+Github,
+# IMDB/TVcal, Twitter, (kick, ban, mute commands).
+# Override irc_JOIN to get username!ident@hostmask of users.
+
 
 from docopt import docopt
 from twisted.internet import reactor, ssl

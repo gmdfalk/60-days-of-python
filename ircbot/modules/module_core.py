@@ -30,9 +30,8 @@ log = logging.getLogger("core")
 def command_admins(bot, user, channel, args):
     "Add, remove or list admins. Usage: admins [(add|del) <nick>,...]"
     if permissions(user) < 20:
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
     superadmins = set(bot.factory.network["superadmins"])
     admins = superadmins ^ bot.factory.network["admins"]
 
@@ -87,9 +86,8 @@ def command_rehash(bot, user, channel, args):
     "Rehashes all available modules to reflect any changes."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     try:
         log.info("Rebuilding {}".format(bot))
@@ -108,9 +106,8 @@ def command_quit(bot, user, channel, args):
     "Ends this or optionally all client instances. Usage: quit [all]."
 
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     if args == "all":
         from twisted.internet import reactor
@@ -122,13 +119,97 @@ def command_quit(bot, user, channel, args):
     bot.quit()
 
 
+def command_kick(bot, user, channel, args, reason=None):
+    "Usage: kick <user> [<reason>]"
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    args = args.split()
+    if len(args) > 2:
+        return bot.say(channel, "Usage: kick <user> [<reason>]")
+    elif len(args) == 2:
+        reason = args[1]
+    usr = args[0]
+
+    bot.kick(channel, usr, reason)
+
+
+def command_giveop(bot, user, channel, args):
+    "Usage: giveop <user> [<channel>]"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    if not args:
+        return bot.say(channel, "Usage: giveop <user> [<channel>]")
+
+    args = args.split()
+    if len(args) > 2:
+        return
+    elif len(args) == 1:
+        usr, chan = args[0], channel
+    else:
+        usr, chan = args[0], args[1]
+
+    bot.mode(chan, True, "o", user=usr)
+
+
+def command_takeop(bot, user, channel, args):
+    "Usage: takeop <user> [<channel>]"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    if not args:
+        return bot.say(channel, "Usage: takeop <user> [<channel>]")
+
+    args = args.split()
+    if len(args) > 2:
+        return
+    elif len(args) == 1:
+        usr, chan = args[0], channel
+    else:
+        usr, chan = args[0], args[1]
+
+    bot.mode(chan, False, "o", user=usr)
+
+
+def command_ban(bot, user, channel, args):
+    "Usage: ban <user> [<channel>]"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    if not args:
+        return bot.say(channel, "Usage: ban <user> [<channel>]")
+
+    args = args.split()
+    if len(args) > 2:
+        return
+    elif len(args) == 1:
+        usr, chan = args[0], channel
+    else:
+        usr, chan = args[0], args[1]
+
+    bot.mode(chan, False, "o", user=usr)
+
+
+def command_unban(bot, user, channel, args):
+    "Usage: kick <user>,..."
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    bot.mode(channel, False, "b", user=user)
+
+
 def command_join(bot, user, channel, args):
     "Usage: join <channel>,... (Comma separated, hash not required)."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     channels = [i if i.startswith("#") else "#" + i\
                 for i in args.split(",")]
@@ -150,9 +231,8 @@ def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     network = bot.factory.network
 
@@ -182,9 +262,8 @@ def command_leave(bot, user, channel, args):
 def command_channels(bot, user, channel, args):
     "List channels the bot is on."
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     return bot.say(channel, "I am on {}"
                     .format(",".join(bot.factory.network["channels"])))
@@ -214,9 +293,8 @@ def command_help(bot, user, channel, cmnd):
 def command_logs(bot, user, channel, args):
     "Usage: logs [on|off|level]."
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     if args == "off" and bot.factory.logs_enabled:
         bot.chatlogger.close_logs()
@@ -263,9 +341,8 @@ def command_version(bot, user, channel, args):
 def command_printvars(bot, user, channel, args):
     "Displays instance variables of the client."
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel,
-                       "{}, your permission level is not high enough.".format(
-                        get_nick(user)))
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     return bot.say(channel, "n{}, p{}, r{}, u{}, i{}, l{}, h{}".format(bot.nickname,
                    bot.password, bot.realname, bot.username, bot.userinfo,
