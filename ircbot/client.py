@@ -1,5 +1,4 @@
 import logging
-import re
 import string
 import textwrap
 from types import FunctionType
@@ -211,7 +210,12 @@ class Client(irc.IRCClient, CoreCommands):
             channel = self.factory.get_nick(channel)
 
         # wrap long text into suitable fragments
-        msg = self.wrap.wrap(message)
+        try:
+            msg = self.wrap.wrap(message)
+        except AttributeError as e:
+            log.debug("Could not wrap {}: {}".format(message, e))
+            msg = ""
+
         cont = False
 
         for m in msg:
@@ -220,7 +224,7 @@ class Client(irc.IRCClient, CoreCommands):
             self.msg(channel, m, length)
             cont = True
 
-        return ('client.say', channel, message)
+        return ("client.say", channel, message)
 
     def connectionMade(self):
         "Called when a connection to the server has been established"
@@ -281,9 +285,9 @@ class Client(irc.IRCClient, CoreCommands):
                                                  msg), channel)
 
         # URL Handling.
-        url = re.search("(?P<url>https?://[^\s]+)", msg).group("url")
+        url = self.factory.get_url(msg)
         if url:
-            log.debug("URL detected.")
+            log.debug("URL detected: {}".format(url))
             self.say(channel, self.factory.get_title(url))
             if self.factory.logs_enabled:
                 self.chatlogger.log_url("<{}> {}"
