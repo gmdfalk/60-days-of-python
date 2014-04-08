@@ -1,17 +1,20 @@
 """Core Commands
 
     The basic bot commands.
-        * rehash
-        * quit
+
+    These require admin rights:
         * join
         * leave
-        * help
         * channels
+        * quit
         * logs
+        * rehash
+
+    These don't:
+        * help
+        * version
 
     Most of these require admin rights.
-
-    Having these here increases rehash time but for now I'll take that penalty.
 """
 
 import logging
@@ -21,6 +24,18 @@ from twisted.python import rebuild
 
 log = logging.getLogger("core")
 
+
+def command_admins(bot, user, channel, args):
+    "Add, remove or list admins. Usage: admins [add|del] <nick>,..."
+    if not is_superadmin(user):
+        return
+
+    args = args.split()
+    if len(args) > 2:
+        return bot.say(channel, "Too many arguments.")
+
+    for i in args:
+        print i
 
 
 def command_rehash(bot, user, channel, args):
@@ -43,17 +58,23 @@ def command_rehash(bot, user, channel, args):
 
 
 def command_quit(bot, user, channel, args):
-    "Ends this or optionally all client instances. Usage quit [all]"
+    "Ends this or optionally all client instances. Usage: quit [all]."
 
     if not bot.factory.is_superadmin(user):
         return
 
+    if args == "all":
+        from twisted.internet import reactor
+        reactor.stop()
+
     bot.factory.retry_enabled = False
+    log.info("Received quit command for {} from {}. Bye."
+             .format(bot.factory.network_name, user))
     bot.quit()
 
 
 def command_join(bot, user, channel, args):
-    "Usage: join <channel>... (Comma separated, hash not required)"
+    "Usage: join <channel>,... (Comma separated, hash not required)."
 
     if not bot.factory.is_admin(user):
         return
@@ -75,7 +96,7 @@ def command_join(bot, user, channel, args):
 
 
 def command_leave(bot, user, channel, args):
-    "Usage: leave <channel>... (Comma separated, hash not required)"
+    "Usage: leave <channel>,... (Comma separated, hash not required)."
 
     if not bot.factory.is_admin(user):
         return
@@ -93,6 +114,8 @@ def command_leave(bot, user, channel, args):
 
     for c in channels:
         if c in network["channels"]:
+            if c != channel:
+                bot.say(channel, "Leaving {}".format(c))
             bot.part(c)
         else:
             bot.say(channel, "I am not in {}".format(c))
@@ -104,7 +127,7 @@ def command_leave(bot, user, channel, args):
 
 
 def command_channels(bot, user, channel, args):
-    "List channels the bot is on. No arguments."
+    "List channels the bot is on."
     if not is_admin(user):
         return
 
@@ -134,7 +157,7 @@ def command_help(bot, user, channel, cmnd):
 
 
 def command_logs(bot, user, channel, args):
-    "Usage: logs [<on>|<off>|<level>]"
+    "Usage: logs [on|off|level]."
     if not is_superadmin(user):
         return
 
@@ -166,6 +189,11 @@ def command_logs(bot, user, channel, args):
                 "Logs are disabled. Use {}logs on to disable."
                 .format(bot.lead))
 
+def command_version(bot, user, channel, args):
+    "Displays the current bot version."
+    return bot.say(channel,
+                   "demibot v{} (https://github.com/mikar/demibot)"
+                   .format(bot.factory.VERSION))
 
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"
