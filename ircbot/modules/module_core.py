@@ -297,8 +297,8 @@ def command_me(bot, user, channel, args):
 
 def command_version(bot, user, channel, args):
     "Displays the current bot version."
-    return bot.say(channel, "demibot v{} ({})".format(bot.factory.URL,
-                                                      bot.factory.VERSION))
+    return bot.say(channel, "demibot v{} ({})".format(bot.factory.VERSION,
+                                                      bot.factory.URL))
 
 def command_printvars(bot, user, channel, args):
     "Displays instance variables of the client."
@@ -314,3 +314,8 @@ def command_printvars(bot, user, channel, args):
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"
     return bot.say(channel, "{}, Pong.".format(get_nick(user)))
+
+
+def command_randomnumber(bot, user, channel, args):
+    "Prints a random number."
+    return bot.say(channel, "5")

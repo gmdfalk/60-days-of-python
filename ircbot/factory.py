@@ -178,4 +178,4 @@ class Factory(protocol.ClientFactory):
         except (urllib2.HTTPError, AttributeError):
             title = None
 
-        return title
+        return "Title: {}".format(title.strip())
