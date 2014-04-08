@@ -8,7 +8,7 @@ def command_timer(bot, user, channel, args):
     try:
         delay = int(delay)
     except ValueError:
-        return bot.say(channel, "Error: Need a number as first argument.")
+        return bot.say(channel, "Error: Need an integer as first argument.")
 
     reactor.callLater(delay, bot.say, channel, "{}, {}.".format(get_nick(user),
                                                                 msg))

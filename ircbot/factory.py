@@ -110,8 +110,7 @@ class Factory(protocol.ClientFactory):
 
         g["get_nick"] = self.get_nick
         g["get_title"] = self.get_title
-        g["is_admin"] = self.is_admin
-        g["is_superadmin"] = self.is_superadmin
+        g["permissions"] = self.permissions
         g["to_utf8"] = self.to_utf8
         g["to_unicode"] = self.to_unicode
         return g
@@ -120,17 +119,13 @@ class Factory(protocol.ClientFactory):
         "Parses nick from nick!user@host"
         return user.split("!", 1)[0]
 
-    def is_admin(self, user):
-        "Check if an user has admin privileges."
-        if self.get_nick(user) in self.network["admins"]:
-                return True
-        return False
-
-    def is_superadmin(self, user):
+    def permissions(self, user):
         "Check if an user has superadmin privileges."
         if self.get_nick(user) in self.network["superadmins"]:
-                return True
-        return False
+                return 20
+        elif self.get_nick(user) in self.network["admins"]:
+            return 10
+        return 0
 
     def to_utf8(self, _string):
         "Convert string to UTF-8 if it is unicode"

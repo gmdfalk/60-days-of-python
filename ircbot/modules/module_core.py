@@ -26,22 +26,62 @@ log = logging.getLogger("core")
 
 
 def command_admins(bot, user, channel, args):
-    "Add, remove or list admins. Usage: admins [add|del] <nick>,..."
-    if not is_superadmin(user):
+    "Add, remove or list admins. Usage: admins [(add|del) <nick>,...]"
+    if permissions(user) < 20:
         return
+
+    superadmins = set(bot.factory.network["superadmins"])
+    admins = superadmins ^ bot.factory.network["admins"]
+
+    str_sadmins = " ".join(superadmins)
+    str_admins = " ".join(admins) if admins else 0
+
+    if not args:
+        return bot.say(channel, "superadmins: {}, admins: {}"
+                       .format(str_sadmins, str_admins))
 
     args = args.split()
     if len(args) > 2:
         return bot.say(channel, "Too many arguments.")
+    elif len(args) == 1:
+        return bot.say(channel, "Not enough arguments.")
 
-    for i in args:
-        print i
+
+    mod_admins = None
+    if "," in args[1]:
+        # Create the list of entities to add/del but ignore superadmins.
+        mod_admins = [i for i in args[1].split(",") if i not in superadmins]
+    else:
+        if args[1] in superadmins:
+            return bot.say(channel, "Cannot modify superadmins.")
+
+    # Handle addition and removal of admins.
+    if args[0] == "del":
+        if mod_admins:
+            for i in mod_admins:
+                bot.factory.network["admins"].discard(i)
+                bot.say(channel, "Removed {} from admins.".format(i))
+                log.debug("Discarded {} from admins.".format(i))
+        else:
+            bot.factory.network["admins"].discard(args[1])
+            bot.say(channel, "Removed {} from admins.".format(args[1]))
+            log.debug("Discarded {} from admins.".format(args[1]))
+    elif args[0] == "add":
+        if mod_admins:
+            for i in mod_admins:
+                bot.factory.network["admins"].add(i)
+                bot.say(channel, "Added {} to admins.".format(i))
+                log.debug("Added {} to admins.".format(i))
+        else:
+            bot.factory.network["admins"].add(args[1])
+            bot.say(channel, "Added {} to admins.".format(args[1]))
+            log.debug("Added {} to admins.".format(args[1]))
 
 
 def command_rehash(bot, user, channel, args):
     "Rehashes all available modules to reflect any changes."
 
-    if not is_superadmin(user):
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
         return
 
     try:
@@ -60,7 +100,7 @@ def command_rehash(bot, user, channel, args):
 def command_quit(bot, user, channel, args):
     "Ends this or optionally all client instances. Usage: quit [all]."
 
-    if not bot.factory.is_superadmin(user):
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
         return
 
     if args == "all":
@@ -76,7 +116,7 @@ def command_quit(bot, user, channel, args):
 def command_join(bot, user, channel, args):
     "Usage: join <channel>,... (Comma separated, hash not required)."
 
-    if not bot.factory.is_admin(user):
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
         return
 
     channels = [i if i.startswith("#") else "#" + i\
@@ -98,7 +138,7 @@ def command_join(bot, user, channel, args):
 def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."
 
-    if not bot.factory.is_admin(user):
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
         return
 
     network = bot.factory.network
@@ -128,7 +168,7 @@ def command_leave(bot, user, channel, args):
 
 def command_channels(bot, user, channel, args):
     "List channels the bot is on."
-    if not is_admin(user):
+    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
         return
 
     return bot.say(channel, "I am on {}"
@@ -158,7 +198,7 @@ def command_help(bot, user, channel, cmnd):
 
 def command_logs(bot, user, channel, args):
     "Usage: logs [on|off|level]."
-    if not is_superadmin(user):
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
         return
 
     if args == "off" and bot.factory.logs_enabled:
@@ -189,11 +229,18 @@ def command_logs(bot, user, channel, args):
                 "Logs are disabled. Use {}logs on to disable."
                 .format(bot.lead))
 
+
+def command_me(bot, user, channel, args):
+    "Displays information about the user."
+    pass
+
+
 def command_version(bot, user, channel, args):
     "Displays the current bot version."
     return bot.say(channel,
                    "demibot v{} (https://github.com/mikar/demibot)"
                    .format(bot.factory.VERSION))
+
 
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"

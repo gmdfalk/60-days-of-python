@@ -49,7 +49,8 @@ class Client(irc.IRCClient):
         method = getattr(self, "command_{}".format(cmnd), None)
         if method is not None:
             log.info("Internal command {} called by {} ({}) on {}"
-                     .format(cmnd, user, self.factory.is_admin(user), channel))
+                     .format(cmnd, user, self.factory.permissions(user),
+                             channel))
             method(user, channel, args)
             return
 
@@ -62,7 +63,7 @@ class Client(irc.IRCClient):
 
             for cname, command in commands:
                 log.info("Module command {} called by {} ({}) on {}"
-                         .format(cname, user, self.factory.is_admin(user),
+                         .format(cname, user, self.factory.permissions(user),
                                  channel))
                 # Defer commands to threads
                 d = threads.deferToThread(command, self, user, channel,
