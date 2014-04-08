@@ -2,17 +2,19 @@
 
     The basic bot commands.
 
-    These require admin rights:
-        * join
+    Sorted by permission:
+        * join (10)
         * leave
         * channels
-        * quit
         * logs
+        * quit (20)
+        * admins
         * rehash
 
-    These don't:
+    These don't require any permissions:
         * help
         * version
+        * me
 
     Most of these require admin rights.
 """
@@ -28,8 +30,9 @@ log = logging.getLogger("core")
 def command_admins(bot, user, channel, args):
     "Add, remove or list admins. Usage: admins [(add|del) <nick>,...]"
     if permissions(user) < 20:
-        return
-
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
     superadmins = set(bot.factory.network["superadmins"])
     admins = superadmins ^ bot.factory.network["admins"]
 
@@ -59,9 +62,10 @@ def command_admins(bot, user, channel, args):
     if args[0] == "del":
         if mod_admins:
             for i in mod_admins:
-                bot.factory.network["admins"].discard(i)
-                bot.say(channel, "Removed {} from admins.".format(i))
-                log.debug("Discarded {} from admins.".format(i))
+                if i in admins:
+                    bot.factory.network["admins"].discard(i)
+                    bot.say(channel, "Removed {} from admins.".format(i))
+                    log.debug("Discarded {} from admins.".format(i))
         else:
             bot.factory.network["admins"].discard(args[1])
             bot.say(channel, "Removed {} from admins.".format(args[1]))
@@ -69,9 +73,10 @@ def command_admins(bot, user, channel, args):
     elif args[0] == "add":
         if mod_admins:
             for i in mod_admins:
-                bot.factory.network["admins"].add(i)
-                bot.say(channel, "Added {} to admins.".format(i))
-                log.debug("Added {} to admins.".format(i))
+                if i not in admins:
+                    bot.factory.network["admins"].add(i)
+                    bot.say(channel, "Added {} to admins.".format(i))
+                    log.debug("Added {} to admins.".format(i))
         else:
             bot.factory.network["admins"].add(args[1])
             bot.say(channel, "Added {} to admins.".format(args[1]))
@@ -82,7 +87,9 @@ def command_rehash(bot, user, channel, args):
     "Rehashes all available modules to reflect any changes."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     try:
         log.info("Rebuilding {}".format(bot))
@@ -101,7 +108,9 @@ def command_quit(bot, user, channel, args):
     "Ends this or optionally all client instances. Usage: quit [all]."
 
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     if args == "all":
         from twisted.internet import reactor
@@ -117,7 +126,9 @@ def command_join(bot, user, channel, args):
     "Usage: join <channel>,... (Comma separated, hash not required)."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     channels = [i if i.startswith("#") else "#" + i\
                 for i in args.split(",")]
@@ -139,7 +150,9 @@ def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."
 
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     network = bot.factory.network
 
@@ -169,7 +182,9 @@ def command_leave(bot, user, channel, args):
 def command_channels(bot, user, channel, args):
     "List channels the bot is on."
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     return bot.say(channel, "I am on {}"
                     .format(",".join(bot.factory.network["channels"])))
@@ -199,7 +214,9 @@ def command_help(bot, user, channel, cmnd):
 def command_logs(bot, user, channel, args):
     "Usage: logs [on|off|level]."
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     if args == "off" and bot.factory.logs_enabled:
         bot.chatlogger.close_logs()
@@ -232,17 +249,34 @@ def command_logs(bot, user, channel, args):
 
 def command_me(bot, user, channel, args):
     "Displays information about the user."
-    pass
+    nick = get_nick(user)
+    level = permissions(user)
+    return bot.say(channel, "{}, your permission level is {}.".format(nick,
+                                                                      level))
 
 
 def command_version(bot, user, channel, args):
     "Displays the current bot version."
-    return bot.say(channel,
-                   "demibot v{} (https://github.com/mikar/demibot)"
-                   .format(bot.factory.VERSION))
+    return bot.say(channel, "demibot v{} ({})".format(bot.factory.URL,
+                                                      bot.factory.VERSION))
+
+def command_printvars(bot, user, channel, args):
+    "Displays instance variables of the client."
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
+
+    return bot.say(channel, "n{}, p{}, r{}, u{}, i{}, l{}, h{}".format(bot.nickname,
+                   bot.password, bot.realname, bot.username, bot.userinfo,
+                   bot.lineRate, bot.hostname))
 
 
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"
-    return bot.say(channel,
-                    "{}, Pong.".format(bot.factory.get_nick(user)))
+    # TODO: Use irc.IRCClient.ping to return a latency here.
+    p = bot.ping(user)
+    pp = bot.ping(get_nick(user))
+    print p, pp
+
+    return bot.say(channel, "{}, Pong.".format(get_nick(user)))

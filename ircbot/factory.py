@@ -18,6 +18,7 @@ log = logging.getLogger("factory")
 class Factory(protocol.ClientFactory):
 
     VERSION = "0.1"  # current demibot version
+    URL = "https://github.com/mikar/demibot"
     clients = {}
     moduledir = os.path.join(sys.path[0], "modules/")
 

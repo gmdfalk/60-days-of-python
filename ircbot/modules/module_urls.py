@@ -7,7 +7,9 @@ log = logging.getLogger("urls")
 def command_urls(bot, user, channel, args):
     "Prints the titles of URLs linked in the channel. Usage: urls [on|off]"
     if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return
+        return bot.say(channel,
+                       "{}, your permission level is not high enough.".format(
+                        get_nick(user)))
 
     if args == "off" and bot.factory.titles_enabled:
         bot.factory.titles_enabled = False

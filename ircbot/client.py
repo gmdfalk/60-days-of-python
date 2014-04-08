@@ -19,6 +19,9 @@ class Client(irc.IRCClient):
         self.nickname = self.factory.network["identity"]["nickname"]
         self.realname = self.factory.network["identity"]["realname"]
         self.username = self.factory.network["identity"]["username"]
+        self.userinfo = "demibot v{} ({})" % (self.factory.VERSION,
+                                              self.factory.URL)
+        self.lineRate = 0.5
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.lead = "."
         log.info("Bot initialized")

@@ -26,6 +26,7 @@ Examples:
     demibot irc.freenode.net #django,#python -n demibot --ssl
     demibot  (uses config.py for multiserver support with detailed settings)
 """
+# TODO: Database (User info, quiz), replace logging with syslog
 
 from docopt import docopt
 from twisted.internet import reactor, ssl
@@ -70,7 +71,7 @@ def main():
                 "ssl": args["--ssl"],
                 "password": None,  # Server password goes here.
                 "identity": identities["default"],
-                "superadmins": ("pld",),
+                "superadmins": ("pld",),  # Comma is important.
                 "admins": {"pld", "mikar"},
                 "channels": channels,
             }
