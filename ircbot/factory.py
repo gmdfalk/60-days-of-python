@@ -28,13 +28,14 @@ class Factory(protocol.ClientFactory):
         # Use XOR to set this to False if nologs is True. Could also use
         # not and or is not.
         self.logs_enabled = True ^ nologs
+        self.titles_enabled = False
         # Connection retry delays
         self.lost_delay = 10
         self.failed_delay = 30
 
     def startFactory(self):
+        log.info("Starting Factory.")
         self._loadmodules()
-        log.info("Factory started.")
 
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost"
@@ -146,7 +147,9 @@ class Factory(protocol.ClientFactory):
         return _string
 
     def get_url(self, msg):
-        "Gets the HTML title of a website"
+        "Extracts a URL from a chat message"
+        # Does not match: www.web.de
+        # TODO: Improve regex and enable multiple URLs in one message.
         try:
             url = re.search("(?P<url>https?://[^\s]+)", msg).group("url")
         except AttributeError:

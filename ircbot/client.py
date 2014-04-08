@@ -4,7 +4,6 @@ import textwrap
 from types import FunctionType
 
 from twisted.internet import threads
-from twisted.python import rebuild
 from twisted.words.protocols import irc
 
 from reporting import ChatLogger
@@ -13,131 +12,7 @@ from reporting import ChatLogger
 log = logging.getLogger("client")
 
 
-class CoreCommands(object):
-
-    def command_rehash(self, user, channel, args):
-        "Rehashes all available modules to reflect any changes."
-
-        # Only allow superadmins to reload modules.
-        if self.factory.is_superadmin(user):
-            try:
-                log.info("Rebuilding {}".format(self))
-                rebuild.updateInstance(self)
-                self.factory._unload_removed_modules()
-                self.factory._loadmodules()
-            except Exception, e:
-                log.error("Rehash error: {}".format(e))
-                return self.say(channel, "Rehash error: {}".format(e))
-            else:
-                log.info("Rehash OK")
-                return self.say(channel, "Rehash OK")
-        else:
-            return self.say(channel, "Requires admin rights")
-
-    def command_join(self, user, channel, args):
-        "Usage: join <channel>... (Comma separated, hash not required)"
-
-        if not self.factory.is_admin(user):
-            return
-
-        channels = [i if i.startswith("#") else "#" + i\
-                    for i in args.split(",")]
-        network = self.factory.network
-
-        for c in channels:
-            log.debug("Attempting to join channel {}.".format(c))
-            if c in network["channels"]:
-                self.say(channel, "I am already in {}".format(c))
-                log.debug("Already on channel {}".format(c))
-                log.debug("Channels I'm on this network: {}"
-                          .format(", ".join(network["channels"])))
-            else:
-                self.say(channel, "Joining {}.".format(c))
-                self.join(c)
-
-    def command_leave(self, user, channel, args):
-        "Usage: leave <channel>... (Comma separated, hash not required)"
-
-        if not self.factory.is_admin(user):
-            return
-
-        network = self.factory.network
-
-        # No arguments, so we leave the current channel.
-        if not args:
-            self.part(channel)
-            return
-
-        # We have input, so split it into channels.
-        channels = [i if i.startswith("#") else "#" + i\
-                    for i in args.split(",")]
-
-        for c in channels:
-            if c in network["channels"]:
-                self.part(c)
-            else:
-                self.say(channel, "I am not in {}".format(c))
-                log.debug("Attempted to leave a channel i'm not in: {}"
-                          .format(c))
-
-            log.debug("Channels I'm in: {}"
-                      .format(", ".join(network["channels"])))
-
-    def command_channels(self, user, channel, args):
-        "List channels the bot is on. No arguments."
-
-        return self.say(channel, "I am on {}"
-                        .format(",".join(self.factory.network["channels"])))
-
-    def command_help(self, user, channel, cmnd):
-        "Get help on all commands or a specific one. Usage: help [<command>]"
-
-        commands = []
-        for module, env in self.factory.ns.items():
-            myglobals, mylocals = env
-            commands += [(c.replace("command_", ""), ref) for c, ref in\
-                         mylocals.items() if c.startswith("command_%s" % cmnd)]
-        # Help for a specific command
-        if len(cmnd):
-            for cname, ref in commands:
-                if cname == cmnd:
-                    helptext = ref.__doc__.split("\n", 1)[0]
-                    self.say(channel, "Help for %s: %s" % (cmnd, helptext))
-                    return
-        # Generic help
-        else:
-            commandlist = ", ".join([c for c, ref in commands])
-            self.say(channel, "Available commands: {}".format(commandlist))
-
-    def command_logs(self, user, channel, args):
-        if args == "off" and self.factory.logs_enabled:
-            self.chatlogger.close_logs()
-            self.factory.logs_enabled = False
-            log.debug("Chatlogs enabled")
-            return self.say(channel, "Chatlogs are now disabled.")
-        elif args == "on" and not self.factory.logs_enabled:
-            self.chatlogger.open_logs(self.factory.network["channels"])
-            self.factory.logs_enabled = True
-            log.debug("Chatlogs disabled")
-            return self.say(channel, "Chatlogs are now enabled.")
-        else:
-            if self.factory.logs_enabled:
-                return self.say(channel,
-                    "Logs are enabled. Use !logs off to disable logging.")
-            else:
-                return self.say(channel,
-                    "Logs are disabled. Use !logs on to enable logging.")
-
-    def command_loglevel(self, user, channel, args):
-        return self.say(channel, "Log level is {}."
-                        .format(log.getEffectiveLevel()))
-
-    def command_ping(self, user, channel, args):
-        return self.say(channel,
-                        "{}, Pong.".format(self.factory.get_nick(user)))
-
-
-class Client(irc.IRCClient, CoreCommands):
+class Client(irc.IRCClient):
 
     def __init__(self, factory):
         self.factory = factory
@@ -285,13 +160,15 @@ class Client(irc.IRCClient, CoreCommands):
                                                  msg), channel)
 
         # URL Handling.
-        url = self.factory.get_url(msg)
-        if url:
-            log.debug("URL detected: {}".format(url))
-            self.say(channel, self.factory.get_title(url))
-            if self.factory.logs_enabled:
-                self.chatlogger.log_url("<{}> {}"
-                                    .format(self.factory.get_nick(user), msg),
+        if "www" in msg or "http" in msg:
+            url = self.factory.get_url(msg)
+            if url:
+                log.debug("URL detected: {}".format(url))
+                if self.factory.titles_enabled:
+                    self.say(channel, self.factory.get_title(url))
+                if self.factory.logs_enabled:
+                    self.chatlogger.log_url("<{}> {}".format(
+                                            self.factory.get_nick(user), msg),
                                             channel)
 
         if channel == lnick:

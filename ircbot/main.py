@@ -103,4 +103,5 @@ def main():
     reactor.run()
 
 if __name__ == "__main__":
+    print "Please use ./demibot instead of main.py."
     main()
