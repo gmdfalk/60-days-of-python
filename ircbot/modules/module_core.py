@@ -125,10 +125,10 @@ def command_kick(bot, user, channel, args, reason=None):
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
-    args = args.split()
-    if len(args) > 2:
+    args = [i for i in args.partition(" ") if i and i != " "]
+    if len(args) < 2:
         return bot.say(channel, "Usage: kick <user> [<reason>]")
-    elif len(args) == 2:
+    else:
         reason = args[1]
     usr = args[0]
 
@@ -136,15 +136,14 @@ def command_kick(bot, user, channel, args, reason=None):
 
 
 def command_mode(bot, user, channel, args):
-    "Usage: mode <mode> <user> [<channel>]"
+    "Usage: mode <(+|-)mode> <user> [<channel>]"
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
     args = args.split()
-    print args
     if len(args) > 3 or len(args) < 2:
-        return bot.say(channel, "Usage: mode <mode> <user> [<channel>]")
+        return bot.say(channel, "Usage: mode <(+|-)mode> <user> [<channel>]")
     elif len(args) == 3:
         chan = args[2]
     else:
@@ -158,10 +157,37 @@ def command_mode(bot, user, channel, args):
             operation, finalmode = False, mode.strip("-")
     else:
         return bot.say(channel, "Mode have this format: +b")
-    print chan, operation, finalmode, usr
 
     bot.mode(chan, operation, finalmode, user=usr)
 
+
+def command_setnick(bot, user, channel, args):
+    "Change the bots nickname. Usage: setnick <nick>"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    args = args.split()
+    if len(args) > 1:
+        return
+
+    bot.factory.network["identity"]["nickname"] = args[0]
+    bot.nickname = bot.factory.network["identity"]["nickname"]
+    bot.setNick(bot.nickname)
+    log.info("Changed nickname to {}".format(args[0]))
+
+
+def command_settopic(bot, user, channel, args):
+    "Set the channel topic. Usage: settopic <topic>"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    if not args:
+        return bot.say(channel, "Usage: settopic <topic>")
+
+    bot.topic(channel, args)
+    log.info("Changed {}'s topic to {}".format(channel, args))
 
 def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."

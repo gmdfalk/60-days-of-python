@@ -26,21 +26,19 @@ class Client(irc.IRCClient):
         log.info("Bot initialized")
 
     def __repr__(self):
-        return "demibot({}, {})".format(self.nickname,
-                                        self.factory.network["server"])
+        return "demibot v{}({}, {})".format(self.nickname, self.factory.VERSION,
+                                            self.factory.network["server"])
 
     def printResult(self, msg, info):
-        # Don't print results if there is nothing to say (usually non-operation
-        # on module)
+        "Log wrapper for completed callbacks"
         log.debug("Result {} {}".format(msg, info))
 
     def printError(self, msg, info):
+        "Log wrapper for errors from callbacks"
         log.error("ERROR {} {}".format(msg, info))
 
-    def irc_ERR_NICKNAMEINUSE(self, prefix, params):
-        self.factory.network["identity"]["nickname"] += "_"
-
     def _command(self, user, channel, cmnd):
+        "Finds and calls the command specified"
         # Split arguments from the command part
         try:
             cmnd, args = cmnd.split(" ", 1)
