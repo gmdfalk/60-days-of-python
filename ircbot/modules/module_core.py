@@ -192,7 +192,7 @@ def command_channels(bot, user, channel, args):
 
 def command_help(bot, user, channel, cmnd):
     "Get help on all commands or a specific one. Usage: help [<command>]"
-
+    # TODO: Only print commands that are available to the user.
     commands = []
     for module, env in bot.factory.ns.items():
         myglobals, mylocals = env
@@ -274,9 +274,4 @@ def command_printvars(bot, user, channel, args):
 
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"
-    # TODO: Use irc.IRCClient.ping to return a latency here.
-    p = bot.ping(user)
-    pp = bot.ping(get_nick(user))
-    print p, pp
-
     return bot.say(channel, "{}, Pong.".format(get_nick(user)))
