@@ -135,96 +135,32 @@ def command_kick(bot, user, channel, args, reason=None):
     bot.kick(channel, usr, reason)
 
 
-def command_giveop(bot, user, channel, args):
-    "Usage: giveop <user> [<channel>]"
+def command_mode(bot, user, channel, args):
+    "Usage: mode <mode> <user> [<channel>]"
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
-
-    if not args:
-        return bot.say(channel, "Usage: giveop <user> [<channel>]")
 
     args = args.split()
-    if len(args) > 2:
-        return
-    elif len(args) == 1:
-        usr, chan = args[0], channel
+    print args
+    if len(args) > 3 or len(args) < 2:
+        return bot.say(channel, "Usage: mode <mode> <user> [<channel>]")
+    elif len(args) == 3:
+        chan = args[2]
     else:
-        usr, chan = args[0], args[1]
+        chan = channel
+    mode, usr = args[0], args[1]
 
-    bot.mode(chan, True, "o", user=usr)
-
-
-def command_takeop(bot, user, channel, args):
-    "Usage: takeop <user> [<channel>]"
-    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
-
-    if not args:
-        return bot.say(channel, "Usage: takeop <user> [<channel>]")
-
-    args = args.split()
-    if len(args) > 2:
-        return
-    elif len(args) == 1:
-        usr, chan = args[0], channel
+    if len(mode) == 2:
+        if "+" in mode:
+            operation, finalmode = True, mode.strip("+")
+        elif "-" in mode:
+            operation, finalmode = False, mode.strip("-")
     else:
-        usr, chan = args[0], args[1]
+        return bot.say(channel, "Mode have this format: +b")
+    print chan, operation, finalmode, usr
 
-    bot.mode(chan, False, "o", user=usr)
-
-
-def command_ban(bot, user, channel, args):
-    "Usage: ban <user> [<channel>]"
-    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
-
-    if not args:
-        return bot.say(channel, "Usage: ban <user> [<channel>]")
-
-    args = args.split()
-    if len(args) > 2:
-        return
-    elif len(args) == 1:
-        usr, chan = args[0], channel
-    else:
-        usr, chan = args[0], args[1]
-
-    bot.mode(chan, False, "o", user=usr)
-
-
-def command_unban(bot, user, channel, args):
-    "Usage: kick <user>,..."
-    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
-
-    bot.mode(channel, False, "b", user=user)
-
-
-def command_join(bot, user, channel, args):
-    "Usage: join <channel>,... (Comma separated, hash not required)."
-
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
-
-    channels = [i if i.startswith("#") else "#" + i\
-                for i in args.split(",")]
-    network = bot.factory.network
-
-    for c in channels:
-        log.debug("Attempting to join channel {}.".format(c))
-        if c in network["channels"]:
-            bot.say(channel, "I am already in {}".format(c))
-            log.debug("Already on channel {}".format(c))
-            log.debug("Channels I'm on this network: {}"
-                      .format(", ".join(network["channels"])))
-        else:
-            bot.say(channel, "Joining {}.".format(c))
-            bot.join(c)
+    bot.mode(chan, operation, finalmode, user=usr)
 
 
 def command_leave(bot, user, channel, args):
