@@ -7,6 +7,7 @@ import urllib2
 from twisted.internet import protocol, reactor
 
 from client import Client
+import requests
 
 
 # from lxml import html
@@ -111,6 +112,8 @@ class Factory(protocol.ClientFactory):
         g = {}
 
         g["get_nick"] = self.get_nick
+        g["get_url"] = self.get_url
+        g["get_urlinfo"] = self.get_urlinfo
         g["get_title"] = self.get_title
         g["permissions"] = self.permissions
         g["to_utf8"] = self.to_utf8
@@ -183,3 +186,37 @@ class Factory(protocol.ClientFactory):
 
         if title:
             return "Title: {}".format(title.strip())
+
+    def get_urlinfo(self, url, nocache=False, params=None, headers=None):
+        "Gets data, bs and headers for the given URL."
+
+        # Make this configurable in the config
+        browser = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11"\
+                  "(KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11"
+
+        # Common session for all requests.
+        s = requests.session()
+        s.verify = False
+        s.stream = True  # Don't fetch content unless asked.
+        s.headers.update({'User-Agent':browser})
+        # Custom headers from requester
+        if headers:
+            s.headers.update(headers)
+
+        try:
+            r = s.get(url, params=params)
+        except requests.exceptions.InvalidSchema:
+            log.error("Invalid schema in URI: {}".format(url))
+            return None
+        except requests.exceptions.ConnectionError:
+            log.error("Connection error when connecting to {}".format(url))
+            return None
+
+        size = int(r.headers.get('Content-Length', 0)) // 1024
+        # log.debug("Content-Length: %dkB" % size)
+        if size > 2048:
+            log.warn("Content too large, will not fetch: {}kB {}".format(size,
+                                                                         url))
+            return None
+
+        return r
