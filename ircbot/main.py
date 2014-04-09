@@ -2,8 +2,8 @@
 """demibot - A multipurpose IRC bot (depends on twisted and requests)
 
 Usage:
-    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-f <file>]
-            [-s] [-q] [--no-logs] [-h] [-v...]
+    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-l <dir>]
+            [--ssl] [--no-logs] [-q] [-v...] [-h]
 
 Arguments:
     server:port        Server to connect to, default port is 6667.
@@ -12,14 +12,14 @@ Arguments:
     channels           Channels to join, comma separated. Hash not necessary.
 
 Options:
-    -n, --nick=<nick>  Nickname of the bot [default: demibot]
-    -p, --pass=<pass>  NickServ password, if required.
-    -f, --file=<file>  File to log bot events to [default: logs/system.log]
-    -s, --ssl          Enable if the server supports SSL connections.
-    -h, --help         Show this help message and exit.
-    -q, --quiet        Do not log bot events to stdout (only to a file).
-    --no-logs          Turns off all logging. Includes quiet.
-    -v                 Logging verbosity, up to -vvv.
+    -n, --nick=<nick>   Nickname of the bot [default: demibot]
+    -p, --pass=<pass>   NickServ password, if required.
+    -l, --logdir=<dir>  File to log bot events to [default: logs/system.log]
+    --no-logs           Turns off all file logging.
+    -s, --ssl           Enable if the server supports SSL connections.
+    -h, --help          Show this help message and exit.
+    -q, --quiet         Do not log bot events to stdout (only to a file).
+    -v                  Logging verbosity, up to -vvv.
 
 Examples:
     demibot irc.freenode.net:6667 freenode,archlinux
@@ -27,17 +27,20 @@ Examples:
     demibot  (uses config.py for multiserver support with detailed settings)
 """
 # TODO:
-# Git update module
 # Database (User info, channel stats, quiz, permission levels, alternate nicks),
 # Modules: Weather, Quiz, Say (maybe include timer), Seen+Tell, RSS+Github,
 # IMDB/TVcal, Twitter, (kick, ban, mute commands), Horoscope.
 # Override irc_JOIN to get username!ident@hostmask of users.
 # Replace logging with syslog
-# Fix runhandler
-# command tempban, 8ball, roll (dice)
+# Git update module
+# command 8ball, roll (dice)
 
 # Check if we can write to --file to prevent error log spam.
 
+
+import logging
+import os
+import sys
 
 from docopt import docopt
 from twisted.internet import reactor, ssl
@@ -45,6 +48,9 @@ from twisted.internet import reactor, ssl
 import config
 from factory import Factory
 from reporting import init_syslog
+
+
+log = logging.getLogger("main")
 
 
 def main():
@@ -92,27 +98,41 @@ def main():
     if args["-v"] > 3:
         args["-v"] = 3
 
+    # Check if we have write permissions to the logdir and create it,
+    # if necessary.
+    if not args["--logdir"]:
+        basedir = os.path.dirname(os.path.realpath(__file__))  # we are here.
+        args["--logdir"] = basedir + "/logs/"
+    try:
+        os.mkdir(args["--logdir"])
+    except OSError as e:
+        if e.errno == 13:  # Permission denied
+            # No write permissions. Turn off all file logging.
+            args["--no-logs"] = True
+            log.error("Missing write permissions. Disabling file logging.")
+        # If the error number is anything but 13 we assume we have write
+        # permissions.
+        log.info("OSError: Could not create logdir. Maybe it already exists?")
+
     # Set up our logger for system events. Chat is logged separately.
     # Both will be disabled if --no-logs is True.
-    init_syslog(args["--file"], args["-v"], args["--no-logs"], args["--quiet"])
+    init_syslog(args["--logdir"], args["-v"], args["--no-logs"], args["--quiet"])
     # Set up the connection info for each network.
     for name in networks.keys():
 
-        factory = Factory(name, networks[name], args["-v"], args["--no-logs"])
+        f = Factory(name, networks[name], args["--logdir"], args["--no-logs"])
 
         server = networks[name]["server"]
         port = networks[name]["port"]
 
         # Create a connection depending on whether SSL is enabled.
         if networks[name]["ssl"]:
-            reactor.connectSSL(server, port, factory,
-                               ssl.ClientContextFactory())
+            reactor.connectSSL(server, port, f, ssl.ClientContextFactory())
         else:
-            reactor.connectTCP(server, port, factory)
+            reactor.connectTCP(server, port, f)
 
     # Finally, run all the factories/bots.
     reactor.run()
 
 if __name__ == "__main__":
-    print "Please use ./demibot instead of main.py."
     main()

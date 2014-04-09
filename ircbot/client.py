@@ -106,7 +106,7 @@ class Client(irc.IRCClient):
         "Called when a connection to the server has been established"
         irc.IRCClient.connectionMade(self)
         if self.factory.logs_enabled:
-            self.chatlogger = ChatLogger(self.factory)
+            self.chatlogger = ChatLogger(self.factory, self.factory.logdir)
             self.chatlogger.open_logs(self.factory.network["channels"])
 
     def connectionLost(self, reason):

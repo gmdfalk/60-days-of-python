@@ -22,17 +22,18 @@ class Factory(protocol.ClientFactory):
     clients = {}
     moduledir = os.path.dirname(os.path.realpath(__file__)) + "/modules/"
 
-    def __init__(self, network_name, network, loglevel, nologs):
+    def __init__(self, network_name, network, logdir, nologs):
         self.network_name = network_name
         self.network = network
-        # Namespace for modules
-        self.ns = {}
+        self.logdir = logdir
         # Use XOR to set this to False if nologs is True. Could also use
         # not and or is not.
         self.logs_enabled = True ^ nologs
         self.titles_enabled = False
         self.retry_enabled = True
-        # Connection retry delays
+        # Namespace for modules:
+        self.ns = {}
+        # Connection retry delays:
         self.lost_delay = 10
         self.failed_delay = 30
 
@@ -41,14 +42,14 @@ class Factory(protocol.ClientFactory):
         self._loadmodules()
 
     def clientConnectionLost(self, connector, reason):
-        "Reconnect after 10 seconds if the connection to the network is lost"
+        "Reconnect after 10 seconds if the connection to the network is lost."
         if self.retry_enabled:
             log.info("connection lost ({}): reconnecting in {} seconds"
                      .format(reason, self.lost_delay))
             reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
-        "Reconnect after 30 seconds if the connection to the network fails"
+        "Reconnect after 30 seconds if the connection to the network fails."
         if self.retry_enabled:
             log.info("connection failed ({}): reconnecting in {} seconds"
                      .format(reason, self.failed_delay))
@@ -61,7 +62,7 @@ class Factory(protocol.ClientFactory):
         return p
 
     def _finalize_modules(self):
-        "Call all module finalizers"
+        "Call all module finalizers."
         for module in self._findmodules():
             # If rehashing (module already in namespace),
             # finalize the old instance first.

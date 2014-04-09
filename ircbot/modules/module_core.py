@@ -138,6 +138,7 @@ def command_kick(bot, user, channel, args, reason=None):
 
 def command_mode(bot, user, channel, args):
     "Usage: mode <(+|-)mode> <user> [<channel>]"
+    # TODO: "all" argument instead of user.
     if permissions(user) < 20:  # 10 == admin, 20 == superadmin
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
