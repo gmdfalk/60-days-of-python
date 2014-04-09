@@ -4,15 +4,14 @@ import os
 import re
 import sys
 import urllib2
-print
 
 from twisted.internet import protocol, reactor
-# from lxml import html
-# from BeautifulSoup import BeautifulSoup as bs
 
 from client import Client
 
 
+# from lxml import html
+# from BeautifulSoup import BeautifulSoup as bs
 log = logging.getLogger("factory")
 
 

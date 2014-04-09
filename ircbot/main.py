@@ -27,10 +27,14 @@ Examples:
     demibot  (uses config.py for multiserver support with detailed settings)
 """
 # TODO:
-# Database (User info, quiz), replace logging with syslog
+# Git update module
+# Database (User info, channel stats, quiz, permission levels, alternate nicks),
 # Modules: Weather, Quiz, Say (maybe include timer), Seen+Tell, RSS+Github,
-# IMDB/TVcal, Twitter, (kick, ban, mute commands).
+# IMDB/TVcal, Twitter, (kick, ban, mute commands), Horoscope.
 # Override irc_JOIN to get username!ident@hostmask of users.
+# Replace logging with syslog
+# Fix runhandler
+# command tempban
 
 
 from docopt import docopt

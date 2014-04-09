@@ -285,12 +285,12 @@ def command_logs(bot, user, channel, args):
     if args == "off" and bot.factory.logs_enabled:
         bot.chatlogger.close_logs()
         bot.factory.logs_enabled = False
-        log.debug("Chatlogs enabled")
+        log.info("Chatlogs enabled")
         return bot.say(channel, "Chatlogs are now disabled.")
     elif args == "on" and not bot.factory.logs_enabled:
         bot.chatlogger.open_logs(bot.factory.network["channels"])
         bot.factory.logs_enabled = True
-        log.debug("Chatlogs disabled")
+        log.info("Chatlogs disabled")
         return bot.say(channel, "Chatlogs are now enabled.")
     elif args == "level":
         # FIXME: Somehow, this shows WARN even though -vvv is enabled.

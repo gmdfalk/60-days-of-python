@@ -40,6 +40,8 @@ class ChatLogger(object):
                 self.logfiles[channel] = open("{}{}-{}{}" .format(self.prefix,
                                               channel, self.server, self.suffix),
                                               "a")
+            else:
+                log.debug("Tried to join a channel twice: {}".format(channel))
         except IOError as e:
             err_str = "IOError: Disabling chatlogs. Missing write permissions?"
             log.error("{}".format(e))
@@ -53,14 +55,18 @@ class ChatLogger(object):
         self.logfiles.pop(channel, None)
 
     def open_logs(self, channels):
+        "Creates the file handles and opens them."
+        for channel in channels:
+            self.add_channel(channel)
         try:
-            for channel in channels:
-                self.add_channel(channel)
-
             self.logfiles["urls"] = open("{}urls-{}{}".format(self.prefix,
                                          self.server, self.suffix), "a")
         except IOError as e:
-            return
+            err_str = "IOError: Disabling chatlogs. Missing write permissions?"
+            log.error("{}".format(e))
+            if self.factory.logs_enabled:
+                self.factory.logs_enabled = False
+                log.error("{}".format(err_str))
 
     def close_logs(self):
         for i in self.logfiles.values():

@@ -212,11 +212,11 @@ class Client(irc.IRCClient):
                 d.addCallback(self.printResult, "handler %s completed" % hname)
                 d.addErrback(self.printError, "handler %s error" % hname)
 
-    def noticed(self, user, channel, message):
-        "I received a notice"
-        self._runhandler("noticed", user, channel,
-                         self.factory.to_utf8(message))
+    #==========================================================================
+    # Handlers
+    #==========================================================================
 
-    def action(self, user, channel, data):
-        "An action"
-        self._runhandler("action", user, channel, self.factory.to_utf8(data))
+    def userJoined(self, user, channel):
+        """Someone joined"""
+        self._runhandler("userJoined", user, channel)
+
