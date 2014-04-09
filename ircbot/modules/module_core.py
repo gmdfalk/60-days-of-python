@@ -323,13 +323,13 @@ def command_logs(bot, user, channel, args):
                        get_nick(user)))
 
     if args == "off" and bot.factory.logs_enabled:
-        bot.chatlogger.close_logs()
         bot.factory.logs_enabled = False
+        bot.chatlogger.close_logs()
         log.info("Chatlogs enabled")
         return bot.say(channel, "Chatlogs are now disabled.")
     elif args == "on" and not bot.factory.logs_enabled:
-        bot.chatlogger.open_logs(bot.factory.network["channels"])
         bot.factory.logs_enabled = True
+        bot.chatlogger.open_logs(bot.factory.network["channels"])
         log.info("Chatlogs disabled")
         return bot.say(channel, "Chatlogs are now enabled.")
     elif args == "level":

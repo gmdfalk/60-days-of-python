@@ -8,12 +8,11 @@ log = logging.getLogger("report")
 
 class ChatLogger(object):
     "The logger for chat messages and URLs"
-    def __init__(self, factory, logdir):
+    def __init__(self, factory):
         self.logfiles = {}
         self.factory = factory
-        self.logdir = logdir
         self.server = self.factory.network_name
-        self.prefix = "logs/"  # Path goes here.
+        self.prefix = self.factory.logdir
         self.suffix = ".log"
 
     def log(self, msg, channel):

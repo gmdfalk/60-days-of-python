@@ -2,7 +2,6 @@ import contextlib
 import logging
 import os
 import re
-import sys
 import urllib2
 
 from twisted.internet import protocol, reactor
@@ -44,19 +43,19 @@ class Factory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         "Reconnect after 10 seconds if the connection to the network is lost."
         if self.retry_enabled:
-            log.info("connection lost ({}): reconnecting in {} seconds"
+            log.info("Connection lost ({}): reconnecting in {} seconds."
                      .format(reason, self.lost_delay))
             reactor.callLater(self.lost_delay, connector.connect)
 
     def clientConnectionFailed(self, connector, reason):
         "Reconnect after 30 seconds if the connection to the network fails."
         if self.retry_enabled:
-            log.info("connection failed ({}): reconnecting in {} seconds"
+            log.info("Connection failed ({}): reconnecting in {} seconds."
                      .format(reason, self.failed_delay))
             reactor.callLater(self.failed_delay, connector.connect)
 
     def buildProtocol(self, address):
-        log.info("Building protocol for {}".format(address))
+        log.info("Building protocol for {}.".format(address))
         p = Client(self)
         self.clients[self.network_name] = p
         return p
@@ -72,7 +71,7 @@ class Factory(protocol.ClientFactory):
                     self.ns[module][0]["finalize"]()
 
     def _loadmodules(self):
-        "Load all modules"
+        "Loads all existing modules."
         self._finalize_modules()
         for module in self._findmodules():
             env = self._getGlobals()
@@ -87,13 +86,13 @@ class Factory(protocol.ClientFactory):
             self.ns[module] = (env, env)
 
     def _unload_removed_modules(self):
-        "Unload modules removed from modules -directory"
-        # Find all modules in namespace that aren't present in moduledir
+        "Unload all modules removed from the modules directory."
+        # Find all modules in namespace that aren't present in moduledir.
         removed_modules = [m for m in self.ns if not m in self._findmodules()]
 
         for m in removed_modules:
-            # finalize module before deleting it
-            # TODO: use general _finalize_modules instead of copy-paste
+            # Finalize module before deleting it.
+            # TODO: Use general _finalize_modules instead of copy-paste.
             if "finalize" in self.ns[m][0]:
                 log.info("Finalize - {}".format(m))
                 self.ns[m][0]["finalize"]()
@@ -101,13 +100,13 @@ class Factory(protocol.ClientFactory):
             log.info("Removed module - {}".format(m))
 
     def _findmodules(self):
-        "Find all modules"
+        "Find modules in moduledir."
         modules = [m for m in os.listdir(self.moduledir) if\
                    m.startswith("module_") and m.endswith(".py")]
         return modules
 
     def _getGlobals(self):
-        "Global methods for modules"
+        "Namespace for utilities/methods made available for modules."
         g = {}
 
         g["get_nick"] = self.get_nick
@@ -118,11 +117,11 @@ class Factory(protocol.ClientFactory):
         return g
 
     def get_nick(self, user):
-        "Parses nick from nick!user@host"
+        "Parses nick from nick!user@host."
         return user.split("!", 1)[0]
 
     def permissions(self, user):
-        "Check if an user has superadmin privileges."
+        "Returns the permission level of a user."
         if self.get_nick(user) in self.network["superadmins"]:
                 return 20
         elif self.get_nick(user) in self.network["admins"]:
@@ -130,13 +129,13 @@ class Factory(protocol.ClientFactory):
         return 0
 
     def to_utf8(self, _string):
-        "Convert string to UTF-8 if it is unicode"
+        "Convert string to UTF-8 if it is unicode."
         if isinstance(_string, unicode):
             _string = _string.encode("UTF-8")
         return _string
 
     def to_unicode(self, _string):
-        "Convert string to UTF-8 if it is unicode"
+        "Convert string to UTF-8 if it is unicode."
         if not isinstance(_string, unicode):
             try:
                 _string = unicode(_string)
@@ -148,7 +147,7 @@ class Factory(protocol.ClientFactory):
         return _string
 
     def get_url(self, msg):
-        "Extracts a URL from a chat message"
+        "Extracts a URL from a chat message."
         # Does not match: www.web.de
         # TODO: Improve regex and enable multiple URLs in one message.
         try:
@@ -159,7 +158,7 @@ class Factory(protocol.ClientFactory):
         return url
 
     def get_title(self, url):
-        "Gets the HTML title of a website"
+        "Gets the HTML title of a website."
         # FIXME: Bug urls:
         # http://www.meetup.com/Stockholm-SDN-Group/events/161810182/
         # https://www.google.com/search?q=python%20get%20html%20text#q=python+get+html+source

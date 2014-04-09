@@ -14,7 +14,7 @@ Arguments:
 Options:
     -n, --nick=<nick>   Nickname of the bot [default: demibot]
     -p, --pass=<pass>   NickServ password, if required.
-    -l, --logdir=<dir>  File to log bot events to [default: logs/system.log]
+    -l, --logdir=<dir>  File to log bot events to
     --no-logs           Turns off all file logging.
     -s, --ssl           Enable if the server supports SSL connections.
     -h, --help          Show this help message and exit.
@@ -55,6 +55,31 @@ log = logging.getLogger("main")
 
 def main():
     args = docopt(__doc__, version="0.1")
+
+    # If ~/.demibot or ~/.config/demibot exist, we use that as logdir (and
+    # later put the configuration file there, too).
+    if not args["<server>"] and not args["--logdir"]:
+        root = os.path.join(os.path.expanduser("~"), ".demibot")
+        config = os.path.join(os.path.expanduser("~"), ".config/demibot")
+        if os.path.isdir(config):
+            args["--logdir"] = config
+        elif os.path.isdir(root):
+            args["--logdir"] = root
+
+    # Check if we have write permissions to the logdir and create it,
+    # if necessary.
+    if not args["--logdir"]:
+        basedir = os.path.dirname(os.path.realpath(__file__))  # we are here.
+        args["--logdir"] = os.path.join(basedir, "logs/")
+    try:
+        os.mkdir(args["--logdir"])
+    except OSError as e:
+        # If the error number is anything but 13 we assume we have write
+        # permissions.
+        if e.errno == 13:  # Permission denied
+            # No write permissions. Turn off all file logging.
+            args["--no-logs"] = True
+            log.error("Missing write permissions. Disabling file logging.")
 
     # If there is no server argument, read the connection infos from config.py.
     if not args["<server>"]:
@@ -97,22 +122,6 @@ def main():
     # Cap verbosity count at 3 to avoid index errors.
     if args["-v"] > 3:
         args["-v"] = 3
-
-    # Check if we have write permissions to the logdir and create it,
-    # if necessary.
-    if not args["--logdir"]:
-        basedir = os.path.dirname(os.path.realpath(__file__))  # we are here.
-        args["--logdir"] = basedir + "/logs/"
-    try:
-        os.mkdir(args["--logdir"])
-    except OSError as e:
-        if e.errno == 13:  # Permission denied
-            # No write permissions. Turn off all file logging.
-            args["--no-logs"] = True
-            log.error("Missing write permissions. Disabling file logging.")
-        # If the error number is anything but 13 we assume we have write
-        # permissions.
-        log.info("OSError: Could not create logdir. Maybe it already exists?")
 
     # Set up our logger for system events. Chat is logged separately.
     # Both will be disabled if --no-logs is True.
