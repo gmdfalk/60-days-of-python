@@ -59,8 +59,6 @@ def main():
             args["--logdir"] = homeconfig
         elif os.path.isdir(homeroot):
             args["--logdir"] = homeroot
-    print args["--logdir"]
-
 
     # If no --logdir is specified, use the default location in the script dir.
     if not args["--logdir"]:
