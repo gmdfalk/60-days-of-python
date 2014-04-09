@@ -35,12 +35,9 @@ Examples:
 # Git update module
 # command 8ball, roll (dice)
 
-# Check if we can write to --file to prevent error log spam.
-
 
 import logging
 import os
-import sys
 
 from docopt import docopt
 from twisted.internet import reactor, ssl
@@ -50,27 +47,27 @@ from factory import Factory
 from reporting import init_syslog
 
 
-log = logging.getLogger("main")
-
-
 def main():
     args = docopt(__doc__, version="0.1")
 
     # If ~/.demibot or ~/.config/demibot exist, we use that as logdir (and
     # later put the configuration file there, too).
     if not args["<server>"] and not args["--logdir"]:
-        root = os.path.join(os.path.expanduser("~"), ".demibot")
-        config = os.path.join(os.path.expanduser("~"), ".config/demibot")
-        if os.path.isdir(config):
-            args["--logdir"] = config
-        elif os.path.isdir(root):
-            args["--logdir"] = root
+        homeroot = os.path.join(os.path.expanduser("~"), ".demibot")
+        homeconfig = os.path.join(os.path.expanduser("~"), ".config/demibot")
+        if os.path.isdir(homeconfig):
+            args["--logdir"] = homeconfig
+        elif os.path.isdir(homeroot):
+            args["--logdir"] = homeroot
+    print args["--logdir"]
 
-    # Check if we have write permissions to the logdir and create it,
-    # if necessary.
+
+    # If no --logdir is specified, use the default location in the script dir.
     if not args["--logdir"]:
         basedir = os.path.dirname(os.path.realpath(__file__))  # we are here.
         args["--logdir"] = os.path.join(basedir, "logs/")
+    # Check if we have write permissions to the logdir and create it,
+    # if necessary.
     try:
         os.mkdir(args["--logdir"])
     except OSError as e:
@@ -79,7 +76,7 @@ def main():
         if e.errno == 13:  # Permission denied
             # No write permissions. Turn off all file logging.
             args["--no-logs"] = True
-            log.error("Missing write permissions. Disabling file logging.")
+            print "Disabling file logging (no write permissions): OSError", e
 
     # If there is no server argument, read the connection infos from config.py.
     if not args["<server>"]:

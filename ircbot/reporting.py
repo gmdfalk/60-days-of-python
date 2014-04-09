@@ -41,7 +41,7 @@ class ChatLogger(object):
                                               channel, self.server, self.suffix),
                                               "a")
             else:
-                log.debug("Tried to join a channel twice: {}".format(channel))
+                log.debug("Tried to open logs twice for: {}".format(channel))
         except IOError as e:
             err_str = "IOError: Disabling chatlogs. Missing write permissions?"
             log.error("{}".format(e))

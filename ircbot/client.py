@@ -13,6 +13,7 @@ log = logging.getLogger("client")
 
 
 class Client(irc.IRCClient):
+    "The actual protocol/bot, instanced by the Factory."
 
     def __init__(self, factory):
         self.factory = factory
@@ -30,15 +31,15 @@ class Client(irc.IRCClient):
                                             self.factory.network["server"])
 
     def printResult(self, msg, info):
-        "Log wrapper for completed callbacks"
+        "Log wrapper for completed callbacks."
         log.debug("Result {} {}".format(msg, info))
 
     def printError(self, msg, info):
-        "Log wrapper for errors from callbacks"
+        "Log wrapper for errors from callbacks."
         log.error("ERROR {} {}".format(msg, info))
 
     def _command(self, user, channel, cmnd):
-        "Finds and calls the command specified"
+        "Finds and calls the command specified."
         # Split arguments from the command part
         try:
             cmnd, args = cmnd.split(" ", 1)
@@ -67,18 +68,18 @@ class Client(irc.IRCClient):
                                  channel))
                 # Defer commands to threads
                 d = threads.deferToThread(command, self, user, channel,
-                                          self.factory.to_utf8(args.strip()))
+                                          self.factory_to_unicode(args.strip()))
                 d.addCallback(self.printResult, "command %s completed" % cname)
                 d.addErrback(self.printError, "command %s error" % cname)
 
     def say(self, channel, message, length=None):
-        "Override default say to make replying to private messages easier"
+        "Override default say to make replying to private messages easier."
 
         # Encode channel
         # (for cases where channel is specified in code instead of "answering")
-        channel = self.factory.to_utf8(channel)
+        channel = self.factory_to_unicode(channel)
         # Encode all outgoing messages to UTF-8
-        message = self.factory.to_utf8(message)
+        message = self.factory_to_unicode(message)
 
         # Change nick!user@host -> nick, since all servers don't support full
         # hostmask messaging
@@ -193,7 +194,7 @@ class Client(irc.IRCClient):
             self._command(user, reply, cmnd)
 
         # Run privmsg handlers
-        self._runhandler("privmsg", user, reply, self.factory.to_utf8(msg))
+        self._runhandler("privmsg", user, reply, self.factory_to_unicode(msg))
 
     def _runhandler(self, handler, *args, **kwargs):
 
@@ -216,7 +217,68 @@ class Client(irc.IRCClient):
     # Handlers
     #==========================================================================
 
+    def irc_JOIN(self, prefix, params):
+        "Override the twisted version to preserve full userhost info"
+        nick = self.factory.get_nick(prefix)
+        channel = params[-1]
+
+        if nick == self.nickname:
+            self.joined(channel)
+        else:
+            self.userJoined(prefix, channel)
+
+        if nick.lower() != self.nickname.lower():
+            pass
+        elif channel not in self.network["channels"]:
+            self.network.channels.add(channel)
+            self.factory.setNetwork(self.network)
+
+    # Client.
+    def joined(self, channel):
+        """I joined a channel"""
+        self._runhandler("joined", channel)
+
+    def left(self, channel):
+        """I left a channel"""
+        self._runhandler("left", channel)
+
+    def noticed(self, user, channel, message):
+        """I received a notice"""
+        self._runhandler("noticed", user, channel, self.factory.to_unicode(message))
+
+    def modeChanged(self, user, channel, set, modes, args):
+        """Mode changed on user or channel"""
+        self._runhandler("modeChanged", user, channel, set, modes, args)
+
+    def kickedFrom(self, channel, kicker, message):
+        """I was kicked from a channel"""
+        self._runhandler("kickedFrom", channel, kicker, self.factory.to_unicode(message))
+
+    def nickChanged(self, nick):
+        """I changed my nick"""
+        self._runhandler("nickChanged", nick)
+
+    # Others.
     def userJoined(self, user, channel):
         """Someone joined"""
         self._runhandler("userJoined", user, channel)
 
+    def userLeft(self, user, channel, message):
+        """Someone left"""
+        self._runhandler("userLeft", user, channel, self.factory.to_unicode(message))
+
+    def userKicked(self, kickee, channel, kicker, message):
+        """Someone got kicked by someone"""
+        self._runhandler("userKicked", kickee, channel, kicker, self.factory.to_unicode(message))
+
+    def action(self, user, channel, data):
+        """An action"""
+        self._runhandler("action", user, channel, self.factory.to_unicode(data))
+
+    def userRenamed(self, oldnick, newnick):
+        """Someone changed their nick"""
+        self._runhandler("userRenamed", oldnick, newnick)
+
+    def receivedMOTD(self, motd):
+        """MOTD"""
+        self._runhandler("receivedMOTD", self.factory.to_unicode(motd))

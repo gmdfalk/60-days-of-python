@@ -15,6 +15,7 @@ log = logging.getLogger("factory")
 
 
 class Factory(protocol.ClientFactory):
+    "Factory that creates a client and handles its connection."
 
     VERSION = "0.1"  # current demibot version
     URL = "https://github.com/mikar/demibot"
@@ -135,7 +136,9 @@ class Factory(protocol.ClientFactory):
         return _string
 
     def to_unicode(self, _string):
-        "Convert string to UTF-8 if it is unicode."
+        "Convert string to unicode."
+        # NOTE: In python 2 work with unicode. In python 3 stick to str only.
+        # http://bit.ly/unipain
         if not isinstance(_string, unicode):
             try:
                 _string = unicode(_string)
@@ -148,7 +151,7 @@ class Factory(protocol.ClientFactory):
 
     def get_url(self, msg):
         "Extracts a URL from a chat message."
-        # Does not match: www.web.de
+        # Does not match www.web.de which is intended.
         # TODO: Improve regex and enable multiple URLs in one message.
         try:
             url = re.search("(?P<url>https?://[^\s]+)", msg).group("url")
