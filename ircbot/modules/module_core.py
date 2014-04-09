@@ -20,7 +20,9 @@
 """
 
 import logging
+import re
 
+from twisted.internet import reactor
 from twisted.python import rebuild
 
 
@@ -110,7 +112,6 @@ def command_quit(bot, user, channel, args):
                        get_nick(user)))
 
     if args == "all":
-        from twisted.internet import reactor
         reactor.stop()
 
     bot.factory.retry_enabled = False
@@ -159,6 +160,44 @@ def command_mode(bot, user, channel, args):
         return bot.say(channel, "Mode have this format: +b")
 
     bot.mode(chan, operation, finalmode, user=usr)
+
+
+def command_tempban(bot, user, channel, args):
+    "Usage: tempban <duration> <user> [<channel>]"
+    if permissions(user) < 20:  # 10 == admin, 20 == superadmin
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
+
+    args = args.split()
+    if len(args) > 3 or len(args) < 2:
+        return bot.say(channel, "Usage: tempban <duration> <user> [<channel>]")
+    elif len(args) == 3:
+        chan = args[2]
+    else:
+        chan = channel
+    duration, usr = args[0].lower(), args[1]
+
+    # Accept only valid duration input e.g. 5, 5d, 5h, 5m.
+    _valid_duration = re.compile("[0-9]+[mhd]?")
+    def valid_duration(d):
+        return bool(_valid_duration.search(d))
+
+    if len(duration) > 2 or not valid_duration(duration):
+        return bot.say(channel, "Duration can be 5, 5m, 5h, 5d")
+
+    if "m" in duration:
+        cut_duration = int(duration.strip("m")) * 60
+    elif "h" in duration:
+        cut_duration = int(duration.strip("h")) * 3600
+    elif "d" in duration:
+        cut_duration = int(duration.strip("d")) * 86400
+    else:
+        cut_duration = int(duration)
+
+    bot.say(chan, "Banning {} for {}.".format(usr, duration))
+    log.info("Banning {} for {} on {}.".format(usr, duration, chan))
+    bot.mode(chan, True, "b", user=usr)
+    reactor.callLater(cut_duration, bot.mode, chan, False, "b", user=usr)
 
 
 def command_setnick(bot, user, channel, args):

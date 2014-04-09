@@ -34,7 +34,9 @@ Examples:
 # Override irc_JOIN to get username!ident@hostmask of users.
 # Replace logging with syslog
 # Fix runhandler
-# command tempban
+# command tempban, 8ball, roll (dice)
+
+# Check if we can write to --file to prevent error log spam.
 
 
 from docopt import docopt
