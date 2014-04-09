@@ -97,11 +97,11 @@ def command_rehash(bot, user, channel, args):
         bot.factory._unload_removed_modules()
         bot.factory._loadmodules()
     except Exception, e:
-        log.error("Rehash error: {}".format(e))
-        return bot.say(channel, "Rehash error: {}".format(e))
+        log.error("Rehash error: {}.".format(e))
+        return bot.say(channel, "Rehash error: {}.".format(e))
     else:
-        log.info("Rehash OK")
-        return bot.say(channel, "Rehash OK")
+        log.info("Rehash OK.")
+        return bot.say(channel, "Rehash OK.")
 
 
 def command_quit(bot, user, channel, args):
@@ -127,7 +127,7 @@ def command_kick(bot, user, channel, args, reason=None):
                        get_nick(user)))
 
     args = [i for i in args.partition(" ") if i and i != " "]
-    if len(args) < 2:
+    if len(args) > 2:
         return bot.say(channel, "Usage: kick <user> [<reason>]")
     else:
         reason = args[1]
@@ -378,8 +378,3 @@ def command_printvars(bot, user, channel, args):
 def command_ping(bot, user, channel, args):
     "Dummy command. Try it!"
     return bot.say(channel, "{}, Pong.".format(get_nick(user)))
-
-
-def command_randomnumber(bot, user, channel, args):
-    "Prints a random number."
-    return bot.say(channel, "5")

@@ -181,4 +181,5 @@ class Factory(protocol.ClientFactory):
         except (urllib2.HTTPError, AttributeError):
             title = None
 
-        return "Title: {}".format(title.strip())
+        if title:
+            return "Title: {}".format(title.strip())
