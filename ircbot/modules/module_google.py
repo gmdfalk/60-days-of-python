@@ -1,21 +1,28 @@
+import re
+
 
 def get_cx(cx_id=None):
     "Reads Google Search ID from a file."
     try:
         with open(".auth") as f:
-            authlist = f.readlines()
+            authstr = f.read()
     except IOError:
         cx_id = None
     else:
-        cx_id = [i.split() for i in authlist if i.startswith("cx ")][0]
+        cx_id = re.search("(?<=cx ).*", authstr)
+        if cx_id:
+            cx_id = cx_id.group()
 
-    return cx_id[1]
+    return cx_id
 
 def command_g(bot, user, channel, args):
     "Searches Google and returns the first result. Usage: g <string>"
     # FIXME: Add correct site to CX_ID.
 
     cx = get_cx()
+    print
+    print cx
+    print
     if not cx:
         return
 
