@@ -31,6 +31,7 @@ def command_roll(bot, user, channel, args):
 
     bot.say(channel, "{} = {}".format(rolls, total))
 
+
 def command_range(bot, user, channel, args):
     "Returns a random number in a range. Usage: range <max>."
 
@@ -45,15 +46,15 @@ def command_8ball(bot, user, channel, args):
     phrases = ["It is certain", "It is decidedly so", "Without a doubt",
                 "Yes definitely", "You may rely on it", "As I see it, yes",
                 "Most likely", "Outlook good", "Signs point to yes",
-                "Reply hazy, try again", "Ask again later", "Cannot predict now"
+                "Reply hazy, try again", "Ask again later", "Very doubtful",
                 "Better not tell you now", "Concentrate and ask again",
                 "Don't count on it", "My reply is no", "My sources say no",
-                "Outlook not so good", "Very doubtful"]
-
+                "Outlook not so good", "Cannot predict now"]
+    nick = get_nick(user)
     if "?" not in args:
-        return bot.say(channel, "Need a question, {}!".format(get_nick(user)))
+        return bot.say(channel, "Need a question, {}!".format(nick))
 
-    bot.say(channel, "{}, {}.".format(random.choice(phrases), get_nick(user)))
+    bot.say(channel, "{}, {}.".format(random.choice(phrases), nick))
 
 
 def command_cointoss(bot, user, channel, args):
