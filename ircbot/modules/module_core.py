@@ -417,11 +417,32 @@ def command_setvar(bot, user, channel, args):
     if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
+    f = bot.factory
     if not args:
-        return bot.say(channel, "Usage: setlead <lead>. Punctuation only.")
+        return bot.say(channel, "retry: {}, minperms: {}, lost_delay: {},"\
+                       "failed_delay: {}, lineRate: {}".format(
+                        f.retry_enabled, f.minperms, f.lost_delay,
+                        f.failed_delay, bot.lineRate))
 
-    if len(args.split()) > 1 or not args in punctuation:
-        return bot.say(channel, "Lead has to be a punctuation mark.")
+    args = args.split()
+    if args[0] == "retry":
+        f.retry_enabled = not f.retry_enabled
+        return bot.say(channel, "retry_enabled: {}".format(f.retry_enabled))
+    if args[0] == "titles" or args[0] == "url":
+        f.titles_enabled = not f.titles_enabled
+        return bot.say(channel, "titles_enabled: {}".format(f.titles_enabled))
+    elif args[0] == "minperms":
+        f.minperms = int(args[1])
+        return bot.say(channel, "minperms: {}".format(f.minperms))
+    elif args[0] == "lost_delay":
+        f.lost_delay = int(args[1])
+        return bot.say(channel, "lost_delay: {}".format(f.lost_delay))
+    elif args[0] == "failed_delay":
+        f.failed_delay = int(args[1])
+        return bot.say(channel, "failed_delay: {}".format(f.failed_delay))
+    elif args[0] == "linerate":
+        bot.lineRate = int(args[1])
+        return bot.say(channel, "lineRate: {}".format(bot.lineRate))
 
     bot.lead = args
     log.info("Command identifier changed to {}".format(bot.lead))
@@ -429,8 +450,8 @@ def command_setvar(bot, user, channel, args):
                    .format(bot.lead))
 
 
-def command_printvar(bot, user, channel, args):
-    "Prints out crucial variables. Usage: printvar [<var>]."
+def command_printvars(bot, user, channel, args):
+    "Prints out crucial variables. Usage: printvars [<var>]."
     f = bot.factory
     perms, nick = permissions(user), get_nick(user)
     if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
@@ -442,22 +463,22 @@ def command_printvar(bot, user, channel, args):
                 " failed_delay: {}".format(f.logs_enabled, f.retry_enabled,
                                            f.titles_enabled, f.minperms,
                                            f.lost_delay, f.failed_delay))
-        bot.say(channel, "logdir: {}, configdir: {}"
-                .format(f.logdir, f.configdir))
+        bot.say(channel, "logdir: {}, configdir: {}, moduledir: {}"
+                .format(f.logdir, f.configdir, f.moduledir))
         return bot.say(channel, "realname: {}, username: {}, password: {}, "\
                        "userinfo: {}, hostname: {}, lineRate: {}, lead: {}"
                        .format(bot.realname, bot.username, bot.password,
                                bot.userinfo, bot.hostname, bot.lineRate,
                                bot.lead))
-    elif args == "bot":
+    elif args == "client":
         return bot.say(channel, "realname: {}, username: {}, password: {}, "\
                        "userinfo: {}, hostname: {}, lineRate: {}, lead: {}"
                        .format(bot.realname, bot.username, bot.password,
                                bot.userinfo, bot.hostname, bot.lineRate,
                                bot.lead))
     elif args == "dirs":
-        return bot.say(channel, "logdir: {}, configdir: {}"
-                       .format(f.logdir, f.configdir))
+        return bot.say(channel, "logdir: {}, configdir: {}, moduledir: {}"
+                       .format(f.logdir, f.configdir, f.moduledir))
     elif args == "factory":
         return bot.say(channel, "logs_enabled: {}, retry_enabled: {},"\
                        " titles_enabled: {}, minperms: {}, lost_delay: {},"\
