@@ -8,14 +8,12 @@
     Alternatively, you obviously can just enter the passwords here in plaintext.
     Other than that, the file should be self-explanatory.
 
-    Tuple for superadmins, sets for admins and channels. Everything else is a
-    dict.
+    Sets for admins and channels. Everything else is a dict.
 
     The auth file has a very simple syntax of identifier passphrase, e.g.:
     user nickservpassword
     server serverpassword
 """
-
 
 def read_authfile(authfile):
     "Reads authentication info from a file"
@@ -25,25 +23,24 @@ def read_authfile(authfile):
             for line in f:
                 name, password = line.split()
                 auth[name] = password
-    except IOError:
+    except IOError as e:
+        print "IOError: {}.\nCould not read authentication file.".format(e)
         auth = {}
 
     return auth
 
-def read_options(use_home):
-    "Entry point for main.py to read in the configuration."
-    pass
 
-def create_options():
-    "Enter your connection settings here."
+def create_options(authfile):
+    "Enter your the network and identity settings here."
 
-    superadmins = "pld",  # The comma is important.
+    # Read authentication information from a file into a dict to "get" from.
+    auth = read_authfile(authfile)
 
     identities = {
         "example": {
             "nickname": "botnick",
-            "realname": "",
-            "username": "",
+            "realname": "botnick",
+            "username": "botnick",
             "nickserv_pw": auth.get("botnick")
         },
     }
@@ -69,3 +66,5 @@ def create_options():
             "channels": {"#channel1", "#channel2"},
         },
     }
+
+    return networks

@@ -38,7 +38,7 @@ def command_admins(bot, user, channel, args):
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
-    superadmins = set(bot.factory.network["superadmins"])
+    superadmins = bot.factory.network["superadmins"]
     admins = superadmins ^ bot.factory.network["admins"]
 
     str_sadmins = " ".join(superadmins)
@@ -223,18 +223,19 @@ def command_setnick(bot, user, channel, args):
 
 def command_setmin(bot, user, channel, args):
     "Change the bots nickname. Usage: setnick <nick>"
-    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
+    level, nick = permissions(user), get_nick(user)
+    if level < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+        return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
     if len(args.split()) > 1 or not args.isdigit():
         return bot.say(channel, "Minperms: {}".format(bot.factory.minperms))
 
-    min = int(args)
-    if min > 20:  # Don't touch superadmins (and shutting yourself out).
-        min = 20
+    minperm = int(args)
+    if minperm > level:  # Don't shut yourself out.
+        return bot.say(channel, "Your maximum is {}, {}".format(level, nick))
+        minperm = 20
 
-    bot.factory.minperms = min
+    bot.factory.minperms = minperm
     log.info("Minperms set to {}".format(bot.factory.minperms))
     return bot.say(channel, "Minperms set to: {}".format(bot.factory.minperms))
 

@@ -23,9 +23,10 @@ class Factory(protocol.ClientFactory):
     clients = {}
     moduledir = os.path.dirname(os.path.realpath(__file__)) + "/modules/"
 
-    def __init__(self, network_name, network, logdir, nologs):
+    def __init__(self, network_name, network, configdir, logdir, nologs):
         self.network_name = network_name
         self.network = network
+        self.configdir = configdir
         self.logdir = logdir
         # Use XOR to set this to False if nologs is True. Could also use
         # not and or is not.
