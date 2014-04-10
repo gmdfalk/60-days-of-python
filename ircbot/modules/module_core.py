@@ -229,13 +229,16 @@ def command_setlead(bot, user, channel, args):
     if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
+    if not args:
+        return bot.say(channel, "Usage: setlead <lead>. Punctuation only.")
+
     if len(args.split()) > 1 or not args in punctuation:
         return bot.say(channel, "Lead has to be a punctuation mark.")
 
-    bot.factory.lead = args
-    log.info("Command identifier changed to {}".format(bot.factory.lead))
+    bot.lead = args
+    log.info("Command identifier changed to {}".format(bot.lead))
     return bot.say(channel, "Command identifier changed to: {}"
-                   .format(bot.factory.lead))
+                   .format(bot.lead))
 
 
 def command_setmin(bot, user, channel, args):

@@ -6,15 +6,15 @@ from twisted.internet import reactor
 
 
 def read_quizfile(quizfile):
-    "Reads the quizfile into a big dictionary."
+    "Reads the quiz file into a big dictionary."
     try:
         with open(quizfile) as f:
             linelist = f.readlines()
     except IOError:
         quizdictlist = None
     else:
-        # Splits the line into category:question*answers.
         questionlist = []
+        # Splits the line into category:question*answers match groups.
         rgx = re.compile("(?:([^:]*):)?([^*]*)\*(.*)")
         for line in linelist:
             match = rgx.search(line)

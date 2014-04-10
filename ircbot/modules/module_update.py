@@ -1,6 +1,6 @@
 import logging
-import subprocess
 import os
+import subprocess
 
 
 log = logging.getLogger("update")
@@ -9,9 +9,9 @@ log = logging.getLogger("update")
 def command_update(bot, user, channel, args):
     """Update the bot sources from our github repository. Depending on your
     git configuration you might have to enter a password in the console."""
-    # TODO: Add interactive(chat) password entry.
+    # TODO: Add interactive(chat) password entry (also need for quizzing).
     if permissions(user) < 20:
-        return
+        return bot.say(channel, "Insufficient permissions.")
 
     cmd = ["git", "pull"]
     cwd = os.getcwd()
@@ -25,8 +25,10 @@ def command_update(bot, user, channel, args):
 
     if res:
         bot.say(channel, "Update failed.")
+        log.info("Update failed.")
     else:
         bot.say(channel, "Update OK.")
+        log.info("Update OK.")
     for line in out.split("\n"):
         bot.say(channel, "{}".format(line))
     if err:

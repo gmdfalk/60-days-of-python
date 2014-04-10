@@ -13,15 +13,14 @@ def get_cx(cx_id=None):
     except IOError:
         cx_id = None
     else:
-        cx_id = re.search("(?<=cx ).*", authstr)
+        cx_id = re.search("(?<=cx\s).*", authstr)
         if cx_id:
             cx_id = cx_id.group()
 
     return cx_id
 
 def command_g(bot, user, channel, args):
-    "Searches Google and returns the first result. Usage: g <string>"
-    # FIXME: Add correct site to CX_ID.
+    "Searches Google and returns the first result. Usage: g <searchterm>"
 
     cx = get_cx()
     print
