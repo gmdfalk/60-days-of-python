@@ -30,7 +30,7 @@ Examples:
 # Database (User info, channel stats, quiz, permission levels, alternate nicks)
 # Modules: Seen+Tell, RSS+Github, IMDB/TVcal, Twitter, madcow
 # Replace logging with syslog
-
+# Add support for channelpasswords
 
 import logging
 import os
@@ -38,7 +38,6 @@ import os
 from docopt import docopt
 from twisted.internet import reactor, ssl
 
-import config
 from factory import Factory
 from reporting import init_syslog
 

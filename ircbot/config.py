@@ -1,16 +1,23 @@
 """config.py
 
-    This file will be used by demibot if started without commandline arguments.
-    Currently, NickServ and server passwords are read from a .auth file in the
-    root directory of demibot. This will probably change. Alternatively, you
-    obviously can just enter the passwords here in plaintext.
+    These connection settings will be used by demibot if started without a
+    <server> argument.
+
+    Currently, NickServ and server passwords are read from an "auth" file in
+    either the root directory of demibot or ~/.demibot or ~/.config/demibot.
+    Alternatively, you obviously can just enter the passwords here in plaintext.
     Other than that, the file should be self-explanatory.
-    Tuple for superadmins, sets for admins and channels. Everything else
-    is a dict.
+
+    Tuple for superadmins, sets for admins and channels. Everything else is a
+    dict.
+
+    The auth file has a very simple syntax of identifier passphrase, e.g.:
+    user nickservpassword
+    server serverpassword
 """
 
 
-def get_auth_info(authfile):
+def read_authfile(authfile):
     "Reads authentication info from a file"
     auth = {}
     try:
@@ -23,77 +30,42 @@ def get_auth_info(authfile):
 
     return auth
 
+def read_options(use_home):
+    "Entry point for main.py to read in the configuration."
+    pass
 
-auth = get_auth_info(".auth")
-# Use a tuple for superadmins and sets for admins & channels.
-superadmins = "pld",  # The comma is important.
+def create_options():
+    "Enter your connection settings here."
 
-identities = {
-    "demibot": {
-        "nickname": "demibot",
-        "realname": "the game",
-        "username": "demibot",
-        "nickserv_pw": auth.get("demibot")
-    },
-}
-networks = {
-    "freenode": {
-        "server": "irc.freenode.net",
-        "port": 6667,
-        "ssl": False,
-        "password": auth.get("freenode"),
-        "identity": identities["demibot"],
-        "superadmins": superadmins,
-        "admins": set(superadmins) | {"mikar"},  # | is short for set.union().
-        "channels": {"#python", "#z1"},
-    },
-    "oftc": {
-        "server": "irc.oftc.net",
-        "port": 6667,
-        "ssl": False,
-        "password": auth.get("oftc"),
-        "identity": identities["demibot"],
-        "superadmins": superadmins,
-        "admins": set(superadmins) | {"mikar"},
-        "channels": {"#awesome", "#z1"},
-    },
-#     "rizon": {
-#         "server": "irc.rizon.net",
-#         "port": 6667,
-#         "ssl": False,
-#         "password": auth.get("oftc"),
-#         "identity": identities["example"],
-#         # It's also possible to list superadmins, admins and channels:
-#         "superadmins": (
-#             "nick1",
-#             "nick2"
-#         ),
-#         "admins": {
-#             "nick1",
-#             "nick2",
-#         },
-#         "channels": {
-#             "#z1",
-#             "#z2",
-#         },
-#     },
-#     "quakenet": {
-#         "server": "irc.quakenet.org",
-#         "port": 6667,
-#         "ssl": False,
-#         "password": auth.get("oftc"),
-#         "identity": identities["example"],
-#         "superadmins": (
-#             "nick1",
-#             "nick2"
-#         ),
-#         "admins": {
-#             "nick1",
-#             "nick2",
-#         },
-#         "channels": {
-#             "#z1",
-#             "#z2",
-#         },
-#     },
-}
+    superadmins = "pld",  # The comma is important.
+
+    identities = {
+        "example": {
+            "nickname": "botnick",
+            "realname": "",
+            "username": "",
+            "nickserv_pw": auth.get("botnick")
+        },
+    }
+    networks = {
+        "freenode": {
+            "server": "irc.freenode.net",
+            "port": 6667,
+            "ssl": False,
+            "password": auth.get("freenode"),
+            "identity": identities["example"],
+            "superadmins": {"nick1", "nick2"},
+            "admins":  {"nick3", "nick4"},
+            "channels": {"#channel1", "#channel2"},
+        },
+        "oftc": {
+            "server": "irc.oftc.net",
+            "port": 6667,
+            "ssl": False,
+            "password": auth.get("oftc"),
+            "identity": identities["example"],
+            "superadmins": {"nick1", "nick2"},
+            "admins":  {"nick3", "nick4"},
+            "channels": {"#channel1", "#channel2"},
+        },
+    }
