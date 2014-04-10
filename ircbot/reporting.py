@@ -18,8 +18,6 @@ class ChatLogger(object):
 
     def log(self, msg, channel):
         "Write a log line with a time stamp to the logfile of the channel"
-        print self.logfiles
-        print self.prefix
         timestamp = time.strftime("%H:%M:%S", time.localtime(time.time()))
         try:
             self.logfiles[channel].write("[{}] {}\n".format(timestamp, msg))

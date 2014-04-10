@@ -69,7 +69,7 @@ def main():
     # Check if we have write permissions to the logdir and create it,
     # if necessary.
     try:
-        os.mkdir(args["--logdir"])
+        os.makedirs(args["--logdir"])
     except OSError as e:
         # If the error number is anything but 13 we assume we have write
         # permissions.
@@ -87,7 +87,7 @@ def main():
         identities = {
             "default": {
                 "nickname": args["--nick"],
-                "realname": "Anonymous",
+                "realname": "demibot",
                 "username": args["--nick"],
                 "nickserv_pw": args["--pass"],
             }
