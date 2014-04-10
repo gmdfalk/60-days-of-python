@@ -35,7 +35,9 @@ class Factory(protocol.ClientFactory):
         self.quiz_enabled = False
         # Set minperms to disable access to commands for certain permission
         # levels. Anything above 0 will disable most public commands.
-        self.minperms = 0
+        self.minperms = 1  # 20 is the maximum.
+        if self.minperms:
+            log.info("Minperms are set! To enable public commands: .setmin 0")
         # Namespace for modules:
         self.ns = {}
         # Connection retry delays:

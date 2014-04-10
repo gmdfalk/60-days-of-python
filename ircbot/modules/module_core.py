@@ -20,6 +20,7 @@
         * rehash
         * printvars
 """
+# TODO: Return out of mode, tempban, kick if we're not channel OP.
 
 import logging
 import re
@@ -33,9 +34,10 @@ log = logging.getLogger("core")
 
 def command_admins(bot, user, channel, args):
     "Add, remove or list admins. Usage: admins [(add|del) <nick>,...]"
-    if permissions(user) < 20:
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
+
     superadmins = set(bot.factory.network["superadmins"])
     admins = superadmins ^ bot.factory.network["admins"]
 
@@ -89,7 +91,7 @@ def command_admins(bot, user, channel, args):
 def command_rehash(bot, user, channel, args):
     "Rehashes all available modules to reflect any changes."
 
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -109,8 +111,9 @@ def command_rehash(bot, user, channel, args):
 def command_quit(bot, user, channel, args):
     "Ends this or optionally all client instances. Usage: quit [all]."
 
-    if bot.factory.mininum_permissions > permissions(user) < 20:
-        return log.debug("{}, insufficient permissions.".format(user))
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+        return bot.say(channel, "{}, insufficient permissions.".format(
+                       get_nick(user)))
 
     if args == "all":
         reactor.stop()
@@ -123,7 +126,7 @@ def command_quit(bot, user, channel, args):
 
 def command_kick(bot, user, channel, args, reason=None):
     "Usage: kick <user> [<reason>]"
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 10:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -140,7 +143,7 @@ def command_kick(bot, user, channel, args, reason=None):
 def command_mode(bot, user, channel, args):
     "Usage: mode <(+|-)mode> <user> [<channel>]"
     # TODO: "all" argument instead of user.
-    if bot.factory.mininum_permissions > permissions(user) < 20:
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -166,7 +169,7 @@ def command_mode(bot, user, channel, args):
 
 def command_tempban(bot, user, channel, args):
     "Usage: tempban <duration> <user> [<channel>]"
-    if bot.factory.mininum_permissions > permissions(user) < 20:
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -204,7 +207,7 @@ def command_tempban(bot, user, channel, args):
 
 def command_setnick(bot, user, channel, args):
     "Change the bots nickname. Usage: setnick <nick>"
-    if bot.factory.mininum_permissions > permissions(user) < 20:
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -220,22 +223,25 @@ def command_setnick(bot, user, channel, args):
 
 def command_setmin(bot, user, channel, args):
     "Change the bots nickname. Usage: setnick <nick>"
-    if permissions(user) < 20:
+    if permissions(user) < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
     if len(args.split()) > 1 or not args.isdigit():
-        return bot.say(channel, "Currently: {}".format(bot.factory.minperms))
+        return bot.say(channel, "Minperms: {}".format(bot.factory.minperms))
 
-    bot.factory.network["identity"]["nickname"] = args[0]
-    bot.nickname = bot.factory.network["identity"]["nickname"]
-    bot.setNick(bot.nickname)
-    log.info("Changed nickname to {}".format(args[0]))
+    min = int(args)
+    if min > 20:  # Don't touch superadmins (and shutting yourself out).
+        min = 20
+
+    bot.factory.minperms = min
+    log.info("Minperms set to {}".format(bot.factory.minperms))
+    return bot.say(channel, "Minperms set to: {}".format(bot.factory.minperms))
 
 
 def command_settopic(bot, user, channel, args):
     "Set the channel topic. Usage: settopic <topic>"
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 10:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -249,7 +255,7 @@ def command_settopic(bot, user, channel, args):
 def command_join(bot, user, channel, args):
     "Usage: join <channel>,... (Comma separated, hash not required)."
 
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 10:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -272,7 +278,7 @@ def command_join(bot, user, channel, args):
 def command_leave(bot, user, channel, args):
     "Usage: leave <channel>,... (Comma separated, hash not required)."
 
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 10:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -303,7 +309,7 @@ def command_leave(bot, user, channel, args):
 
 def command_channels(bot, user, channel, args):
     "List channels the bot is on."
-    if permissions(user) < 10:  # 10 == admin, 20 == superadmin
+    if permissions(user) < 10:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 

@@ -24,24 +24,15 @@ def get_auth_info(authfile):
     return auth
 
 
-authfile = ".auth"
-auth = get_auth_info(authfile)
-
+auth = get_auth_info(".auth")
 # Use a tuple for superadmins and sets for admins & channels.
-superadmins = ("pld",)  # The comma is important.
-channels = {"#z1", "#z2"}
+superadmins = "pld",  # The comma is important.
 
 identities = {
-    "example": {
-        "nickname": "examplebot",
-        "realname": "I'm a bot",
-        "username": "examplebot",
-        "nickserv_pw": auth.get("example")
-    },
     "demibot": {
         "nickname": "demibot",
         "realname": "the game",
-        "username": "anonymous",
+        "username": "demibot",
         "nickserv_pw": auth.get("demibot")
     },
 }
@@ -54,7 +45,7 @@ networks = {
         "identity": identities["demibot"],
         "superadmins": superadmins,
         "admins": set(superadmins) | {"mikar"},  # | is short for set.union().
-        "channels": channels,
+        "channels": {"#python", "#z1"},
     },
     "oftc": {
         "server": "irc.oftc.net",
@@ -64,7 +55,7 @@ networks = {
         "identity": identities["demibot"],
         "superadmins": superadmins,
         "admins": set(superadmins) | {"mikar"},
-        "channels": channels,
+        "channels": {"#awesome", "#z1"},
     },
 #     "rizon": {
 #         "server": "irc.rizon.net",

@@ -27,10 +27,9 @@ Examples:
     demibot  (uses config.py for multiserver support with detailed settings)
 """
 # TODO:
-# Database (User info, channel stats, quiz, permission levels, alternate nicks),
+# Database (User info, channel stats, quiz, permission levels, alternate nicks)
 # Modules: Seen+Tell, RSS+Github, IMDB/TVcal, Twitter, madcow
 # Replace logging with syslog
-# QUIZ!
 
 
 import logging

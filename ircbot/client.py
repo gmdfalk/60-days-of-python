@@ -21,7 +21,7 @@ class Client(irc.IRCClient):
         self.realname = self.factory.network["identity"]["realname"]
         self.username = self.factory.network["identity"]["username"]
         self.sourceURL = self.factory.URL  # CTCP source queries to the github.
-        self.lineRate = 0.5  # print at most 0.5 lines per second.
+        self.lineRate = 1  # print at most n lines per second.
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.lead = "."
         log.info("Bot initialized")
@@ -40,6 +40,13 @@ class Client(irc.IRCClient):
 
     def _command(self, user, channel, cmnd):
         "Finds and calls the command specified."
+        # Check if the user has the minimum required permissions.
+        if self.factory.minperms > 20:
+            self.factory.minperms = 20
+        if self.factory.minperms > self.factory.permissions(user):
+            log.info("{} has insufficient permissions for {}."
+                     .format(user, cmnd))
+            return
         # Split arguments from the command part
         try:
             cmnd, args = cmnd.split(" ", 1)
