@@ -21,7 +21,7 @@ class Client(irc.IRCClient):
         self.realname = self.factory.network["identity"]["realname"]
         self.username = self.factory.network["identity"]["username"]
         self.sourceURL = self.factory.URL  # CTCP source queries to the github.
-        self.lineRate = 1  # print at most n lines per second.
+        self.lineRate = 1  # Print at most n lines per second.
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.lead = "."
         log.info("Bot initialized")

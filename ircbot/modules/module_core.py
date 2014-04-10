@@ -16,6 +16,7 @@
         * tempban
         * mode
         * setnick
+        * setlead
         * admins
         * rehash
         * printvars
@@ -24,6 +25,7 @@
 
 import logging
 import re
+from string import punctuation
 
 from twisted.internet import reactor
 from twisted.python import rebuild
@@ -221,18 +223,33 @@ def command_setnick(bot, user, channel, args):
     log.info("Changed nickname to {}".format(args[0]))
 
 
+def command_setlead(bot, user, channel, args):
+    "Change the bots command identifier. Usage: setlead <lead>."
+    perms, nick = permissions(user), get_nick(user)
+    if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+        return bot.say(channel, "{}, insufficient permissions.".format(nick))
+
+    if len(args.split()) > 1 or not args in punctuation:
+        return bot.say(channel, "Lead has to be a punctuation mark.")
+
+    bot.factory.lead = args
+    log.info("Command identifier changed to {}".format(bot.factory.lead))
+    return bot.say(channel, "Command identifier changed to: {}"
+                   .format(bot.factory.lead))
+
+
 def command_setmin(bot, user, channel, args):
     "Change the bots nickname. Usage: setnick <nick>"
-    level, nick = permissions(user), get_nick(user)
-    if level < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+    perms, nick = permissions(user), get_nick(user)
+    if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
     if len(args.split()) > 1 or not args.isdigit():
         return bot.say(channel, "Minperms: {}".format(bot.factory.minperms))
 
     minperm = int(args)
-    if minperm > level:  # Don't shut yourself out.
-        return bot.say(channel, "Your maximum is {}, {}".format(level, nick))
+    if minperm > perms:  # Don't shut yourself out.
+        return bot.say(channel, "Your maximum is {}, {}".format(perms, nick))
         minperm = 20
 
     bot.factory.minperms = minperm
@@ -377,9 +394,9 @@ def command_logs(bot, user, channel, args):
 def command_me(bot, user, channel, args):
     "Displays information about the user."
     nick = get_nick(user)
-    level = permissions(user)
+    perms = permissions(user)
     return bot.say(channel, "{}, your permission level is {}.".format(nick,
-                                                                      level))
+                                                                      perms))
 
 
 def command_version(bot, user, channel, args):
