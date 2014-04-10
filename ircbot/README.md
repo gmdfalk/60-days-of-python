@@ -1,6 +1,6 @@
 # demibot  
 
-## An IRCBot written in Python.  
+## A modular IRCBot 
   
 ##### What it currently provides:  
   * Logs both system messages and chat. URLs are logged to a separate file.

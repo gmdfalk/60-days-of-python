@@ -3,12 +3,14 @@
     From https://github.com/EArmour
 """
 import re
+import os
 
 
 def get_cx(configdir, cx_id=None):
     "Reads Google Search ID from a file."
     try:
-        with open(configdir + "/auth") as f:
+        authfile = os.path.join(configdir, "auth")
+        with open(authfile) as f:
             authstr = f.read()
     except IOError:
         cx_id = None

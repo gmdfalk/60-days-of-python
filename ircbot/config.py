@@ -21,7 +21,7 @@ def read_authfile(configdir):
     auth = {}
     try:
         authfile = os.path.join(configdir, "auth")
-        with open(configdir + "/auth") as f:
+        with open(authfile) as f:
             for line in f:
                 name, password = line.split()
                 auth[name] = password
@@ -31,11 +31,11 @@ def read_authfile(configdir):
     return auth
 
 
-def create_options(authfile):
+def create_options(configdir):
     "Enter your the network and identity settings here."
 
     # Read authentication information from a file into a dict to "get" from.
-    auth = read_authfile(authfile)
+    auth = read_authfile(configdir)
 
     identities = {
         "example": {
