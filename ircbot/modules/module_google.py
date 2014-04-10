@@ -1,3 +1,7 @@
+"""Google Search using Custom Search Engine API
+
+    From https://github.com/EArmour
+"""
 import re
 
 

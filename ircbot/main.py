@@ -28,9 +28,9 @@ Examples:
 """
 # TODO:
 # Database (User info, channel stats, quiz, permission levels, alternate nicks),
-# Modules: Weather, Quiz, Say (maybe include timer), Seen+Tell, RSS+Github,
-# IMDB/TVcal, Twitter, madcow
+# Modules: Seen+Tell, RSS+Github, IMDB/TVcal, Twitter, madcow
 # Replace logging with syslog
+# QUIZ!
 
 
 import logging

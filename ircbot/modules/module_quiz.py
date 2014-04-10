@@ -1,27 +1,20 @@
-from __future__ import unicode_literals, print_function, division
+import re
 
 
-def calc_bmi(height, weight):
-    return (float(weight) / height ** 2) * 10000
-
-
-def print_bmi(bmi):
-    if bmi < 16.5:
-        weight_category = "severely underweight (less than 16.5)"
-    elif bmi < 18.5:
-        weight_category = "underweight (from 16.5 to 18.4)"
-    elif bmi < 25:
-        weight_category = "normal (from 18.5 to 24.9)"
-    elif bmi < 30.1:
-        weight_category = "overweight (from 25 to 30)"
-    elif bmi < 35:
-        weight_category = "obese class I (from 30.1 to 34.9)"
-    elif bmi <= 40:
-        weight_category = "obese class II (from 35 to 40)"
+def read_quizfile(quizfile):
+    "Reads the quizfile into a big dictionary."
+    try:
+        with open(quizfile) as f:
+            linelist = f.readlines()
+    except IOError:
+        quizdict = None
     else:
-        weight_category = "obese class III (over 40)"
+        for line in linelist:
+            if ":" in line:
+                line = line.split(":")
+                category = line[0]
 
-    return "your BMI is {0:.2f} which is {1}.".format(bmi, weight_category)
+    return quizdict
 
 
 def command_quiz(bot, user, channel, args):
