@@ -30,8 +30,9 @@ class Factory(protocol.ClientFactory):
         # Use XOR to set this to False if nologs is True. Could also use
         # not and or is not.
         self.logs_enabled = True ^ nologs
+        self.retry_enabled = True  # Retry if connection lost/failed.
         self.titles_enabled = False
-        self.retry_enabled = True
+        self.quiz_enabled = False
         # Namespace for modules:
         self.ns = {}
         # Connection retry delays:
