@@ -1,7 +1,6 @@
 # demibot  
 
 ## An IRCBot written in Python.  
-======
   
 ##### What it currently provides:  
   * Logs both system messages and chat. URLs are logged to a separate file.
@@ -49,7 +48,8 @@
  `self.titles_enabled = True` and `self.minperms = 0`.
  
  
- For a simple test run or on-the-fly changes setups or bot stacking, there is a command-line interface.
+ For a simple test run, on-the-fly changes/setups or bot stacking, there is a command-line interface.  
+   
  Examples:  
  ```
  demibot irc.freenode.net:6667 python,bash,linux -a adminnick -n botnick -p nickservpw
