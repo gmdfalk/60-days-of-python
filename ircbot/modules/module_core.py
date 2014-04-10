@@ -436,14 +436,34 @@ def command_printvar(bot, user, channel, args):
     if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
         return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
-    bot.say(channel, "logs_enabled: {}, retry_enabled: {}, titles_enabled: {},"\
-            "minperms: {}, lost_delay: {}, failed_delay: {}".format(
-            f.logs_enabled, f.retry_enabled, f.titles_enabled, f.minperms))
-    bot.say(channel, "logdir: {}, configdir: {}".format(f.logdir, f.configdir))
-    return bot.say(channel, "realname: {}, username: {}, password: {},"\
-                   "userinfo: {}, hostname: {}, lineRate: {}"
-                   .format(bot.realname, bot.username, bot.password,
-                           bot.userinfo, bot.hostname, bot.lineRate))
+    if not args:
+        bot.say(channel, "logs_enabled: {}, retry_enabled: {},"\
+                " titles_enabled: {}, minperms: {}, lost_delay: {},"\
+                " failed_delay: {}".format(f.logs_enabled, f.retry_enabled,
+                                           f.titles_enabled, f.minperms,
+                                           f.lost_delay, f.failed_delay))
+        bot.say(channel, "logdir: {}, configdir: {}"
+                .format(f.logdir, f.configdir))
+        return bot.say(channel, "realname: {}, username: {}, password: {}, "\
+                       "userinfo: {}, hostname: {}, lineRate: {}, lead: {}"
+                       .format(bot.realname, bot.username, bot.password,
+                               bot.userinfo, bot.hostname, bot.lineRate,
+                               bot.lead))
+    elif args == "bot":
+        return bot.say(channel, "realname: {}, username: {}, password: {}, "\
+                       "userinfo: {}, hostname: {}, lineRate: {}, lead: {}"
+                       .format(bot.realname, bot.username, bot.password,
+                               bot.userinfo, bot.hostname, bot.lineRate,
+                               bot.lead))
+    elif args == "dirs":
+        return bot.say(channel, "logdir: {}, configdir: {}"
+                       .format(f.logdir, f.configdir))
+    elif args == "factory":
+        return bot.say(channel, "logs_enabled: {}, retry_enabled: {},"\
+                       " titles_enabled: {}, minperms: {}, lost_delay: {},"\
+                       " failed_delay: {}".format(f.logs_enabled, f.retry_enabled,
+                                                  f.titles_enabled, f.minperms,
+                                                  f.lost_delay, f.failed_delay))
 
 
 def command_ping(bot, user, channel, args):
