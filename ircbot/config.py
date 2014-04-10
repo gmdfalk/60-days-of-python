@@ -1,7 +1,6 @@
-"""demibot config.py
+"""config.py
 
-    This file will be used by demibot if started without command-line arguments.
-    Make sure you configure it to your liking.
+    This file will be used by demibot if started without commandline arguments.
     Currently, NickServ and server passwords are read from a .auth file in the
     root directory of demibot. This will probably change. Alternatively, you
     obviously can just enter the passwords here in plaintext.
@@ -21,6 +20,7 @@ def get_auth_info(authfile):
                 auth[name] = password
     except IOError:
         auth = {}
+
     return auth
 
 

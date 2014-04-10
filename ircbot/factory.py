@@ -33,6 +33,9 @@ class Factory(protocol.ClientFactory):
         self.retry_enabled = True  # Retry if connection lost/failed.
         self.titles_enabled = False
         self.quiz_enabled = False
+        # Set minperms to disable access to commands for certain permission
+        # levels. Anything above 0 will disable most public commands.
+        self.minperms = 0
         # Namespace for modules:
         self.ns = {}
         # Connection retry delays:

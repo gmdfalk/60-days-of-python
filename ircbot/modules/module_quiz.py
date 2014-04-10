@@ -24,9 +24,9 @@ def read_quizfile(quizfile):
     return questionlist
 
 def command_quiz(bot, user, channel, args):
-    "A very basic quiz bot. No hints, no points. Usage: quiz [on|off|<delay>]"
+    "A very basic quiz bot. No hints, no points. Usage: quiz [on|off|<delay>]."
     # TODO:
-    delay = 30
+    delay = 25
 
     if args == "on":
         bot.factory.quiz_enabled = True
@@ -42,18 +42,20 @@ def command_quiz(bot, user, channel, args):
         delay = int(args)
         bot.say(channel, "Delay changed to: {}.".format(delay))
     else:
-        bot.say(channel, "Bot enabled: {}. Delay: {}"
+        bot.say(channel, "Quiz running: {}. Delay: {}"
                 .format(bot.factory.quiz_enabled, delay))
 
+    quizlist = None
     if bot.factory.quiz_enabled:
         quizlist = read_quizfile("modules/quiz_general.txt")
 
-    while bot.factory.quiz_enabled:
+    while bot.factory.quiz_enabled and quizlist:
         category, question, answers = random.choice(quizlist)
+        question = question.strip().capitalize()  # Format the question poco.
         if category:
             bot.say(channel, "{}: {}?".format(category, question))
         else:
             bot.say(channel, "{}?".format(question))
 
         reactor.callLater(delay, bot.say, channel, answers)
-        time.sleep(delay + 10)
+        time.sleep(delay + 5)
