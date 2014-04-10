@@ -76,7 +76,7 @@ def main():
 
     # If there is no server argument, read the connection infos from config.py.
     if not args["<server>"]:
-        networks = config.create_options()
+        networks = config.create_options(configdir)
     # Otherwise we turn the docopt args into a config.py compatible format.
     else:
         # The default identity to connect with if we're not using config.py.

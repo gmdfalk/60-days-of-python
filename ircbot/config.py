@@ -15,18 +15,17 @@
     server serverpassword
 """
 
-def read_authfile(authfile):
+def read_authfile(configdir):
     "Reads authentication info from a file"
     auth = {}
     try:
-        with open(authfile) as f:
+        with open(configdir + "/auth") as f:
             for line in f:
                 name, password = line.split()
                 auth[name] = password
     except IOError as e:
         print "IOError: {}.\nCould not read authentication file.".format(e)
         auth = {}
-
     return auth
 
 
@@ -38,10 +37,10 @@ def create_options(authfile):
 
     identities = {
         "example": {
-            "nickname": "botnick",
+            "nickname": "demibot",
             "realname": "botnick",
             "username": "botnick",
-            "nickserv_pw": auth.get("botnick")
+            "nickserv_pw": auth.get("demibot")
         },
     }
     networks = {
@@ -51,7 +50,7 @@ def create_options(authfile):
             "ssl": False,
             "password": auth.get("freenode"),
             "identity": identities["example"],
-            "superadmins": {"nick1", "nick2"},
+            "superadmins": {"pld", "nick2"},
             "admins":  {"nick3", "nick4"},
             "channels": {"#channel1", "#channel2"},
         },
@@ -61,7 +60,7 @@ def create_options(authfile):
             "ssl": False,
             "password": auth.get("oftc"),
             "identity": identities["example"],
-            "superadmins": {"nick1", "nick2"},
+            "superadmins": {"pld", "nick2"},
             "admins":  {"nick3", "nick4"},
             "channels": {"#channel1", "#channel2"},
         },

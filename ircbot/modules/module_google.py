@@ -5,10 +5,10 @@
 import re
 
 
-def get_cx(cx_id=None):
+def get_cx(configdir, cx_id=None):
     "Reads Google Search ID from a file."
     try:
-        with open(".auth") as f:
+        with open(configdir + "/auth") as f:
             authstr = f.read()
     except IOError:
         cx_id = None
@@ -22,7 +22,7 @@ def get_cx(cx_id=None):
 def command_g(bot, user, channel, args):
     "Searches Google and returns the first result. Usage: g <searchterm>"
 
-    cx = get_cx()
+    cx = get_cx(bot.factory.configdir)
     print
     print cx
     print

@@ -361,7 +361,7 @@ def command_help(bot, user, channel, cmnd):
 
 def command_logs(bot, user, channel, args):
     "Usage: logs [on|off|level]."
-    if bot.factory.mininum_permissions > permissions(user) < 20:
+    if bot.factory.minperms > permissions(user) < 20:
         return bot.say(channel, "{}, insufficient permissions.".format(
                        get_nick(user)))
 
@@ -383,6 +383,8 @@ def command_logs(bot, user, channel, args):
         label = levels[level / 10]
         return bot.say(channel, "Log level is {} ({})."
                         .format(level / 10, label))
+    elif args == "dir" or args == "logdir":
+        return bot.say(channel, "{}".format(bot.factory.logdir))
     else:
         if bot.factory.logs_enabled:
             return bot.say(channel,
@@ -408,15 +410,40 @@ def command_version(bot, user, channel, args):
                                                       bot.factory.URL))
 
 
-def command_printvars(bot, user, channel, args):
-    "Displays instance variables of the client."
-    if bot.factory.mininum_permissions > permissions(user) < 20:
-        return bot.say(channel, "{}, insufficient permissions.".format(
-                       get_nick(user)))
+def command_setvar(bot, user, channel, args):
+    """Change internal variables. Use with extreme caution. Can break the bot.
+    Usage: setvar <var>."""
+    perms, nick = permissions(user), get_nick(user)
+    if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+        return bot.say(channel, "{}, insufficient permissions.".format(nick))
 
-    return bot.say(channel, "pw: {}, rn: {}, un: {}, ui: {}, lR: {}, hn: {}"
-                   .format(bot.password, bot.realname, bot.username,
-                           bot.userinfo, bot.lineRate, bot.hostname))
+    if not args:
+        return bot.say(channel, "Usage: setlead <lead>. Punctuation only.")
+
+    if len(args.split()) > 1 or not args in punctuation:
+        return bot.say(channel, "Lead has to be a punctuation mark.")
+
+    bot.lead = args
+    log.info("Command identifier changed to {}".format(bot.lead))
+    return bot.say(channel, "Command identifier changed to: {}"
+                   .format(bot.lead))
+
+
+def command_printvar(bot, user, channel, args):
+    "Prints out crucial variables. Usage: printvar [<var>]."
+    f = bot.factory
+    perms, nick = permissions(user), get_nick(user)
+    if perms < 20:  # 0 public, 1-9 undefined, 10-19 admin, 20 root
+        return bot.say(channel, "{}, insufficient permissions.".format(nick))
+
+    bot.say(channel, "logs_enabled: {}, retry_enabled: {}, titles_enabled: {},"\
+            "minperms: {}, lost_delay: {}, failed_delay: {}".format(
+            f.logs_enabled, f.retry_enabled, f.titles_enabled, f.minperms))
+    bot.say(channel, "logdir: {}, configdir: {}".format(f.logdir, f.configdir))
+    return bot.say(channel, "realname: {}, username: {}, password: {},"\
+                   "userinfo: {}, hostname: {}, lineRate: {}"
+                   .format(bot.realname, bot.username, bot.password,
+                           bot.userinfo, bot.hostname, bot.lineRate))
 
 
 def command_ping(bot, user, channel, args):
