@@ -45,19 +45,17 @@ def main():
     # If ~/.demibot or ~/.config/demibot exist, we use that as location for
     # the logs and auth file.
     configdir = os.path.dirname(os.path.realpath(__file__))  # We are here.
-    if not args["<server>"] and not args["--logdir"]:
-        home = os.path.join(os.path.expanduser("~"), ".demibot")
-        homeconfig = os.path.join(os.path.expanduser("~"), ".config/demibot")
-        if os.path.isdir(homeconfig):
-            configdir = homeconfig
-            args["--logdir"] = configdir
-        elif os.path.isdir(home):
-            configdir = home
-            args["--logdir"] = configdir
+#     if not args["<server>"] and not args["--logdir"]:
+    home = os.path.join(os.path.expanduser("~"), ".demibot")
+    homeconfig = os.path.join(os.path.expanduser("~"), ".config/demibot")
+    if os.path.isdir(homeconfig):
+        configdir = homeconfig
+    elif os.path.isdir(home):
+        configdir = home
 
     # If no --logdir is specified, use the path to the running script + "logs".
     if not args["--logdir"]:
-        args["--logdir"] = os.path.join(configdir, "logs/")
+        args["--logdir"] = os.path.join(configdir, "logs")
 
     # Check if we have write permissions to the logdir and create it,
     # if necessary.
@@ -99,6 +97,7 @@ def main():
                         for i in args["<channels>"].split(",")}
         except AttributeError:
             print "Could not resolve channel arguments."
+            print "Syntax: demibot irc.freenode.net chan1,chan2,#chan3"
             sys.exit(1)
         networks = {
             network_name: {
@@ -116,7 +115,7 @@ def main():
     # Cap verbosity count at 3 to avoid index errors.
     if args["-v"] > 3:
         args["-v"] = 3
-
+    print args, configdir
     # Set up our logger for system events. Chat is logged separately.
     # Both will be disabled if --no-logs is True.
     init_syslog(args["--logdir"], args["-v"], args["--no-logs"], args["--quiet"])
