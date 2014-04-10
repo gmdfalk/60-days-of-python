@@ -14,11 +14,13 @@
     user nickservpassword
     server serverpassword
 """
+import os
 
 def read_authfile(configdir):
     "Reads authentication info from a file"
     auth = {}
     try:
+        authfile = os.path.join(configdir, "auth")
         with open(configdir + "/auth") as f:
             for line in f:
                 name, password = line.split()

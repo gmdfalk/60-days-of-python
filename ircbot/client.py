@@ -275,9 +275,9 @@ class Client(irc.IRCClient):
     def userJoined(self, user, channel):
         self._runhandler("userJoined", user, channel)
 
-    def userLeft(self, user, channel, message):
-        self._runhandler("userLeft", user, channel,
-                         self.factory.to_utf8(message))
+#     def userLeft(self, user, channel, message):
+#         self._runhandler("userLeft", user, channel,
+#                          self.factory.to_utf8(message))
 
     def userKicked(self, kickee, channel, kicker, message):
         self._runhandler("userKicked", kickee, channel, kicker,

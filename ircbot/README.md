@@ -3,42 +3,49 @@ demibot
 An IRCBot written in Python.  
 --
   
-What it currently does:  
-  * Logs chat messages.
-  * Splits urls into a separate logfile (why not?).
-  * Basic commands:
-    * join: Join one or more channels, comma separated.
-    * leave: Leave one or more channels.
-    * rehash: Reload modules.
-    * me: Shows how you are registered with the bot (superadmin, admin, none).  
-          Might be expanded to include various stats, e.g. your ping or score.  
-  * Provides modules:
-    * bmi: calculate the body mass index with height/weight.
-    * whatshesaid: quotes from emancipated women ([**collected by jessamynsmith**](https://github.com/jessamynsmith/talkbackbot)).
-    * swanson: quotes from the one and only Ron Swanson.  
-    * timer: pings you with a message after n seconds.
-    * quiz: asks questions, gives hints and takes answers.
+What it currently provides:  
+  * Logs both system messages and chat. URLs are logged to a separate file.
+  * Modularity/Plugins (taken from [**Pyfibot**](https://github.com/lepinkainen/pyfibot))  
+    so their modules are mostly compatible with demibot, some of which i even included.
+  * Many commands and modules (type .help or look through the modules directory)
     
-Quite a bit of the code is adopted from [**Pyfibot**](https://github.com/lepinkainen/pyfibot), including the BMI-module.  
-  
 Features and modules I'd like to introduce:  
-  * Quiz (with a database. smart autohinting, highscores, etc)
-  * Conduct a poll.
+  * Database logging (would allow many interesting functionalities).
+  * Collecting and displaying notes and quotes (!give, !grab, !q nick, !rq etc)
+  * Channel password support.
   * Search channel log.
-  * HTTP link capture/collection/storage. Displaying the title tag in the chat.
-  * Implement some popular online service modules:
-    * Weather and date/time information (day + week number, too)
-    * Google search
-    * Google translate
+  * Possible modules:
+    * Weather
     * Dictionary/Wiki queries
+    * Seen+Tell
+    * RSS+Github
+    * IMDB/TVcal
+    * Twitter
+    * Polling
+    * Evaluate python/bash/regex
+    * Fortune cookie quotes
+    * Markov-Chain for "smart" conversation
     * Wolfram Alpha?
-  * Collecting and displaying notes and quotes from the chat (sorted by nick)
-  * Database of nicks. Allow adding quotes and with quotes and authorizations, allowing querying (like last seen).
-  * Evaluate python/bash/regex.
-  * Store notes with keyword and repeat them on demand (!give nick note)
-  * Operator/Auth features (Kick, Ban, Silence, give OP to admins etc)
-  * Disable/enable commands, public ignore
-  * Fortune cookie quotes
-  * Markov-Chain for "smart" conversation
-  * Tomorrow is Monday
-  
+ 
+ Installation:
+  $ git clone https://github.com/mikar/demibot
+  $ cd demibot
+  $ pip install .
+ 
+ There you go, that's it.
+ 
+ Usage:
+ You probably want to modify config.py in the installation directory of demibot,
+ which provides you with multi-server support and fine-grained configuration.
+ You can create a file called "auth" in either the installation directory or
+ $HOME/.config/demibot or $HOME/.demibot from which nickserv and server passwords
+ can be read.
+ By default, public commands and url title display are disabled. You can enable
+ them with .setmin 0 and .urls on or permanently in the Factory class by setting
+ self.titles_enabled to True and self.minperms to 0.
+ 
+ 
+ For a simple test run or on-the-fly changes setups or bot stacking, there is a command-line interface.
+ Examples:
+  $ demibot irc.freenode.net:6667 python,bash,linux -a adminnick -n botnick -p nickservpw
+  $ demibot irc.quakenet #cs,#offtopic -a adminnick --ssl -l /mnt/share/weird/place/for/logs

@@ -21,7 +21,8 @@ class Factory(protocol.ClientFactory):
     VERSION = "0.1"  # current demibot version
     URL = "https://github.com/mikar/demibot"
     clients = {}
-    moduledir = os.path.dirname(os.path.realpath(__file__)) + "/modules/"
+    basedir = os.path.dirname(os.path.realpath(__file__))
+    moduledir = os.path.join(basedir, "modules/")
 
     def __init__(self, network_name, network, configdir, logdir, nologs):
         self.network_name = network_name

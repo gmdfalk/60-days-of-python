@@ -7,7 +7,7 @@
 """demibot - A multipurpose IRC bot (depends on twisted and requests)
 
 Usage:
-    demibot [<server> <channels>] [-n <nick>] [-p <pass>] [-l <dir>]
+    demibot [<server> <channels>] [-a <adm>] [-n <nick>] [-p <pass>] [-l <dir>]
             [--ssl] [--no-logs] [-q] [-v...] [-h]
 
 Arguments:
@@ -17,9 +17,10 @@ Arguments:
     channels           Channels to join, comma separated. Hash not necessary.
 
 Options:
-    -n, --nick=<nick>   Nickname of the bot [default: demibot]
+    -a, --admin=<adm>   The root admin for the bot.
+    -n, --nick=<nick>   Nickname of the bot. [default: demibot]
     -p, --pass=<pass>   NickServ password, if required.
-    -l, --logdir=<dir>  File to log bot events to
+    -l, --logdir=<dir>  File to log bot events to.
     --no-logs           Turns off all file logging.
     -s, --ssl           Enable if the server supports SSL connections.
     -h, --help          Show this help message and exit.
@@ -30,9 +31,12 @@ Examples:
     demibot irc.freenode.net:6667 freenode,archlinux
     demibot irc.freenode.net #django,#python -n demibot --ssl
     demibot  (uses config.py for multiserver support with detailed settings)
+
+    You probably want to configure your config.py and just use ./demibot.
 """
 
 import os
+import sys
 
 from docopt import docopt
 from twisted.internet import reactor, ssl
@@ -97,8 +101,12 @@ def main():
         # Let's hope this doesn't produce unexpected results.
         network_name = max(args["<server>"].split("."), key=len)
         # Fix channel names, if a hash is missing.
-        channels = {i if i.startswith("#") else "#" + i\
-                    for i in args["<channels>"].split(",")}
+        try:
+            channels = {i if i.startswith("#") else "#" + i\
+                        for i in args["<channels>"].split(",")}
+        except AttributeError:
+            print "Could not resolve channel arguments."
+            sys.exit(1)
         networks = {
             network_name: {
                 "server": args["<server>"],
@@ -106,8 +114,8 @@ def main():
                 "ssl": args["--ssl"],
                 "password": None,  # Server password, if you need one.
                 "identity": identities["default"],
-                "superadmins": {"nick1", "nick2"},
-                "admins": {"nick3", "nick4"},
+                "superadmins": {args["--admin"]},
+                "admins": {},
                 "channels": channels,
             }
         }
