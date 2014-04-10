@@ -26,13 +26,6 @@ Options:
     -h, --help          Show this help message and exit.
     -q, --quiet         Do not log bot events to stdout (only to a file).
     -v                  Logging verbosity, up to -vvv.
-
-Examples:
-    demibot irc.freenode.net:6667 freenode,archlinux
-    demibot irc.freenode.net #django,#python -n demibot --ssl
-    demibot  (uses config.py for multiserver support with detailed settings)
-
-    You probably want to configure your config.py and just use ./demibot.
 """
 
 import os
