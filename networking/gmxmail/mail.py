@@ -12,31 +12,44 @@ class Mail(object):
 
 class MailHandler(object):
 
-    def __init__(self, account, password, ssl):
-        parser = SafeConfigParser()
-        if account:
-            self.account = account
-        if password:
-            self.password = password
-        if ssl:
-            self.ssl = ssl
+    def __init__(self, account, username, password):
+        # ConfigParser setup.
+        self.c = SafeConfigParser()
+        self.c.read("config.ini")
 
+        # Read in the options.
+        self.account = account or "emma-stein@gmx.net"
+        for i in self.c.options(self.account):
+            print self.i, self.c.get(self.account, i)
 
-    def get_mail(self, recipients, message, sign, encrypt, attach):
+        print self.i
+#         self.username = username or self.get_option("username")
+#         self.password = password or self.get_option("password")
+#         self.inc_security = self.get_option("incomingsecurity")
+#         self.inc_server = self.get_option("incomingserver")
+#         self.inc_port = self.get_option("incomingport")
+#         self.out_security = self.get_option("outgoingsecurity")
+#         self.out_server = self.get_option("outgoingserver")
+#         self.out_port = self.get_option("outgoingport")
+#         self.autofetch = self.get_option("autofetch")
+#         self.autofetchinterval = self.get_option("autofetchinterval")
+#         self.deleteafterfetch = self.get_option("deleteafterfetch")
+#         self.publickey = self.get_option("publickey")
+
+    def get_option(self, option):
+        return self.c.get(self.account, option)
+
+    def get_mail(self):
         log.info("Getting mail.")
+#         self.print_options()
 
-    def send_mail(self, recipients, message, sign, encrypt, attach, account):
+    def send_mail(self, recipients, message, sign, encrypt, attach):
         log.info("Sending mail.")
 
         parser = SafeConfigParser()
         log.info("Parsing configuration file.")
         parser.read("config.ini")
 
-        if parser.has_section(account):
-            print '%-19s: %s' % (account, parser.has_section(account))
-            for option in ["username", "password"]:
-                    print '%s.%-12s  : %s' % (account, option,
-                                              parser.has_option(account, option))
 #     server = 'mail.server.com'
 #     user = ''
 #     password = ''
