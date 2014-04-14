@@ -84,8 +84,6 @@ def main():
 
     init_logging(args["--quiet"], args["-v"], configdir)
 
-    print args
-
     m = MailHandler(args["--acc"], args["--user"])
 
     if args["send"]:

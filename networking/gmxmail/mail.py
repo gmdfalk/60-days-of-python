@@ -19,14 +19,19 @@ class MailHandler(object):
         self.config.read("config.ini")
         self.account = account or "emma-stein@gmx.net"
         self.username = username or self.get_opt("username")
-
+        self.use_tls = True
 
     def get_opt(self, option):
+        "Parse an option from config.ini"
         log.debug("Querying option: {}.".format(option))
-        return self.config.get(self.account, option)
+        section = self.account
+        if not self.config.has_section(section):
+            section = "DEFAULT"
+        return self.config.get(section, option)
 
 
     def print_options(self):
+        "Print all available options. For debugging purposes."
         for i in self.config.options(self.account):
             print i + ":", self.config.get(self.account, i)
 
@@ -37,16 +42,29 @@ class MailHandler(object):
 
     def send_mail(self, recipients, message, sign, encrypt, attach):
         log.info("Sending mail.")
-        recipients = {i for i in recipients.split(",") if "@" in i}
+        recipients = [i for i in recipients.split(",") if "@" in i]
         if not recipients:
             log.error("No valid recipients in {}.".format(recipients))
             return
 
-        password = getpass("Password for {}: ".format(self.account))
+        password = getpass("Password for {}: ".format(self.username))
+        server = self.get_opt("outserver")
+        port = self.config.getint(self.account, "outport")
 
-        session = smtplib.SMTP(self.get_opt("outserver"))
-        session.login(self.username, password)
-        session.sendmail(self.account, recipients, message)
+        smtp = smtplib.SMTP()
+        smtp.connect(server, port)
+
+        if self.use_tls:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+
+        if not self.username:
+            self.username = self.account
+
+        smtp.login(self.username, password)
+        smtp.sendmail(self.account, recipients, message)
+        smtp.close()
 
 
 def parse_config():
