@@ -2,31 +2,32 @@
 """gmxmail
 
 Usage:
-    gmxmail [send <recipients> <message> [sign|encrypt|attach]] [--no-ssl]
-            [-q] [-h] [-v...]
-    gmxmail (add|del) <account> [<pgp-key>]
+    gmxmail [send <recipients> <message> [sign|encrypt|attach]] [-a <acc>]
+            [-p <pass>] [--no-ssl] [-q] [-h] [-v...]
 
 Arguments:
-    get     Get mail. Optionally, specify the account to use with -a.
-    send    Send a mail. Recipients comma-separated, message quoted.
-    store   Store account information safely (address, password, pgp-key).
+    send               Send a mail. Recipients comma-separated, message quoted.
+                       Optionally, you can sign or encrypt the message (PGP).
 
 Options:
-    -a, --acc=<acc>    Account to send the mail from. Asks for password if the
-                       account hasn't been stored yet.
-    --no-ssl           Do not secure connection with SSL/TLS.
+    -a, --acc=<acc>    Account to send the e-mail from.
+    -p, --pass=<pass>  Specify a password for the e-mail account.
+    --no-ssl           Do not use SSL/TLS i.e. use an unsecure connection.
     -h, --help         Show this help message and exit.
-    -q, --quiet        Do not log bot events to stdout.
+    -q, --quiet        Do not log bot events to stdout. Will still log to file.
     -v                 Logging verbosity, up to -vvv.
 """
-from getpass import getpass
+
 import logging
 import sys
 
 from docopt import docopt
 
+from getmail import get_mail
+from sendmail import send_mail
 
-log = logging.getLogger("gmxmail")
+
+log = logging.getLogger("main")
 
 
 def init_logging(loglevel, quiet):
@@ -39,7 +40,7 @@ def init_logging(loglevel, quiet):
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logger.setLevel(levels[loglevel])
 
-    logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
+    logformat = "%(asctime)-14s %(levelname)-7s %(name)-5s %(message)s"
 
     formatter = logging.Formatter(logformat)
 
@@ -62,31 +63,19 @@ def init_logging(loglevel, quiet):
         log.info("Could not attach file handler.")
 
 
-def get_mail():
-    log.debug("get_mail")
-
-
-def send_mail():
-    log.debug("send_mail")
-
-
-def store_acc(acc, pgpkey):
-    password = getpass()
-    log.debug(acc, password, pgpkey)
-
-
 def main():
     args = docopt(__doc__, version="0.1")
-    print args
-    log.debug("test")
+    # For now, set the loglevel to debug.
+    args["-v"] = 3
+    log.error("error")
     init_logging(args["-v"], args["--quiet"])
-    log.debug("test")
-    if args["get"]:
-        get_mail()
-    elif args["send"]:
+    log.warn("warn")
+    log.info("info")
+    log.debug("debug")
+    if args["send"]:
         send_mail()
-    elif args["store"]:
-        store_acc(args["<account>"], args["<pgp-key>"])
+    else:
+        get_mail()
 
 if __name__ == "__main__":
     main()
