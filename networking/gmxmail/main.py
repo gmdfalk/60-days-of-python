@@ -18,6 +18,7 @@ Options:
     -v                 Logging verbosity, up to -vvv.
 """
 
+import ConfigParser
 import logging
 import sys
 
@@ -63,15 +64,18 @@ def init_logging(loglevel, quiet):
         log.info("Could not attach file handler.")
 
 
+def parse_opts(args):
+    print args
+    log.info("Parsing configuration file.")
+
+
 def main():
     args = docopt(__doc__, version="0.1")
-    # For now, set the loglevel to debug.
-    args["-v"] = 3
-    log.error("error")
+    # For now, set the loglevel always to debug.
+
     init_logging(args["-v"], args["--quiet"])
-    log.warn("warn")
-    log.info("info")
-    log.debug("debug")
+
+    parse_opts(args)
     if args["send"]:
         send_mail()
     else:
