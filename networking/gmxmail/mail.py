@@ -1,6 +1,7 @@
 from ConfigParser import SafeConfigParser
 import logging
 import smtplib
+from getpass import getpass
 
 
 log = logging.getLogger("mail")
@@ -12,26 +13,23 @@ class Mail(object):
 
 class MailHandler(object):
 
-    def __init__(self, account, username, password):
+    def __init__(self, account, username):
         # ConfigParser setup.
         self.config = SafeConfigParser()
         self.config.read("config.ini")
-
-        # Read in the options.
         self.account = account or "emma-stein@gmx.net"
         self.username = username or self.get_opt("username")
-        self.password = password or self.decode_pass(self.get_opt("password"))
 
-    def decode_pass(self, password):
-        pass
 
     def get_opt(self, option):
         log.debug("Querying option: {}.".format(option))
         return self.config.get(self.account, option)
 
+
     def print_options(self):
         for i in self.config.options(self.account):
             print i + ":", self.config.get(self.account, i)
+
 
     def get_mail(self):
         log.info("Getting mail.")
@@ -39,14 +37,15 @@ class MailHandler(object):
 
     def send_mail(self, recipients, message, sign, encrypt, attach):
         log.info("Sending mail.")
-
         recipients = {i for i in recipients.split(",") if "@" in i}
         if not recipients:
             log.error("No valid recipients in {}.".format(recipients))
             return
 
+        password = getpass("Password for {}: ".format(self.account))
+
         session = smtplib.SMTP(self.get_opt("outserver"))
-        session.login(self.user, self.password)
+        session.login(self.username, password)
         session.sendmail(self.account, recipients, message)
 
 

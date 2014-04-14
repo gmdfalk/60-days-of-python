@@ -3,7 +3,7 @@
 
 Usage:
     gmxmail (get|send <recipients> <message> [[sign] [encrypt] [attach]])
-            [-a <acc>] [-u <user>] [-p <pass>] [-q] [-h] [-v...]
+            [-a <acc>] [-u <user>] [-q] [-h] [-v...]
 
 Arguments:
     get                Get mail count (for the default account, unless -a).
@@ -14,7 +14,6 @@ Arguments:
 Options:
     -a, --acc=<acc>    Account to send the e-mail from.
     -u, --user=<user>  Username to use as login, if necessary. Defaults to acc.
-    -p, --pass=<pass>  Specify a password for the e-mail account.
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not log bot events to stdout. Will still log to file.
     -v                 Logging verbosity, up to -vvv.
@@ -87,7 +86,7 @@ def main():
 
     print args
 
-    m = MailHandler(args["--acc"], args["--user"], args["--pass"])
+    m = MailHandler(args["--acc"], args["--user"])
 
     if args["send"]:
         m.send_mail(args["<recipients>"], args["<message>"],
