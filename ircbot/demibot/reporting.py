@@ -97,7 +97,7 @@ def init_syslog(logdir, loglevel, nologs, quiet):
         log.debug("Added logging console handler.")
 
     # If nologs is True, we do not log to any file.
-    if nologs:
+    if not nologs:
         try:
             logfile = os.path.join(logdir, "demibot.log")
             file_handler = logging.FileHandler(logfile)
