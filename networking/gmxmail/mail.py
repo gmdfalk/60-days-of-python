@@ -14,55 +14,40 @@ class MailHandler(object):
 
     def __init__(self, account, username, password):
         # ConfigParser setup.
-        self.c = SafeConfigParser()
-        self.c.read("config.ini")
+        self.config = SafeConfigParser()
+        self.config.read("config.ini")
 
         # Read in the options.
         self.account = account or "emma-stein@gmx.net"
-        for i in self.c.options(self.account):
-            print self.i, self.c.get(self.account, i)
+        self.username = username or self.get_opt("username")
+        self.password = password or self.decode_pass(self.get_opt("password"))
 
-        print self.i
-#         self.username = username or self.get_option("username")
-#         self.password = password or self.get_option("password")
-#         self.inc_security = self.get_option("incomingsecurity")
-#         self.inc_server = self.get_option("incomingserver")
-#         self.inc_port = self.get_option("incomingport")
-#         self.out_security = self.get_option("outgoingsecurity")
-#         self.out_server = self.get_option("outgoingserver")
-#         self.out_port = self.get_option("outgoingport")
-#         self.autofetch = self.get_option("autofetch")
-#         self.autofetchinterval = self.get_option("autofetchinterval")
-#         self.deleteafterfetch = self.get_option("deleteafterfetch")
-#         self.publickey = self.get_option("publickey")
+    def decode_pass(self, password):
+        pass
 
-    def get_option(self, option):
-        return self.c.get(self.account, option)
+    def get_opt(self, option):
+        log.debug("Querying option: {}.".format(option))
+        return self.config.get(self.account, option)
+
+    def print_options(self):
+        for i in self.config.options(self.account):
+            print i + ":", self.config.get(self.account, i)
 
     def get_mail(self):
         log.info("Getting mail.")
-#         self.print_options()
+
 
     def send_mail(self, recipients, message, sign, encrypt, attach):
         log.info("Sending mail.")
 
-        parser = SafeConfigParser()
-        log.info("Parsing configuration file.")
-        parser.read("config.ini")
+        recipients = {i for i in recipients.split(",") if "@" in i}
+        if not recipients:
+            log.error("No valid recipients in {}.".format(recipients))
+            return
 
-#     server = 'mail.server.com'
-#     user = ''
-#     password = ''
-#
-#     recipients = ['user@mail.com', 'other@mail.com']
-#     sender = 'you@mail.com'
-#     message = 'Hello World'
-#
-#     session = smtplib.SMTP(server)
-#     # if your SMTP server doesn't need authentications,
-#     # you don't need the following line:
-#     session.login(user, password)
-#     session.sendmail(sender, recipients, message)
+        session = smtplib.SMTP(self.get_opt("outserver"))
+        session.login(self.user, self.password)
+        session.sendmail(self.account, recipients, message)
 
 
 def parse_config():

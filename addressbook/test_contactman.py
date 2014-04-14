@@ -11,14 +11,14 @@ from contactman import Contact, ContactList, Friend, Supplier, EmailableContact
 class TestContactman(unittest.TestCase):
 
     def setUp(self):
-        self.c = Contact("max", "demian@gmx.de")
+        self.config = Contact("max", "demian@gmx.de")
         self.d = Contact("1", "2")
 
     def test_contact(self):
         self.assertEqual(str(self.d), "1, 2")
-        self.assertEqual(self.c.name, "max")
-        self.assertEqual(self.c.email, "demian@gmx.de")
-        self.assertEqual([self.c, self.d], Contact.all_contacts)
+        self.assertEqual(self.config.name, "max")
+        self.assertEqual(self.config.email, "demian@gmx.de")
+        self.assertEqual([self.config, self.d], Contact.all_contacts)
 
     def test_supplier(self):
         s = Supplier("mix", "dimian@gmx.de")

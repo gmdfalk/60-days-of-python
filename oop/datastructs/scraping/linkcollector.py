@@ -54,7 +54,7 @@ class LinkCollector(object):
 if __name__ == "__main__":
     c = LinkCollector("http://localhost:8000")
     c.collect_links()
-    for link, item in c.collected_links.items():
+    for link, item in config.collected_links.items():
         print("{}: {}".format(link, item))
 
     # With LXML (python2 only) we could do somethiing like this:

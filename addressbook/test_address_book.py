@@ -13,34 +13,34 @@ import os
 class TestContacts(unittest.TestCase):
 
     def setUp(self):
-        self.c = Contacts("test.db")
-        self.c.populate_database()
+        self.config = Contacts("test.db")
+        self.config.populate_database()
 
     def tearDown(self):
-        self.c.delete_database()
+        self.config.delete_database()
 
     def test_search(self):
-        self.assertEquals(self.c.search("Simpson"), [])
-        self.assertNotEquals(self.c.search("Frankfurt"), [])
+        self.assertEquals(self.config.search("Simpson"), [])
+        self.assertNotEquals(self.config.search("Frankfurt"), [])
 
     def test_insert(self):
-        self.c.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
+        self.config.insert(name="Lisa Simpson", zipcode="80085", city="Springfield",
              street="742 Evergreen Terrace", phone="555 636", mobile="",
              email="chunkylover53@aol.com")
-        self.assertNotEquals(self.c.search("Evergreen Terrace"), [])
+        self.assertNotEquals(self.config.search("Evergreen Terrace"), [])
 
     def test_show_all(self):
-        self.c.show_all()
+        self.config.show_all()
 
     def test_delete_table(self):
-        self.c.delete_table()
+        self.config.delete_table()
         with self.assertRaises(OperationalError):
-            self.c.search("Frankfurt")
+            self.config.search("Frankfurt")
 
     def test_delete_database(self):
-        self.c.populate_database()
+        self.config.populate_database()
         self.assertTrue(os.path.isfile("test.db"))
-        self.c.delete_database()
+        self.config.delete_database()
         self.assertFalse(os.path.isfile("test.db"))
 
 if __name__ == "__main__":
