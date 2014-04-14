@@ -2,12 +2,14 @@
 """gmxmail
 
 Usage:
-    gmxmail [send <recipients> <message> [sign|encrypt|attach]] [-a <acc>]
-            [-p <pass>] [--no-ssl] [-q] [-h] [-v...]
+    gmxmail (get|send <recipients> <message> [[sign] [encrypt] [attach]])
+            [-a <acc>] [-p <pass>] [--no-ssl] [-q] [-h] [-v...]
 
 Arguments:
+    get                Get mail count (for the default account, unless -a).
     send               Send a mail. Recipients comma-separated, message quoted.
-                       Optionally, you can sign or encrypt the message (PGP).
+                       Optionally, you can sign/encrypt the message or attack
+                       your public key.
 
 Options:
     -a, --acc=<acc>    Account to send the e-mail from.
@@ -18,20 +20,18 @@ Options:
     -v                 Logging verbosity, up to -vvv.
 """
 
-import ConfigParser
 import logging
 import sys
 
 from docopt import docopt
 
-from getmail import get_mail
-from sendmail import send_mail
+from mail import MailHandler
 
 
 log = logging.getLogger("main")
 
 
-def init_logging(loglevel, quiet):
+def init_logging(quiet, loglevel):
     "Initializes the logger for system messages."
     logger = logging.getLogger()
 
@@ -64,22 +64,21 @@ def init_logging(loglevel, quiet):
         log.info("Could not attach file handler.")
 
 
-def parse_opts(args):
-    print args
-    log.info("Parsing configuration file.")
-
-
 def main():
     args = docopt(__doc__, version="0.1")
     # For now, set the loglevel always to debug.
 
-    init_logging(args["-v"], args["--quiet"])
+    init_logging(args["--quiet"], args["-v"])
 
-    parse_opts(args)
+    print args
+
+    m = MailHandler(args["--acc"], args["--pass"], args["--no-ssl"])
+
     if args["send"]:
-        send_mail()
+        m.send_mail(args["<recipients>"], args["<message>"],
+                    args["sign"], args["encrypt"], args["attach"])
     else:
-        get_mail()
+        m.get_mail()
 
 if __name__ == "__main__":
     main()
