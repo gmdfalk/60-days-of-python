@@ -11,14 +11,14 @@ from contactman import Contact, ContactList, Friend, Supplier, EmailableContact
 class TestContactman(unittest.TestCase):
 
     def setUp(self):
-        self.config = Contact("max", "demian@gmx.de")
+        self.c = Contact("max", "demian@gmx.de")
         self.d = Contact("1", "2")
 
     def test_contact(self):
         self.assertEqual(str(self.d), "1, 2")
-        self.assertEqual(self.config.name, "max")
-        self.assertEqual(self.config.email, "demian@gmx.de")
-        self.assertEqual([self.config, self.d], Contact.all_contacts)
+        self.assertEqual(self.c.name, "max")
+        self.assertEqual(self.c.email, "demian@gmx.de")
+        self.assertEqual([self.c, self.d], Contact.all_contacts)
 
     def test_supplier(self):
         s = Supplier("mix", "dimian@gmx.de")
@@ -27,12 +27,6 @@ class TestContactman(unittest.TestCase):
     def test_contact_list(self):
         new = Contact("tst", "tst@t.st")
         self.assertEqual(Contact.all_contacts.search("tst"), [new])
-
-#     def test_oldfriend(self):
-#         ContactList().delete_all()
-#         new_friend = Friend("tom", "mail", "phone")
-#         self.assertEqual(Contact.all_contacts.search("tom"), [new_friend])
-#         print new_friend
 
     def test_friend(self):
         ContactList().delete_all()
