@@ -45,7 +45,7 @@ class MailHandler(object):
             sys.exit(1)
         self.config.read(self.configfile)
 
-        self.account = account or "emma-stein@gmx.net"
+        self.account = account or "mikar@gmx.de"
         try:
             self.username = username or self.get_opt("username")
         except ConfigParser.NoOptionError:
@@ -182,6 +182,21 @@ class MailHandler(object):
             elif gpg.list_keys() and sign:
                 signature = str(gpg.sign(message, keyid=privkeyid))
                 if signature:
+                    msg = MIMEMultipart()
+                    signed = MIMEText(
+                                   _text=signature,
+                                   _subtype=self.content_subtype,
+                                   _charset=self.content_charset
+                                   )
+                    msg.attach(signed)
+                else:
+                    log.error("Failed to sign the message.")
+                    sys.exit(1)
+
+            elif gpg.list_keys() and encrypt:
+                encrypted_ascii_data = gpg.encrypt(message, recipients)
+                signature = str(gpg.sign(message, keyid=privkeyid))
+                if signature:
                     msg = MIMEText(
                                    _text=signature,
                                    _subtype=self.content_subtype,
@@ -190,10 +205,6 @@ class MailHandler(object):
                 else:
                     log.error("Failed to sign the message.")
                     sys.exit(1)
-
-            elif gpg.list_keys() and encrypt:
-                pass
-#                 encrypted_ascii_data = gpg.encrypt(data, recipients)
             else:
                 log.error("No GPG keys found.")
 
