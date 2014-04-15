@@ -12,6 +12,12 @@ import sys
 
 log = logging.getLogger("mail")
 
+use_gnupg = False
+try:
+    import gnupg
+    use_gnupg = True
+except ImportError:
+    log.error("Could not import gnupg. Encryption disabled.")
 
 class Mail(object):
     pass
@@ -21,6 +27,8 @@ class MailHandler(object):
 
     def __init__(self, account, username, configdir):
         # ConfigParser setup.
+        log.debug("Initializing MailHandler with {}, {} in {}."
+                  .format(account, username, configdir))
         self.configdir = configdir
         self.configfile = os.path.join(configdir, "gmxmail.ini")
         self.config = SafeConfigParser()
@@ -87,24 +95,17 @@ class MailHandler(object):
         port = self.get_opt("outport", int)
 
         # Split header into CC, BCC and Subject.
+        cc, bcc = "", ""
         header = header.split("::")
         if len(header) == 3:
             cc, bcc, subject = header[0], header[1], header[2]
         elif len(header) == 2:
-            cc, bcc, subject = header[0], set(), header[1]
+            cc, subject = header[0], header[1]
         else:
-            cc, bcc, subject = set(), set(), header[0]
+            subject = header[0]
 
-        if cc and not "@" in cc:
-            log.warn("Invalid CC: {}".format(cc))
-            cc = set()
-        elif "," in cc:
-            cc = {i for i in cc.split(",") if "@" in i}
-        if bcc and not "@" in bcc:
-            log.warn("Invalid BCC: {}".format(bcc))
-            bcc = set()
-        elif "," in bcc:
-            bcc = {i for i in bcc.split(",") if "@" in i}
+        cc = {i for i in cc.split(",") if "@" in i}
+        bcc = {i for i in bcc.split(",") if "@" in i}
 
         # Create the actual header from our gathered information.
         msg = MIMEText(
@@ -134,4 +135,6 @@ class MailHandler(object):
 
         session.login(self.username, password)
         session.sendmail(self.account, recipients, msg.as_string())
+        log.info("Mail sent from {} to {} ({}).".format(self.account,
+                                                        recipients, subject))
         session.quit()

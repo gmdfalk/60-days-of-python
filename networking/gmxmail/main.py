@@ -15,7 +15,7 @@ Arguments:
 Options:
     -a, --acc=<acc>    Account to send the e-mail from.
     -u, --user=<user>  Username to use as login, if necessary. Defaults to acc.
-    -s, --sign         Sign the mail with your PGP/GPG Key.
+    -s, --sign         Sign the mail with your GPG Key.
     -e, --encrypt      Encrypt the mail.
     -k, --key          Attach your public key to the mail.
     -h, --help         Show this help message and exit.
@@ -83,7 +83,7 @@ def get_configdir():
 def main():
     "Entry point for gmxmail."
     args = docopt(__doc__, version="0.1")
-
+    print args
     configdir = get_configdir()
 
     init_logging(args["--quiet"], args["-v"], configdir)
