@@ -36,11 +36,17 @@ class MailHandler(object):
         self.configdir = configdir
         self.configfile = os.path.join(configdir, "gmxmail.ini")
         self.config = SafeConfigParser()
+
         if not os.path.isfile(self.configfile):
             log.error("Config file not found at {}.".format(self.configfile))
             sys.exit(1)
         self.config.read(self.configfile)
+
         self.account = account or "emma-stein@gmx.net"
+        if not self.config.has_section(self.account) and not username:
+            log.error("Got account {} but no username. Exiting."
+                      .format(self.account))
+            sys.exit()
         self.username = username or self.get_opt("username")
         self.content_subtype = "plain"
         self.content_charset = "utf-8"
@@ -56,12 +62,13 @@ class MailHandler(object):
         section = self.account
         if not self.config.has_section(section):
             section = "DEFAULT"
+            log.debug("Section {} not found. Using DEFAULT".format(section))
         if optiontype == int:
-            return self.config.getint(self.account, option)
+            return self.config.getint(section, option)
         elif optiontype == float:
-            return self.config.getfloat(self.account, option)
+            return self.config.getfloat(section, option)
         elif optiontype == bool:
-            return self.config.getboolean(self.account, option)
+            return self.config.getboolean(section, option)
         elif optiontype == str:
             return self.config.get(section, option)
         else:
@@ -83,10 +90,18 @@ class MailHandler(object):
         server = self.get_opt("incserver")
         port = self.get_opt("incport", int)
 
-        session = poplib.POP3_SSL(server, port)
+        # Unnecessarily check if we'll use SSL.
+        if self.get_opt("incsecurity") == "SSL":
+            session = poplib.POP3_SSL(server, port)
+        else:
+            session = poplib.POP3(server, port)
 
-        session.user(self.username)
-        session.pass_(password)
+        try:
+            session.user(self.username)
+            session.pass_(password)
+        except poplib.error_proto:
+            log.error("Authentification failed. Wrong credentials?")
+            sys.exit(1)
 
         messages = [session.retr(i) for i in range(1, len(session.list()[1]))]
         messages = ["\n".join(msg[1]) for msg in messages]
