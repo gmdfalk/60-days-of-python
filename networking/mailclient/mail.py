@@ -1,23 +1,27 @@
 from ConfigParser import SafeConfigParser
-from email.Header import Header
+from email import parser
 from email.Utils import formatdate
 from email.mime.text import MIMEText
 from getpass import getpass
 import logging
 import os
+import poplib
 import smtplib
-import time
 import sys
+import time
 
 
 log = logging.getLogger("mail")
 
+
+# See if we can use GnuPG. If not, disable encryption.
 use_gnupg = False
 try:
     import gnupg
     use_gnupg = True
 except ImportError:
     log.error("Could not import gnupg. Encryption disabled.")
+
 
 class Mail(object):
     pass
@@ -46,7 +50,6 @@ class MailHandler(object):
         # But that will someone skip the DEFAULT section so we'll stick with
         # self.get_opt() for now.
 
-
     def get_opt(self, option, optiontype=str):
         "Parse an option from config.ini"
         log.debug("Querying option: {}.".format(option))
@@ -65,15 +68,32 @@ class MailHandler(object):
             log.error("Invalid option type: {} ({}).".format(option,
                                                              optiontype))
 
-
     def print_options(self):
         "Print all available options. For debugging purposes."
         for i in self.config.options(self.account):
             print i + ":", self.config.get(self.account, i)
 
-
     def get_mail(self):
-        log.info("Getting mail.")
+        log.info("Getting mail for {}".format(self.account))
+
+        if not self.username:
+            self.username = self.account
+
+        password = getpass("Password for {}: ".format(self.username))
+        server = self.get_opt("incserver")
+        port = self.get_opt("incport", int)
+
+        session = poplib.POP3_SSL(server, port)
+
+        session.user(self.username)
+        session.pass_(password)
+
+        messages = [session.retr(i) for i in range(1, len(session.list()[1]))]
+        messages = ["\n".join(msg[1]) for msg in messages]
+        messages = [parser.Parser().parsestr(msg) for msg in messages]
+        for message in messages:
+            print message["subject"]
+        session.quit()
 
 
     def send_mail(self, recipient, header, message, sign, encrypt, key):
