@@ -84,13 +84,6 @@ class MailHandler(object):
         for i in self.config.options(self.account):
             print i + ":", self.config.get(self.account, i)
 
-    def create_signature(self, signature):
-        message = Message()
-        message['Content-Type'] = 'application/pgp-signature; name="signature.asc"'
-        message['Content-Description'] = 'OpenPGP digital signature'
-        message.set_payload(signature)
-        return message
-
     def get_mail(self):
         "Get the mail. Uses poplib as GMX Freemail does not allow imap."
         log.info("Getting mail for {}".format(self.account))
@@ -179,6 +172,31 @@ class MailHandler(object):
                            _charset=self.content_charset
                            )
 
+        if sign or encrypt:
+            gpg = gnupg.GPG()
+            privkeyid = self.get_opt("privatekeyid")
+            privkeyfp = self.get_opt("privatekeyfp")
+            # Use windows style line-breaks.
+            if gpg.list_keys() and sign and encrypt:
+                pass
+            elif gpg.list_keys() and sign:
+                signature = str(gpg.sign(message, keyid=privkeyid))
+                if signature:
+                    msg = MIMEText(
+                                   _text=signature,
+                                   _subtype=self.content_subtype,
+                                   _charset=self.content_charset
+                                   )
+                else:
+                    log.error("Failed to sign the message.")
+                    sys.exit(1)
+
+            elif gpg.list_keys() and encrypt:
+                pass
+#                 encrypted_ascii_data = gpg.encrypt(data, recipients)
+            else:
+                log.error("No GPG keys found.")
+
         # Create the actual header from our gathered information.
         pubkeyloc = None
         if attachkey:  # Attach GPG Public attachkey.
@@ -219,40 +237,14 @@ class MailHandler(object):
         msg["User-Agent"] = self.user_agent
         msg["Subject"] = subject
 
-        if sign or encrypt:
-            gpg = gnupg.GPG()
-            privkeyid = self.get_opt("privatekeyid")
-            privkeyfp = self.get_opt("privatekeyfp")
-            basemsg = msg
-            # Use windows style line-breaks.
-            basetext = basemsg.as_string().replace('\n', '\r\n')
-            if gpg.list_keys() and sign and encrypt:
-                pass
-            elif gpg.list_keys() and sign:
-                signature = str(gpg.sign(basetext, keyid=privkeyid))
-                if signature:
-                    signmsg = self.create_signature(signature)
-                    msg = MIMEMultipart(_subtype="signed", micalg="pgp-sha1",
-                    protocol="application/pgp-signature")
-                    msg.attach(basemsg)
-                    msg.attach(signmsg)
-                else:
-                    log.error("Failed to sign the message.")
-                    sys.exit(1)
-
-            elif gpg.list_keys() and encrypt:
-                pass
-#                 encrypted_ascii_data = gpg.encrypt(data, recipients)
-            else:
-                log.error("No GPG keys found.")
         # If --dryrun is enabled, we exit here.
         if dryrun:
             print msg
             sys.exit()
         session = smtplib.SMTP(server, port)
         # If the loglevel is DEBUG (10), enable verbose logging.
-        if logging.getLogger().getEffectiveLevel() == 10:
-            session.set_debuglevel(1)
+#         if logging.getLogger().getEffectiveLevel() == 10:
+#             session.set_debuglevel(1)
 
         if self.get_opt("outsecurity"):
             session.ehlo()
