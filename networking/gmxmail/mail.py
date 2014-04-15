@@ -7,6 +7,7 @@ import logging
 import os
 import smtplib
 import time
+import sys
 
 
 log = logging.getLogger("mail")
@@ -23,6 +24,9 @@ class MailHandler(object):
         self.configdir = configdir
         self.configfile = os.path.join(configdir, "gmxmail.ini")
         self.config = SafeConfigParser()
+        if not os.path.isfile(self.configfile):
+            log.error("Config file not found at {}.".format(self.configfile))
+            sys.exit(1)
         self.config.read(self.configfile)
         self.account = account or "emma-stein@gmx.net"
         self.username = username or self.get_opt("username")
@@ -114,10 +118,7 @@ class MailHandler(object):
             msg["Cc"] = ", ".join(cc)
         msg["Date"] = formatdate(time.time())
         msg["User-Agent"] = self.user_agent
-        try:
-            msg["Subject"] = Header(subject, self.header_charset)
-        except UnicodeDecodeError:
-            msg["Subject"] = Header(subject, self.content_charset)
+        msg["Subject"] = subject
 
         session = smtplib.SMTP(server, port)
         if logging.getLogger().getEffectiveLevel() > 30:

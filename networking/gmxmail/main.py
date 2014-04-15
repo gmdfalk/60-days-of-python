@@ -92,7 +92,7 @@ def main():
 
     if args["send"]:
         m.send_mail(args["<recipient>"], args["<head>"], args["<message>"],
-                    args["--sign"], args["--encrypt"], args["--attach"])
+                    args["--sign"], args["--encrypt"], args["--key"])
     else:
         m.get_mail()
 
