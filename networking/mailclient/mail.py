@@ -1,4 +1,4 @@
-from ConfigParser import SafeConfigParser
+import ConfigParser
 from email import parser
 from email.Utils import formatdate
 from email.mime.text import MIMEText
@@ -35,7 +35,7 @@ class MailHandler(object):
                   .format(account, username, configdir))
         self.configdir = configdir
         self.configfile = os.path.join(configdir, "gmxmail.ini")
-        self.config = SafeConfigParser()
+        self.config = ConfigParser.SafeConfigParser()
 
         if not os.path.isfile(self.configfile):
             log.error("Config file not found at {}.".format(self.configfile))
@@ -43,11 +43,12 @@ class MailHandler(object):
         self.config.read(self.configfile)
 
         self.account = account or "emma-stein@gmx.net"
-        if not self.config.has_section(self.account) and not username:
-            log.error("Got account {} but no username. Exiting."
+        try:
+            self.username = username or self.get_opt("username")
+        except ConfigParser.NoOptionError:
+            self.username = self.account
+            log.debug("No username found. Defaulting to {}."
                       .format(self.account))
-            sys.exit()
-        self.username = username or self.get_opt("username")
         self.content_subtype = "plain"
         self.content_charset = "utf-8"
         self.user_agent = "gmxmail (https://github.com/mikar/gmxmail"
@@ -81,6 +82,7 @@ class MailHandler(object):
             print i + ":", self.config.get(self.account, i)
 
     def get_mail(self):
+        "Get the mail. Uses poplib as GMX Freemail does not allow imap."
         log.info("Getting mail for {}".format(self.account))
 
         if not self.username:
@@ -95,6 +97,10 @@ class MailHandler(object):
             session = poplib.POP3_SSL(server, port)
         else:
             session = poplib.POP3(server, port)
+
+        # If the loglevel is DEBUG (10), enable verbose logging.
+        if logging.getLogger().getEffectiveLevel() == 10:
+            session.set_debuglevel(1)
 
         try:
             session.user(self.username)
@@ -157,7 +163,8 @@ class MailHandler(object):
         msg["Subject"] = subject
 
         session = smtplib.SMTP(server, port)
-        if logging.getLogger().getEffectiveLevel() > 30:
+        # If the loglevel is DEBUG (10), enable verbose logging.
+        if logging.getLogger().getEffectiveLevel() == 10:
             session.set_debuglevel(1)
 
         if self.get_opt("outsecurity"):
@@ -168,7 +175,11 @@ class MailHandler(object):
         # Union of the three sets.
         recipients = recipients | cc | bcc
 
-        session.login(self.username, password)
+        try:
+            session.login(self.username, password)
+        except smtplib.SMTPAuthenticationError:
+            log.error("Authentication failed. Wrong credentials?")
+            sys.exit(1)
         session.sendmail(self.account, recipients, msg.as_string())
         log.info("Mail sent from {} to {} ({}).".format(self.account,
                                                         recipients, subject))

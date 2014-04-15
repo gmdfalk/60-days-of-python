@@ -42,7 +42,6 @@ def init_logging(quiet, loglevel, configdir):
     # Set the loglevel.
     if loglevel > 3:
         loglevel = 3
-    loglevel = 3
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logger.setLevel(levels[loglevel])
 
@@ -83,10 +82,14 @@ def get_configdir():
 def main():
     "Entry point for gmxmail."
     args = docopt(__doc__, version="0.1")
-    print args
+
     configdir = get_configdir()
 
     init_logging(args["--quiet"], args["-v"], configdir)
+
+    # Loglevels: 10 (Debug), 20 (Info), 30 (Warn), 40 (Error)
+    log.info("Loglevel is {}".format(logging.getLogger().getEffectiveLevel()))
+
 
     m = MailHandler(args["--acc"], args["--user"], configdir)
 
