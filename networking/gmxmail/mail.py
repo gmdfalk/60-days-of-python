@@ -1,10 +1,10 @@
 from ConfigParser import SafeConfigParser
 from email.Header import Header
-from email.Utils import formataddr
 from email.Utils import formatdate
 from email.mime.text import MIMEText
 from getpass import getpass
 import logging
+import os
 import smtplib
 import time
 
@@ -18,16 +18,21 @@ class Mail(object):
 
 class MailHandler(object):
 
-    def __init__(self, account, username):
+    def __init__(self, account, username, configdir):
         # ConfigParser setup.
+        self.configdir = configdir
+        self.configfile = os.path.join(configdir, "gmxmail.ini")
         self.config = SafeConfigParser()
-        self.config.read("config.ini")
+        self.config.read(self.configfile)
         self.account = account or "emma-stein@gmx.net"
         self.username = username or self.get_opt("username")
         self.content_subtype = "plain"
         self.content_charset = "utf-8"
         self.user_agent = "gmxmail (https://github.com/mikar/gmxmail"
-
+        # Note: Could also use the config as a dictionary with:
+        # self.c = self.config._sections[self.account]
+        # But that will someone skip the DEFAULT section so we'll stick with
+        # self.get_opt() for now.
 
 
     def get_opt(self, option, optiontype=str):
@@ -60,6 +65,7 @@ class MailHandler(object):
 
 
     def send_mail(self, recipient, header, message, sign, encrypt, key):
+        "Sends a mail via SMTP."
         log.info("Sending mail to {} ({}). Sign/Encrypt/AttachKey: {}/{}/{}."
                  .format(recipient, header, sign, encrypt, key))
 
@@ -126,5 +132,5 @@ class MailHandler(object):
         recipients = recipients | cc | bcc
 
         session.login(self.username, password)
-        session.sendmail(self.account, recipients, header)
+        session.sendmail(self.account, recipients, msg.as_string())
         session.quit()
