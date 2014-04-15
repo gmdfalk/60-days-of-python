@@ -1,9 +1,12 @@
 import ConfigParser
 from email import parser
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 from email.Utils import formatdate
-from email.mime.text import MIMEText
+from email.message import Message
 from getpass import getpass
 import logging
+import mimetypes
 import os
 import poplib
 import smtplib
@@ -54,7 +57,7 @@ class MailHandler(object):
         self.user_agent = "gmxmail (https://github.com/mikar/gmxmail"
         # Note: Could also use the config as a dictionary with:
         # self.c = self.config._sections[self.account]
-        # But that will someone skip the DEFAULT section so we'll stick with
+        # But that will somehow skip the DEFAULT values so we'll stick with
         # self.get_opt() for now.
 
     def get_opt(self, option, optiontype=str):
@@ -81,6 +84,13 @@ class MailHandler(object):
         for i in self.config.options(self.account):
             print i + ":", self.config.get(self.account, i)
 
+    def create_signature(self, signature):
+        message = Message()
+        message['Content-Type'] = 'application/pgp-signature; name="signature.asc"'
+        message['Content-Description'] = 'OpenPGP digital signature'
+        message.set_payload(signature)
+        return message
+
     def get_mail(self):
         "Get the mail. Uses poplib as GMX Freemail does not allow imap."
         log.info("Getting mail for {}".format(self.account))
@@ -106,18 +116,23 @@ class MailHandler(object):
             session.user(self.username)
             session.pass_(password)
         except poplib.error_proto:
-            log.error("Authentification failed. Wrong credentials?")
+            log.error("Authentification for {} failed. Wrong credentials?"
+                      .format(self.account))
             sys.exit(1)
 
         messages = [session.retr(i) for i in range(1, len(session.list()[1]))]
         messages = ["\n".join(msg[1]) for msg in messages]
         messages = [parser.Parser().parsestr(msg) for msg in messages]
+
+        # TODO: Make this prettier. Example:
+        # http://g33k.wordpress.com/2009/02/04/check-gmail-the-python-way/
+        print "You have {} new messages.".format(len(messages))
         for message in messages:
-            print message["subject"]
+            print message["Subject"], message["From"], message["Date"]
         session.quit()
 
 
-    def send_mail(self, recipient, header, message, sign, encrypt, key):
+    def send_mail(self, recipient, header, message, sign, encrypt, key, dry):
         "Sends a mail via SMTP."
         log.info("Sending mail to {} ({}). Sign/Encrypt/AttachKey: {}/{}/{}."
                  .format(recipient, header, sign, encrypt, key))
@@ -148,12 +163,52 @@ class MailHandler(object):
         cc = {i for i in cc.split(",") if "@" in i}
         bcc = {i for i in bcc.split(",") if "@" in i}
 
+        if key or sign or encrypt:
+            msg = MIMEMultipart()
+            textatt = MIMEText(
+                               _text=message,
+                               _subtype=self.content_subtype,
+                               _charset=self.content_charset
+                               )
+            msg.attach(textatt)
+        else:
+            msg = MIMEText(
+                           _text=message,
+                           _subtype=self.content_subtype,
+                           _charset=self.content_charset
+                           )
+
         # Create the actual header from our gathered information.
-        msg = MIMEText(
-                       _text=message,
-                       _subtype=self.content_subtype,
-                       _charset=self.content_charset
-                       )
+        keyloc = None
+        if key:  # Attach GPG Public key.
+            keyfile = self.get_opt("publickey")
+            if os.path.isfile(keyfile):
+                keyloc = keyfile
+            elif os.path.isfile(os.path.join(self.configdir, keyfile)):
+                keyloc = os.path.join(self.configdir, keyfile)
+            else:
+                log.error("Public key '{}' could not be found."
+                          .format(keyfile))
+        if keyloc:
+            ctype, encoding = mimetypes.guess_type(keyloc)
+            if ctype is None or encoding is not None:
+                ctype = 'application/octet-stream'
+            maintype, subtype = ctype.split('/', 1)
+            if maintype == 'text':
+                with open(keyloc) as f:
+                    keyatt = MIMEText(f.read(), _subtype=subtype)
+                keyatt.add_header(
+                        'Content-Disposition',
+                        'attachment',
+                        filename=keyfile
+                )
+                msg.attach(keyatt)
+                log.info("Attached public key {} to message.".format(keyfile))
+            else:
+                log.error("{} is not a textfile. Sure it's a GPG Key?"
+                          .format(keyloc))
+
+        # Add Mime infos to the message.
         msg["From"] = self.account
         msg["To"] = ", ".join(recipients)
         if cc:
@@ -162,6 +217,32 @@ class MailHandler(object):
         msg["User-Agent"] = self.user_agent
         msg["Subject"] = subject
 
+        if sign or encrypt:
+            gpg = gnupg.GPG()
+            keyid = self.get_opt("keyid")
+            if gpg.list_keys() and sign:
+                basemsg = msg
+                # Use windows style line-breaks.
+                basetext = basemsg.as_string().replace('\n', '\r\n')
+                signature = str(gpg.sign(basetext, detach=True, keyid=keyid))
+                msg.attach(signature)
+                if signature:
+                    signmsg = self.create_signature(signature)
+                    msg = MIMEMultipart(_subtype="signed", micalg="pgp-sha1",
+                    protocol="application/pgp-signature")
+                    msg.attach(basemsg)
+                    msg.attach(signmsg)
+                else:
+                    log.error("Failed to sign the message.")
+                    sys.exit(1)
+            elif gpg.list_keys() and encrypt:
+                pass
+            else:
+                sys.exit('Error: no OpenPGP keys available!')
+
+        if dry:
+            print msg
+            sys.exit()
         session = smtplib.SMTP(server, port)
         # If the loglevel is DEBUG (10), enable verbose logging.
         if logging.getLogger().getEffectiveLevel() == 10:
@@ -180,6 +261,8 @@ class MailHandler(object):
         except smtplib.SMTPAuthenticationError:
             log.error("Authentication failed. Wrong credentials?")
             sys.exit(1)
+
+        # TODO: Add footer (with user-agent, timestamp?)
         session.sendmail(self.account, recipients, msg.as_string())
         log.info("Mail sent from {} to {} ({}).".format(self.account,
                                                         recipients, subject))

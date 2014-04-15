@@ -3,7 +3,7 @@
 
 Usage:
     gmxmail (get|send <recipient> <head> <message> [[-s] [-e] [-k]])
-            [-a <acc>] [-u <user>] [-q] [-h] [-v...]
+            [-a <acc>] [-u <user>] [-d] [-q] [-h] [-v...]
 
 Arguments:
     get                Get mail (for the default account, unless -a).
@@ -15,6 +15,7 @@ Arguments:
 Options:
     -a, --acc=<acc>    Account to send the e-mail from.
     -u, --user=<user>  Username to use as login, if necessary. Defaults to acc.
+    -d, --dryrun       Do not send the mail but print it to console.
     -s, --sign         Sign the mail with your GPG Key.
     -e, --encrypt      Encrypt the mail.
     -k, --key          Attach your public key to the mail.
@@ -22,6 +23,7 @@ Options:
     -q, --quiet        Do not log bot events to stdout. Will still log to file.
     -v                 Logging verbosity, up to -vvv.
 """
+# TODO: Add signature to mails and avoid being flagged as spam.
 
 import logging
 import os
@@ -80,7 +82,7 @@ def get_configdir():
 
 
 def main():
-    "Entry point for gmxmail."
+    "Entry point for gmxmail. Parse command-line arguments and instantiate MH."
     args = docopt(__doc__, version="0.1")
 
     configdir = get_configdir()
@@ -95,7 +97,8 @@ def main():
 
     if args["send"]:
         m.send_mail(args["<recipient>"], args["<head>"], args["<message>"],
-                    args["--sign"], args["--encrypt"], args["--key"])
+                    args["--sign"], args["--encrypt"], args["--key"],
+                    args["--dryrun"])
     else:
         m.get_mail()
 
