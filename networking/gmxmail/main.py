@@ -2,30 +2,34 @@
 """gmxmail
 
 Usage:
-    gmxmail (get|send <recipients> <message> [[sign] [encrypt] [attach]])
+    gmxmail (get|send <recipient> <head> <message> [[-s] [-e] [-k]])
             [-a <acc>] [-u <user>] [-q] [-h] [-v...]
 
 Arguments:
-    get                Get mail count (for the default account, unless -a).
+    get                Get mail (for the default account, unless -a).
     send               Send a mail. Recipients comma-separated, message quoted.
+                       Head is cc::bcc::subject, cc::::subject or just subject.
                        Optionally, you can sign/encrypt the message or attack
-                       your public key.
+                       your public key. All three with -sek.
 
 Options:
     -a, --acc=<acc>    Account to send the e-mail from.
     -u, --user=<user>  Username to use as login, if necessary. Defaults to acc.
+    -s, --sign         Sign the mail with your PGP/GPG Key.
+    -e, --encrypt      Encrypt the mail.
+    -k, --key          Attach your public key to the mail.
     -h, --help         Show this help message and exit.
     -q, --quiet        Do not log bot events to stdout. Will still log to file.
     -v                 Logging verbosity, up to -vvv.
 """
 
 import logging
+import os
 import sys
 
 from docopt import docopt
 
 from mail import MailHandler
-import os
 
 
 log = logging.getLogger("main")
@@ -84,11 +88,11 @@ def main():
 
     init_logging(args["--quiet"], args["-v"], configdir)
 
-    m = MailHandler(args["--acc"], args["--user"])
+    m = MailHandler(args["--acc"], args["--user"], configdir)
 
     if args["send"]:
-        m.send_mail(args["<recipients>"], args["<message>"],
-                    args["sign"], args["encrypt"], args["attach"])
+        m.send_mail(args["<recipient>"], args["<head>"], args["<message>"],
+                    args["--sign"], args["--encrypt"], args["--attach"])
     else:
         m.get_mail()
 

@@ -1,7 +1,12 @@
 from ConfigParser import SafeConfigParser
+from email.Header import Header
+from email.Utils import formataddr
+from email.Utils import formatdate
+from email.mime.text import MIMEText
+from getpass import getpass
 import logging
 import smtplib
-from getpass import getpass
+import time
 
 
 log = logging.getLogger("mail")
@@ -19,15 +24,29 @@ class MailHandler(object):
         self.config.read("config.ini")
         self.account = account or "emma-stein@gmx.net"
         self.username = username or self.get_opt("username")
-        self.use_tls = True
+        self.content_subtype = "plain"
+        self.content_charset = "utf-8"
+        self.user_agent = "gmxmail (https://github.com/mikar/gmxmail"
 
-    def get_opt(self, option):
+
+
+    def get_opt(self, option, optiontype=str):
         "Parse an option from config.ini"
         log.debug("Querying option: {}.".format(option))
         section = self.account
         if not self.config.has_section(section):
             section = "DEFAULT"
-        return self.config.get(section, option)
+        if optiontype == int:
+            return self.config.getint(self.account, option)
+        elif optiontype == float:
+            return self.config.getfloat(self.account, option)
+        elif optiontype == bool:
+            return self.config.getboolean(self.account, option)
+        elif optiontype == str:
+            return self.config.get(section, option)
+        else:
+            log.error("Invalid option type: {} ({}).".format(option,
+                                                             optiontype))
 
 
     def print_options(self):
@@ -40,54 +59,72 @@ class MailHandler(object):
         log.info("Getting mail.")
 
 
-    def send_mail(self, recipients, message, sign, encrypt, attach):
-        log.info("Sending mail.")
-        recipients = [i for i in recipients.split(",") if "@" in i]
+    def send_mail(self, recipient, header, message, sign, encrypt, key):
+        log.info("Sending mail to {} ({}). Sign/Encrypt/AttachKey: {}/{}/{}."
+                 .format(recipient, header, sign, encrypt, key))
+
+        recipients = {i for i in recipient.split(",") if "@" in i}
         if not recipients:
             log.error("No valid recipients in {}.".format(recipients))
             return
 
-        password = getpass("Password for {}: ".format(self.username))
-        server = self.get_opt("outserver")
-        port = self.config.getint(self.account, "outport")
-
-        smtp = smtplib.SMTP()
-        smtp.connect(server, port)
-
-        if self.use_tls:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.ehlo()
-
+        # TODO: Hash the password with sha256+salt and only ask once at start-
+        # up, if we implement a curse UI.
         if not self.username:
             self.username = self.account
+        password = getpass("Password for {}: ".format(self.username))
+        server = self.get_opt("outserver")
+        port = self.get_opt("outport", int)
 
-        smtp.login(self.username, password)
-        smtp.sendmail(self.account, recipients, message)
-        smtp.close()
+        # Split header into CC, BCC and Subject.
+        header = header.split("::")
+        if len(header) == 3:
+            cc, bcc, subject = header[0], header[1], header[2]
+        elif len(header) == 2:
+            cc, bcc, subject = header[0], set(), header[1]
+        else:
+            cc, bcc, subject = set(), set(), header[0]
 
+        if cc and not "@" in cc:
+            log.warn("Invalid CC: {}".format(cc))
+            cc = set()
+        elif "," in cc:
+            cc = {i for i in cc.split(",") if "@" in i}
+        if bcc and not "@" in bcc:
+            log.warn("Invalid BCC: {}".format(bcc))
+            bcc = set()
+        elif "," in bcc:
+            bcc = {i for i in bcc.split(",") if "@" in i}
 
-def parse_config():
-    parser = SafeConfigParser()
-    log.info("Parsing configuration file.")
-    parser.read("config.ini")
+        # Create the actual header from our gathered information.
+        msg = MIMEText(
+                       _text=message,
+                       _subtype=self.content_subtype,
+                       _charset=self.content_charset
+                       )
+        msg["From"] = self.account
+        msg["To"] = ", ".join(recipients)
+        if cc:
+            msg["Cc"] = ", ".join(cc)
+        msg["Date"] = formatdate(time.time())
+        msg["User-Agent"] = self.user_agent
+        try:
+            msg["Subject"] = Header(subject, self.header_charset)
+        except UnicodeDecodeError:
+            msg["Subject"] = Header(subject, self.content_charset)
 
-    # Get one option.
-    print parser.get("DEFAULT", "autofetch")
+        session = smtplib.SMTP(server, port)
+        if logging.getLogger().getEffectiveLevel() > 30:
+            session.set_debuglevel(1)
 
-    # Get all sections and their options.
-    for section_name in parser.sections():
-        print 'Section:', section_name
-        print 'Options:', parser.options(section_name)
-        for name, value in parser.items(section_name):
-            print '  %s = %s' % (name, value)
-        print
+        if self.get_opt("outsecurity"):
+            session.ehlo()
+            session.starttls()
+            session.ehlo()
 
-    # See if sections exist:
-    for section in ['wiki', 'emma', 'dvcs' ]:
-        print '%-19s: %s' % (section, parser.has_section(section))
-        for option in [ 'username', 'password', 'url', 'description' ]:
-                print '%s.%-12s  : %s' % (section, option,
-                                          parser.has_option(section, option))
-    print parser.getint("emma", "outgoingport")
-    print parser.getboolean("emma", "autofetch")
+        # Union of the three sets.
+        recipients = recipients | cc | bcc
+
+        session.login(self.username, password)
+        session.sendmail(self.account, recipients, header)
+        session.quit()
