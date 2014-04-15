@@ -132,10 +132,11 @@ class MailHandler(object):
         session.quit()
 
 
-    def send_mail(self, recipient, header, message, sign, encrypt, key, dry):
+    def send_mail(self, recipient, header, message,
+                  sign, encrypt, attachkey, dryrun):
         "Sends a mail via SMTP."
         log.info("Sending mail to {} ({}). Sign/Encrypt/AttachKey: {}/{}/{}."
-                 .format(recipient, header, sign, encrypt, key))
+                 .format(recipient, header, sign, encrypt, attachkey))
 
         recipients = {i for i in recipient.split(",") if "@" in i}
         if not recipients:
@@ -163,7 +164,7 @@ class MailHandler(object):
         cc = {i for i in cc.split(",") if "@" in i}
         bcc = {i for i in bcc.split(",") if "@" in i}
 
-        if key or sign or encrypt:
+        if attachkey or sign or encrypt:
             msg = MIMEMultipart()
             textatt = MIMEText(
                                _text=message,
@@ -179,34 +180,35 @@ class MailHandler(object):
                            )
 
         # Create the actual header from our gathered information.
-        keyloc = None
-        if key:  # Attach GPG Public key.
-            keyfile = self.get_opt("publickey")
-            if os.path.isfile(keyfile):
-                keyloc = keyfile
-            elif os.path.isfile(os.path.join(self.configdir, keyfile)):
-                keyloc = os.path.join(self.configdir, keyfile)
+        pubkeyloc = None
+        if attachkey:  # Attach GPG Public attachkey.
+            pubkeyfile = self.get_opt("publickeyfile")
+            if os.path.isfile(pubkeyfile):
+                pubkeyloc = pubkeyfile
+            elif os.path.isfile(os.path.join(self.configdir, pubkeyfile)):
+                pubkeyloc = os.path.join(self.configdir, pubkeyfile)
             else:
-                log.error("Public key '{}' could not be found."
-                          .format(keyfile))
-        if keyloc:
-            ctype, encoding = mimetypes.guess_type(keyloc)
+                log.error("Public attachkey '{}' could not be found."
+                          .format(pubkeyfile))
+        if pubkeyloc:
+            ctype, encoding = mimetypes.guess_type(pubkeyloc)
             if ctype is None or encoding is not None:
                 ctype = 'application/octet-stream'
             maintype, subtype = ctype.split('/', 1)
             if maintype == 'text':
-                with open(keyloc) as f:
+                with open(pubkeyloc) as f:
                     keyatt = MIMEText(f.read(), _subtype=subtype)
                 keyatt.add_header(
                         'Content-Disposition',
                         'attachment',
-                        filename=keyfile
+                        filename=pubkeyfile
                 )
                 msg.attach(keyatt)
-                log.info("Attached public key {} to message.".format(keyfile))
+                log.info("Attached public attachkey {} to message."
+                         .format(pubkeyfile))
             else:
                 log.error("{} is not a textfile. Sure it's a GPG Key?"
-                          .format(keyloc))
+                          .format(pubkeyloc))
 
         # Add Mime infos to the message.
         msg["From"] = self.account
@@ -219,13 +221,15 @@ class MailHandler(object):
 
         if sign or encrypt:
             gpg = gnupg.GPG()
-            keyid = self.get_opt("keyid")
-            if gpg.list_keys() and sign:
-                basemsg = msg
-                # Use windows style line-breaks.
-                basetext = basemsg.as_string().replace('\n', '\r\n')
-                signature = str(gpg.sign(basetext, detach=True, keyid=keyid))
-                msg.attach(signature)
+            privkeyid = self.get_opt("privatekeyid")
+            privkeyfp = self.get_opt("privatekeyfp")
+            basemsg = msg
+            # Use windows style line-breaks.
+            basetext = basemsg.as_string().replace('\n', '\r\n')
+            if gpg.list_keys() and sign and encrypt:
+                pass
+            elif gpg.list_keys() and sign:
+                signature = str(gpg.sign(basetext, keyid=privkeyid))
                 if signature:
                     signmsg = self.create_signature(signature)
                     msg = MIMEMultipart(_subtype="signed", micalg="pgp-sha1",
@@ -235,12 +239,14 @@ class MailHandler(object):
                 else:
                     log.error("Failed to sign the message.")
                     sys.exit(1)
+
             elif gpg.list_keys() and encrypt:
                 pass
+#                 encrypted_ascii_data = gpg.encrypt(data, recipients)
             else:
-                sys.exit('Error: no OpenPGP keys available!')
-
-        if dry:
+                log.error("No GPG keys found.")
+        # If --dryrun is enabled, we exit here.
+        if dryrun:
             print msg
             sys.exit()
         session = smtplib.SMTP(server, port)
