@@ -3,7 +3,6 @@ from email import parser
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Utils import formatdate
-from email.message import Message
 from getpass import getpass
 import logging
 import mimetypes
@@ -31,6 +30,9 @@ class Mail(object):
 
 
 class MailHandler(object):
+
+    # List of fingerprints of potential recipients. Necessary for encryption.
+    FPs = {"MaxDemian": "F0B840E33233E8C33CDA3BF5432B81517FCD8602"}
 
     def __init__(self, account, username, configdir):
         # ConfigParser setup.
@@ -120,8 +122,8 @@ class MailHandler(object):
         # TODO: Make this prettier. Example:
         # http://g33k.wordpress.com/2009/02/04/check-gmail-the-python-way/
         print "You have {} new messages.".format(len(messages))
-        for message in messages:
-            print message["Subject"], message["From"], message["Date"]
+        for m in messages:
+            print "{}, [{}], ({})".format(m["From"], m["Subject"], m["Date"])
         session.quit()
 
 
@@ -157,58 +159,61 @@ class MailHandler(object):
         cc = {i for i in cc.split(",") if "@" in i}
         bcc = {i for i in bcc.split(",") if "@" in i}
 
-        if attachkey or sign or encrypt:
-            msg = MIMEMultipart()
-            textatt = MIMEText(
-                               _text=message,
-                               _subtype=self.content_subtype,
-                               _charset=self.content_charset
-                               )
-            msg.attach(textatt)
-        else:
-            msg = MIMEText(
-                           _text=message,
-                           _subtype=self.content_subtype,
-                           _charset=self.content_charset
-                           )
+        # Initialize our message to attach signatures/keyfiles, body etc to.
+        msg = MIMEMultipart()
 
         if sign or encrypt:
             gpg = gnupg.GPG()
             privkeyid = self.get_opt("privatekeyid")
             privkeyfp = self.get_opt("privatekeyfp")
-            # Use windows style line-breaks.
-            if gpg.list_keys() and sign and encrypt:
-                pass
-            elif gpg.list_keys() and sign:
-                signature = str(gpg.sign(message, keyid=privkeyid))
-                if signature:
-                    msg = MIMEMultipart()
-                    signed = MIMEText(
-                                   _text=signature,
-                                   _subtype=self.content_subtype,
-                                   _charset=self.content_charset
-                                   )
-                    msg.attach(signed)
+            for i in gpg.list_keys():
+                if "432B81517FCD8602" in i["keyid"]:
+                     break
+            else:
+                log.error("{} not found in gpg.list_keys().".format(privkeyid))
+                sys.exit(1)
+            if sign and encrypt:
+                encrypted = str(gpg.encrypt(message, self.FPs["MaxDemian"],
+                                            sign=privkeyfp))
+                if encrypted:
+                    encryptedtext = MIMEText(
+                                           _text=encrypted,
+                                           _subtype=self.content_subtype,
+                                           _charset=self.content_charset
+                                           )
+                    msg.attach(encryptedtext)
+                else:
+                    log.error("Failed to encrypt the message.")
+                    sys.exit(1)
+            elif sign:
+#                 message = msg.as_string().replace('\n', '\r\n')
+                signed = str(gpg.sign(message, keyid=privkeyid))
+                if signed:
+                    signedtext = MIMEText(
+                                       _text=signed,
+                                       _subtype=self.content_subtype,
+                                       _charset=self.content_charset
+                                       )
+                    msg.attach(signedtext)
                 else:
                     log.error("Failed to sign the message.")
                     sys.exit(1)
 
-            elif gpg.list_keys() and encrypt:
-                encrypted_ascii_data = gpg.encrypt(message, recipients)
-                signature = str(gpg.sign(message, keyid=privkeyid))
-                if signature:
-                    msg = MIMEText(
-                                   _text=signature,
-                                   _subtype=self.content_subtype,
-                                   _charset=self.content_charset
-                                   )
+            elif encrypt:
+                encrypted = str(gpg.encrypt(message, self.FPs["MaxDemian"]))
+                if encrypted:
+                    encryptedtext = MIMEText(
+                                           _text=encrypted,
+                                           _subtype=self.content_subtype,
+                                           _charset=self.content_charset
+                                           )
+                    msg.attach(encryptedtext)
                 else:
-                    log.error("Failed to sign the message.")
+                    log.error("Failed to encrypt the message.")
                     sys.exit(1)
             else:
                 log.error("No GPG keys found.")
 
-        # Create the actual header from our gathered information.
         pubkeyloc = None
         if attachkey:  # Attach GPG Public attachkey.
             pubkeyfile = self.get_opt("publickeyfile")
@@ -226,7 +231,11 @@ class MailHandler(object):
             maintype, subtype = ctype.split('/', 1)
             if maintype == 'text':
                 with open(pubkeyloc) as f:
-                    keyatt = MIMEText(f.read(), _subtype=subtype)
+#                     keyatt = f.read()
+                    keyatt = MIMEText(
+                                      f.read(),
+                                      _subtype=subtype,
+                                      _charset=self.content_charset)
                 keyatt.add_header(
                         'Content-Disposition',
                         'attachment',
