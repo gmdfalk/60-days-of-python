@@ -33,6 +33,9 @@ class MailHandler(object):
 
     # List of fingerprints of potential recipients. Necessary for encryption.
     FPs = {"MaxDemian": "F0B840E33233E8C33CDA3BF5432B81517FCD8602"}
+    signature = "This is a signature."\
+                " There are many like it but this one is mine."
+    print signature
 
     def __init__(self, account, username, configdir):
         # ConfigParser setup.
@@ -164,17 +167,17 @@ class MailHandler(object):
 
         if sign or encrypt:
             gpg = gnupg.GPG()
-            privkeyid = self.get_opt("privatekeyid")
-            privkeyfp = self.get_opt("privatekeyfp")
+            keyid = self.get_opt("keyid")
+            keyfp = self.get_opt("keyfp")
             for i in gpg.list_keys():
-                if "432B81517FCD8602" in i["keyid"]:
+                if keyid in i["keyid"]:
                      break
             else:
-                log.error("{} not found in gpg.list_keys().".format(privkeyid))
+                log.error("{} not found in gpg.list_keys().".format(keyid))
                 sys.exit(1)
             if sign and encrypt:
                 encrypted = str(gpg.encrypt(message, self.FPs["MaxDemian"],
-                                            sign=privkeyfp))
+                                            sign=keyfp))
                 if encrypted:
                     encryptedtext = MIMEText(
                                            _text=encrypted,
@@ -187,7 +190,7 @@ class MailHandler(object):
                     sys.exit(1)
             elif sign:
 #                 message = msg.as_string().replace('\n', '\r\n')
-                signed = str(gpg.sign(message, keyid=privkeyid))
+                signed = str(gpg.sign(message, keyid=keyid))
                 if signed:
                     signedtext = MIMEText(
                                        _text=signed,
@@ -216,7 +219,7 @@ class MailHandler(object):
 
         pubkeyloc = None
         if attachkey:  # Attach GPG Public attachkey.
-            pubkeyfile = self.get_opt("publickeyfile")
+            pubkeyfile = self.get_opt("keyfile")
             if os.path.isfile(pubkeyfile):
                 pubkeyloc = pubkeyfile
             elif os.path.isfile(os.path.join(self.configdir, pubkeyfile)):

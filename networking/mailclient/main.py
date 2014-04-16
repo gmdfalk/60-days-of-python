@@ -23,7 +23,8 @@ Options:
     -q, --quiet        Do not log bot events to stdout. Will still log to file.
     -v                 Logging verbosity, up to -vvv.
 """
-# TODO: Add signature to mails and avoid being flagged as spam.
+# TODO: Add signature to mails (and avoid being flagged as spam).
+# Add general attachment option.
 
 import logging
 import os
