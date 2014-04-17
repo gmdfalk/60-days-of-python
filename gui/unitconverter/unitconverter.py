@@ -3,12 +3,13 @@
 import sys
 
 from PyQt4 import QtGui
+import conversion
 
 
-class Example(QtGui.QWidget):
+class Converter(QtGui.QWidget):
 
     def __init__(self):
-        super(Example, self).__init__()
+        super(Converter, self).__init__()
 
         self.initUI()
 
@@ -16,7 +17,7 @@ class Example(QtGui.QWidget):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
-        self.setToolTip("This is a <b>QWidget</b> widget")
+#         self.setToolTip("This is a <b>QWidget</b> widget")
 
         btn = QtGui.QPushButton("Button", self)
         btn.setToolTip("This is a <b>QPushButton</b> widget")
@@ -33,7 +34,7 @@ class Example(QtGui.QWidget):
 def main():
     app = QtGui.QApplication(sys.argv)
 
-    ex = Example()
+    ex = Converter()
 
     sys.exit(app.exec_())
 
