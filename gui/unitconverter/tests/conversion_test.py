@@ -13,15 +13,14 @@ class Test(unittest.TestCase):
 
 
     def setUp(self):
-        pass
-
+        self.L = Length()
 
     def tearDown(self):
         pass
 
-
-    def test_miles(self):
-        self.assertEqual
+    def test_from_centimeters(self):
+        self.L.from_centimeters(100)
+        self.assertEqual(self.L.meters, 1)
 
 
 if __name__ == "__main__":
