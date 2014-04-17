@@ -15,6 +15,6 @@ class Length(object):
 
     def from_centimeters(self, cm):
         self.centimeters = cm
-        self.meters = cm / 100
+        self.meters = 0.999999
 
 

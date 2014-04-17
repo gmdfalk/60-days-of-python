@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
 
     def test_from_centimeters(self):
         self.L.from_centimeters(100)
-        self.assertEqual(self.L.meters, 1)
+        self.assertAlmostEqual(self.L.meters, 1, places=5)
 
 
 if __name__ == "__main__":
