@@ -113,27 +113,27 @@ class Volume(object):
 
     @property
     def ounces(self):
-        return round(self._liters * 33.814, self.precision)
+        return round(self._liters * 33.8140227, self.precision)
 
     @ounces.setter
     def ounces(self, value):
-        self._liters = value / 33.814
+        self._liters = value / 33.8140227
 
     @property
     def pints(self):
-        return round(self._liters * 2.11338, self.precision)
+        return round(self._liters * 2.11337642, self.precision)
 
     @pints.setter
     def pints(self, value):
-        self._liters = value / 2.11338
+        self._liters = value / 2.11337642
 
     @property
     def gallons(self):
-        return round(self._liters * 0.264172, self.precision)
+        return round(self._liters * 0.26417205, self.precision)
 
     @gallons.setter
     def gallons(self, value):
-        self._liters = value / 0.264172
+        self._liters = value / 0.26417205
 
     @property
     def barrels(self):
@@ -144,7 +144,117 @@ class Volume(object):
         self._liters = value / 0.00838641436
 
 
-if __name__ == "__main__":
-    v = Volume()
-    v.liters = 1
-    print v.gallons
+class Data(object):
+
+    def __init__(self):
+        # NOTE: maybe pass precision as an argument instead of keeping it here.
+        self.precision = 4  # Decimal points of accuracy.
+        self._bytes = 0
+
+    @property
+    def bits(self):
+        return round(self._bytes * 8, self.precision)
+
+    @bits.setter
+    def bits(self, value):
+        self._bytes = value / 8
+
+    @property
+    def bytes(self):
+        "8 bits"
+        return round(self._bytes, self.precision)
+
+    @bytes.setter
+    def bytes(self, value):
+        self._bytes = value
+
+    @property
+    def kilobytes(self):
+        "1000 bytes, kB or KB"
+        return round(self._bytes / 1000, self.precision)
+
+    @kilobytes.setter
+    def kilobytes(self, value):
+        self._bytes = value * 1000
+
+    @property
+    def megabytes(self):
+        "1000^2 bytes, MB"
+        return round(self._bytes / (1000 ** 2), self.precision)
+
+    @megabytes.setter
+    def megabytes(self, value):
+        self._bytes = value * (1000 ** 2)
+
+    @property
+    def gigabytes(self):
+        "1000^3 bytes, GB"
+        return round(self._bytes / (1000 ** 3), self.precision)
+
+    @gigabytes.setter
+    def gigabytes(self, value):
+        self._bytes = value * (1000 ** 3)
+
+    @property
+    def terrabytes(self):
+        "1000^4 bytes, TB"
+        return round(self._bytes / (1000 ** 4), self.precision)
+
+    @terrabytes.setter
+    def terrabytes(self, value):
+        self._bytes = value * (1000 ** 4)
+
+    @property
+    def petabytes(self):
+        "1000^5 bytes, PB"
+        return round(self._bytes / (1000 ** 5), self.precision)
+
+    @petabytes.setter
+    def petabytes(self, value):
+        self._bytes = value * (1000 ** 5)
+
+    @property
+    def kibibytes(self):
+        "1024 bytes, KB or KiB"
+        return round(self._bytes / 1024, self.precision)
+
+    @kibibytes.setter
+    def kibibytes(self, value):
+        self._bytes = value * 1024
+
+    @property
+    def mebibytes(self):
+        "1024^2 bytes, MiB"
+        return round(self._bytes / (1024 ** 2), self.precision)
+
+    @mebibytes.setter
+    def mebibytes(self, value):
+        self._bytes = value * (1024 ** 2)
+
+    @property
+    def gibibytes(self):
+        "1024^3 bytes, GiB"
+        return round(self._bytes / (1024 ** 3), self.precision)
+
+    @gibibytes.setter
+    def gibibytes(self, value):
+        self._bytes = value * (1024 ** 3)
+
+    @property
+    def tebibytes(self):
+        "1024^4 bytes, TiB"
+        return round(self._bytes / (1024 ** 4), self.precision)
+
+    @tebibytes.setter
+    def tebibytes(self, value):
+        self._bytes = value * (1024 ** 4)
+
+    @property
+    def pebibytes(self):
+        "1024^5 bytes, PiB"
+        return round(self._bytes / (1024 ** 5), self.precision)
+
+    @pebibytes.setter
+    def pebibytes(self, value):
+        self._bytes = value * (1024 ** 5)
+
