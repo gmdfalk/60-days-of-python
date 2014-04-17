@@ -2,11 +2,12 @@
 
 import sys
 
-from PyQt4 import QtGui
-import conversion
+from PyQt4 import QtGui, QtCore
+
+from conversion import Data, Length, Volume
 
 
-class Converter(QtGui.QWidget):
+class Converter(QtGui.QMainWindow):
 
     def __init__(self):
         super(Converter, self).__init__()
@@ -17,24 +18,36 @@ class Converter(QtGui.QWidget):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
-#         self.setToolTip("This is a <b>QWidget</b> widget")
+        dbtn = QtGui.QPushButton("Quit", self)
+        dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        dbtn.resize(dbtn.sizeHint())
+#         dbtn.move(0, 0)
+        lbtn = QtGui.QPushButton("Quit", self)
+        lbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        lbtn.resize(lbtn.sizeHint())
+        lbtn.move(100, 0)
+        vbtn = QtGui.QPushButton("Quit", self)
+        vbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        vbtn.resize(vbtn.sizeHint())
+        vbtn.move(200, 0)
 
-        btn = QtGui.QPushButton("Button", self)
-        btn.setToolTip("This is a <b>QPushButton</b> widget")
-        btn.resize(btn.sizeHint())
-#         btn.move(50, 50)
-
-        self.setGeometry(300, 300, 250, 150)
+        self.setGeometry(300, 300, 285, 150)
         self.setWindowTitle("UnitConverter")
         self.setWindowIcon(QtGui.QIcon("data/calculator.png"))
 
         self.show()
 
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
 
-    ex = Converter()
+    c = Converter()
 
     sys.exit(app.exec_())
 

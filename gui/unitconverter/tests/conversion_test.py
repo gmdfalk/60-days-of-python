@@ -14,6 +14,7 @@ class LengthTest(unittest.TestCase):
 
     def setUp(self):
         self.L = Length()
+        self.L.precision = 4
 
     def test_base_case(self):
         self.L.inches = 2
@@ -48,6 +49,7 @@ class VolumeTest(unittest.TestCase):
 
     def setUp(self):
         self.v = Volume()
+        self.v.precision = 4
 
 
     def test_base_case(self):
@@ -79,9 +81,9 @@ class DataTest(unittest.TestCase):
     def setUp(self):
         self.d = Data()
 
-    def test_base_case(self):
-        self.d.megabytes = 1
+    def test_high_precision(self):
         self.d.precision = 10
+        self.d.megabytes = 1
         self.assertEqual(self.d.bits, 8000000)
         self.assertEqual(self.d.bytes, 1000000)
         self.assertEqual(self.d.kilobytes, 1000)
