@@ -72,8 +72,79 @@ class Length(object):
         self._meters = value / 0.000621371
 
 
+class Volume(object):
+
+    def __init__(self):
+        # NOTE: maybe pass precision as an argument instead of keeping it here.
+        self.precision = 4  # Decimal points of accuracy.
+        self._liters = 0
+
+    @property
+    def milliliters(self):
+        return round(self._liters * 1000, self.precision)
+
+    @milliliters.setter
+    def milliliters(self, value):
+        self._liters = value / 1000
+
+    @property
+    def centiliters(self):
+        return round(self._liters * 100, self.precision)
+
+    @centiliters.setter
+    def centiliters(self, value):
+        self._liters = value / 100
+
+    @property
+    def liters(self):
+        return round(self._liters, self.precision)
+
+    @liters.setter
+    def liters(self, value):
+        self._liters = value
+
+    @property
+    def kiloliters(self):
+        return round(self._liters / 1000, self.precision)
+
+    @kiloliters.setter
+    def kiloliters(self, value):
+        self._liters = value * 1000
+
+    @property
+    def ounces(self):
+        return round(self._liters * 33.814, self.precision)
+
+    @ounces.setter
+    def ounces(self, value):
+        self._liters = value / 33.814
+
+    @property
+    def pints(self):
+        return round(self._liters * 2.11338, self.precision)
+
+    @pints.setter
+    def pints(self, value):
+        self._liters = value / 2.11338
+
+    @property
+    def gallons(self):
+        return round(self._liters * 0.264172, self.precision)
+
+    @gallons.setter
+    def gallons(self, value):
+        self._liters = value / 0.264172
+
+    @property
+    def barrels(self):
+        return round(self._liters * 0.00838641436, self.precision)
+
+    @barrels.setter
+    def barrels(self, value):
+        self._liters = value / 0.00838641436
+
+
 if __name__ == "__main__":
-    L = Length()
-    L.centimeters = 100
-    print L.millimeters, L.centimeters, L._meters, L.kilometers
-    print L.inches, L.feet, L.yards, L.miles
+    v = Volume()
+    v.liters = 1
+    print v.gallons
