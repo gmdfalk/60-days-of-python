@@ -19,8 +19,8 @@ class Test(unittest.TestCase):
         pass
 
     def test_from_centimeters(self):
-        self.L.from_centimeters(100)
-        self.assertAlmostEqual(self.L.meters, 1, places=5)
+        self.L.from_centimeters(123456)
+        self.assertEqual(self.L.meters, 1234.56)
 
 
 if __name__ == "__main__":

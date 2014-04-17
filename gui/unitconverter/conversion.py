@@ -14,7 +14,13 @@ class Length(object):
         self.miles = 0
 
     def from_centimeters(self, cm):
-        self.centimeters = cm
-        self.meters = 0.999999
+        self.millimeters = round(cm * 10, 3)
+        self.centimeters = round(cm, 3)
+        self.meters = round(cm / 100, 3)
+        self.kilometers = round(cm / 1000, 3)
 
 
+if __name__ == "__main__":
+    L = Length()
+    L.from_centimeters(1251.12321)
+    print L.meters, L.millimeters
