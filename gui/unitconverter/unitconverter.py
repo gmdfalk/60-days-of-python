@@ -55,6 +55,9 @@ class Converter(QtGui.QWidget):
     def clear_data_input(self):
         for i in self.dl:
             i.deleteLater()
+#         for widget in qApp.allWidgets():
+#             if isinstance(widget, QtGui.QLineEdit):
+#                 widget.clear()
 
     def create_data_input(self):
         # Input field
@@ -163,8 +166,8 @@ def main():
     c = Converter()
 
     # Delete widget after 10 seconds.
-    t = Timer(10, c.deleteLater)
-    t.start()
+#     t = Timer(10, c.deleteLater)
+#     t.start()
 
     sys.exit(app.exec_())
 
