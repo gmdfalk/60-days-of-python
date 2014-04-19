@@ -2,9 +2,9 @@
 
 import sys
 
-from PyQt4 import Qt, QtGui, QtCore
+from PyQt4 import QtGui, QtCore
 
-from conversion import Data, Length, Volume
+from conversion import Data
 
 
 class Converter(QtGui.QWidget):
@@ -63,23 +63,8 @@ class Converter(QtGui.QWidget):
 
     def create_data_fields(self):
 
-        self.bits = QtGui.QLineEdit()
-        self.bytes = QtGui.QLineEdit()
-        self.KB = QtGui.QLineEdit()
-        self.KiB = QtGui.QLineEdit()
-        self.MB = QtGui.QLineEdit()
-        self.MiB = QtGui.QLineEdit()
-        self.GB = QtGui.QLineEdit()
-        self.GiB = QtGui.QLineEdit()
-        self.TB = QtGui.QLineEdit()
-        self.TiB = QtGui.QLineEdit()
-        self.PB = QtGui.QLineEdit()
-        self.PiB = QtGui.QLineEdit()
-
-        data = [self.bits, "bits", self.bytes, "bytes", self.KB, "KB",
-                self.KiB, "KiB", self.MB, "MB", self.MiB, "MiB",
-                self.GB, "GB", self.GiB, "GiB", self.TB, "TB",
-                self.TiB, "TiB", self.PB, "PB", self.PiB, "PiB"]
+        data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
+                "GB", "GiB", "TB", "TiB", "PB", "PiB"]
 
         pos = [(0, 0), (0, 1), (0, 2), (0, 3),
                (1, 0), (1, 1), (1, 2), (1, 3),
@@ -91,12 +76,12 @@ class Converter(QtGui.QWidget):
         # Create the grid layout from our lists.
         grid = QtGui.QGridLayout()
 
-        for i in range(len(data)):
-            if isinstance(data[i], str):
+        for i in range(len(pos)):
+            if i % 2:
                 grid.addWidget(QtGui.QLabel(data[i]), pos[i][0], pos[i][1])
             else:
-                print i
-                grid.addWidget(data[i], pos[i][0], pos[i][1])
+                field = setattr(self, data[i / 2], QtGui.QLineEdit())
+                grid.addWidget(field, pos[i][0], pos[i][1])
 
 #         dbtn = QtGui.QPushButton("Data", self)
 #         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
