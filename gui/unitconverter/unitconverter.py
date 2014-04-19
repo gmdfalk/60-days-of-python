@@ -18,22 +18,16 @@ class Converter(QtGui.QWidget):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
-        self.create_buttons()
-
-        self.data = Data()
-        self.create_data_ui()
-
         # Main Window
         self.setGeometry(300, 300, 350, 300)
         self.setWindowTitle("UnitConverter")
         self.setWindowIcon(QtGui.QIcon("data/calculator.png"))
 
+        # Create the initial UI elements.
+        self.create_data_ui()
+
+        # Now, show it all.
         self.show()
-
-    def create_buttons(self):
-#         "Creates the buttons at the top."
-
-        pass
 
     def clear_gui(self):
         "Delete elements so we can switch to a different conversion mode."
@@ -45,6 +39,8 @@ class Converter(QtGui.QWidget):
 
     def create_data_ui(self):
 
+        self.data = Data()
+
         data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
                 "GB", "GiB", "TB", "TiB", "PB", "PiB"]
 
@@ -54,7 +50,7 @@ class Converter(QtGui.QWidget):
                (3, 0), (3, 1), (3, 2), (3, 3),
                (4, 0), (4, 1), (4, 2), (4, 3),
                (5, 0), (5, 1), (5, 2), (5, 3)]
-
+        # GRID
         grid = QtGui.QGridLayout()
         # Dictionary that holds our QLineEdit fields for later use.
         self.edits = {unit: QtGui.QLineEdit() for unit in data}
@@ -72,12 +68,12 @@ class Converter(QtGui.QWidget):
                 field.setAlignment(QtCore.Qt.AlignRight)
                 grid.addWidget(field, pos[i][0], pos[i][1])
 
+        # BUTTONS
         dbtn = QtGui.QPushButton("Data", self)
-        dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-
         lbtn = QtGui.QPushButton("Length", self)
         vbtn = QtGui.QPushButton("Volume", self)
         nbtn = QtGui.QPushButton("Numbers", self)
+#         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
 
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch(1)
@@ -86,9 +82,11 @@ class Converter(QtGui.QWidget):
         hbox.addWidget(vbtn)
         hbox.addWidget(nbtn)
 
+        # Patch it all together in a vertical layout.
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addLayout(hbox, grid)
+        vbox.addLayout(hbox)
+        vbox.addLayout(grid)
         self.setLayout(vbox)
 
     def precision_changed(self, text):
