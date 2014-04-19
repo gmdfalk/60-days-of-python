@@ -1,21 +1,44 @@
 #!/usr/bin/env python2
+# TODO: Blank lineedit when entering it.
 
+import decimal
 import sys
 
 from PyQt4 import QtGui, QtCore
 
 from conversion import Data
 
-# TODO: Blank lineedit when entering it.
+
+def format_num(num):
+    try:
+        dec = decimal.Decimal(num)
+    except:
+        return "bad"
+    tup = dec.as_tuple()
+    delta = len(tup.digits) + tup.exponent
+    digits = ''.join(str(d) for d in tup.digits)
+    if delta <= 0:
+        zeros = abs(tup.exponent) - len(tup.digits)
+        val = '0.' + ('0' * zeros) + digits
+    else:
+        val = digits[:delta] + ('0' * tup.exponent) + '.' + digits[delta:]
+    val = val.rstrip('0')
+    if val[-1] == '.':
+        val = val[:-1]
+    if tup.sign:
+        return '-' + val
+    return val
+
 
 class Converter(QtGui.QWidget):
 
     def __init__(self, app):
 
-        super(Converter, self).__init__()
-        self.app = app
-        self.initUI()
+        self.precision = 10  # Maximum number of decimal points.
         self.maxlength = 18  # Defunct. Max length of a QLineEdit field.
+        self.app = app
+        super(Converter, self).__init__()
+        self.initUI()
 
     def initUI(self):
 
@@ -92,7 +115,10 @@ class Converter(QtGui.QWidget):
     def create_precision_layout(self):
 
         prec = QtGui.QLineEdit()
+        prec.setText(str(self.precision))
+        prec.setAlignment(QtCore.Qt.AlignCenter)
         prec.textEdited[str].connect(self.update_precision)
+
 
         layout = QtGui.QHBoxLayout()
         layout.addStretch(1)
@@ -120,13 +146,13 @@ class Converter(QtGui.QWidget):
 
         # Set the text alignment for the LineEdits and connect edits to actions.
         for i in self.edits.values():
-            i.setAlignment(QtCore.Qt.AlignRight)
+            i.setAlignment(QtCore.Qt.AlignLeft)
             i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
 
     def update_precision(self, text):
         try:
-            self.data.precision = int(text)
+            self.precision = int(text)
             self.update_data()
         except ValueError as e:
             pass  # Fail silently if wrong precision format is given.
@@ -135,8 +161,12 @@ class Converter(QtGui.QWidget):
         for k, v in self.edits.items():
             # Exclude the sender from being updated.
             if v != self.sender():
-                text = getattr(self.data, k)
-                v.setText("{0:.{1}f}".format(text, self.data.precision))
+                text = format_num(getattr(self.data, k))
+                if "." in text:
+                    split = text.split(".")
+                    split[1] = split[1][:self.precision]
+                    text = ".".join(split).rstrip("0") if split[1] else split[0]
+                v.setText(text)
 
     def data_changed(self, text):
         for k, v in self.edits.items():
