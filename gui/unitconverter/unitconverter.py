@@ -154,8 +154,8 @@ class Converter(QtGui.QWidget):
         try:
             self.precision = int(text)
             self.update_data()
-        except ValueError as e:
-            pass  # Fail silently if wrong precision format is given.
+        except ValueError:
+            pass  # Fail sil2ently if wrong precision format is given.
 
     def update_data(self):
         for k, v in self.edits.items():
@@ -165,7 +165,7 @@ class Converter(QtGui.QWidget):
                 if "." in text:
                     split = text.split(".")
                     split[1] = split[1][:self.precision]
-                    text = ".".join(split).rstrip("0") if split[1] else split[0]
+                    text = ".".join(split) if split[1] else split[0]
                 v.setText(text)
 
     def data_changed(self, text):
@@ -180,10 +180,10 @@ class Converter(QtGui.QWidget):
 
 
 def main():
+    "Main entry point."
+
     app = QtGui.QApplication(sys.argv)
-
     c = Converter(app)
-
     sys.exit(app.exec_())
 
 
