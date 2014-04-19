@@ -6,6 +6,7 @@ from PyQt4 import QtGui, QtCore
 
 from conversion import Data
 
+# TODO: Blank lineedit when entering it.
 
 class Converter(QtGui.QWidget):
 
@@ -102,8 +103,10 @@ class Converter(QtGui.QWidget):
 
         self.setLayout(vbox)
 
+        # Set the text alignment for the LineEdits.
         for i in self.edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
+        self.edits["MB"].textChanged[str].connect(self.data_changed)
         self.edits["MB"].textChanged[str].connect(self.update_data)
 
     def update_precision(self, text):
@@ -113,15 +116,17 @@ class Converter(QtGui.QWidget):
             print e
 
     def update_data(self):
-        for i in self.edits:
-            i.setText(str(self.data.i))
+        for k, v in self.edits.items():
+            # Exclude the sender from being updated.
+            if v != self.sender():
+                text = str(getattr(self.data, k))
+                v.setText(text)
 
-    def megabytes_changed(self, text):
-
+    def data_changed(self, text):
         try:
-            self.data.megabytes = float(text)
+            self.data.MB = float(text)
         except ValueError:
-            self.data.megabytes = 0
+            self.data.MB = 0
 
 
 def main():
