@@ -23,44 +23,42 @@ from docopt import docopt
 
 from conversion import Data, Length, Volume
 
-d = Data()
-data_units = {
-              d.bits: "bit bits",
-              d.bytes: "byte bytes",
-              d.KB: "kb kilobytes kilobyte",
-              d.MB: "mb megabytes megabyte",
-              d.GB: "gb gigabytes gigabyte",
-              d.TB: "tb terrabytes terrabyte",
-              d.PB: "pb petabytes petabyte",
-              d.KiB: "kb kibibytes kibibyte",
-              d.MiB: "mb mebibytes mebibyte",
-              d.GiB: "gb gibibytes gibibyte",
-              d.TiB: "tb tebibytes tebibyte",
-              d.PiB: "pb pebibytes pebibyte"
-             }
-l = Length()
-length_units = {
-                l.mm: "mm millimeter millimeters",
-                l.cm: "cm centimeter centimeters",
-
-                }
-
-def check_validity(args):
-    if not args or len(args) < 2:
-        print "Not enough arguments."
-        sys.exit(9)
-
 
 def main():
     args = docopt(__doc__, version="0.1")
 
-    check_validity(args["<args>"])
-    for i in args["<args>"]:
-#         check_validity(args)
-        # find source
-        # find target
-        # convert and return
-        pass
+    if not args["<args>"] or len(args["<args>"]) < 2:
+        print "Not enough arguments."
+        sys.exit(9)
+
+    d = Data()
+    data_units = {
+                  d.bits: "bit bits",
+                  d.bytes: "byte bytes",
+                  d.kilobytes: "kb kilobytes kilobyte",
+                  d.megabytes: "mb megabytes megabyte",
+                  d.gigabytes: "gb gigabytes gigabyte",
+                  d.terrabytes: "tb terrabytes terrabyte",
+                  d.petabytes: "pb petabytes petabyte",
+                  d.kibibytes: "kb kibibytes kibibyte",
+                  d.mebibytes: "mb mebibytes mebibyte",
+                  d.gibibytes: "gb gibibytes gibibyte",
+                  d.tebibytes: "tb tebibytes tebibyte",
+                  d.pebibytes: "pb pebibytes pebibyte"
+                 }
+
+    l = Length()
+    length_units = {
+                    l.millimeters: "mm millimeter millimeters",
+                    l.centimeters: "cm centimeter centimeters",
+                    l.meters: "m meter meters",
+                    l.kilometers: "km kilometer kilometers",
+                    l.inches: "in inches inch",
+                    l.feet: "ft feet foot",
+                    l.yards: "yd yard yards",
+                    l.miles: "mi ml mile miles"
+                    }
+
 
 if __name__ == "__main__":
     main()
