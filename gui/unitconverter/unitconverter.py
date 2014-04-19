@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # TODO: Blank lineedit when entering it.
 # Use maxline and validator to set input/output constraints for lineedits.
+# TODO: roughly complete: mass/weight, length/distance, capacity/volume, temp.
+# FIXME: QLayout::addChildLayout: layout "" already has a parent
 
 import decimal
 import sys
@@ -47,21 +49,17 @@ class Converter(QtGui.QWidget):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
-        self.tabs = QtGui.QTabWidget()
-        self.datatab = QtGui.QWidget()
+        tabs = QtGui.QTabWidget()
+        datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
 
-#         self.data = Data()
-#         datalayout, self.data_edits = self.create_byte_layout(self.datatab)
-#         lengthlayout = QtGui.QVBoxLayout(lengthtab)
+        datalayout = self.create_data_tab(datatab)
 
-        datalayout = self.create_data_tab(self.datatab)
-
-        self.tabs.addTab(self.datatab, "Data")
-        self.tabs.addTab(lengthtab, "Length")
+        tabs.addTab(datatab, "Data")
+        tabs.addTab(lengthtab, "Length")
 
         mainlayout = QtGui.QVBoxLayout()
-        mainlayout.addWidget(self.tabs)
+        mainlayout.addWidget(tabs)
         mainlayout.addLayout(datalayout)
 
         self.setLayout(mainlayout)
@@ -95,13 +93,13 @@ class Converter(QtGui.QWidget):
 
         return layout, edits
 
-    def create_precision_layout(self):
+    def create_decplaces_layout(self):
 
         prec = QtGui.QLineEdit()
         prec.setFixedWidth(36)
         prec.setAlignment(QtCore.Qt.AlignCenter)
         prec.setText(str(self.decplaces))
-        prec.textEdited[str].connect(self.update_precision)
+        prec.textEdited[str].connect(self.update_decplaces)
 
 
         layout = QtGui.QHBoxLayout()
@@ -114,7 +112,7 @@ class Converter(QtGui.QWidget):
         self.data = Data()
 
         data, self.data_edits = self.create_byte_layout()
-        prec = self.create_precision_layout()
+        prec = self.create_decplaces_layout()
 
         # Patch it all together in a vertical layout.
         data_layout = QtGui.QVBoxLayout(tab)
@@ -133,7 +131,7 @@ class Converter(QtGui.QWidget):
 
         return data_layout
 
-    def update_precision(self, text):
+    def update_decplaces(self, text):
         try:
             self.decplaces = int(text)
             self.update_data()
@@ -141,6 +139,7 @@ class Converter(QtGui.QWidget):
             pass  # Fail silently if wrong decplaces format is given.
 
     def update_data(self):
+        "Update the values of all Data/Bytes QLineEdits"
         for k, v in self.data_edits.items():
             # Exclude the sender from being updated.
             if v != self.sender():
@@ -152,6 +151,7 @@ class Converter(QtGui.QWidget):
                 v.setText(text)
 
     def data_changed(self, text):
+        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
         for k, v in self.data_edits.items():
             if v == self.sender():
                 target = k

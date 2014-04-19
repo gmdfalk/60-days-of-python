@@ -59,6 +59,18 @@ def main():
                     l.miles: "mi ml mile miles"
                     }
 
+    v = Length()
+    volume_units = {
+                    v.milliliters: "ml millimeter millimeters",
+                    v.centiliters: "cl centiliter centiliters",
+                    v.liters: "l liter liters",
+                    v.kiloliters: "kl kiloliter kiloliters",
+                    v.ounces: "oz floz ounce ounces",
+                    v.pints: "pt pint pints",
+                    v.gallons: "gal gallon gallons",
+                    v.barrels: "bbl barrel barrels"
+                    }
+
 
 if __name__ == "__main__":
     main()
