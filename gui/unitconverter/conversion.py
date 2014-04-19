@@ -149,7 +149,7 @@ class Data(object):
 
     def __init__(self):
         # NOTE: maybe pass precision as an argument instead of keeping it here.
-        self.precision = 4  # Decimal points of accuracy.
+        self.precision = 10  # Decimal points of accuracy.
         self._bytes = 0
 
     @property
@@ -170,92 +170,91 @@ class Data(object):
         self._bytes = value
 
     @property
-    def kilobytes(self):
+    def KB(self):
         "1000 bytes, kB or KB"
         return round(self._bytes / 1000, self.precision)
 
-    @kilobytes.setter
-    def kilobytes(self, value):
+    @KB.setter
+    def KB(self, value):
         self._bytes = value * 1000
 
     @property
-    def megabytes(self):
+    def MB(self):
         "1000^2 bytes, MB"
         return round(self._bytes / (1000 ** 2), self.precision)
 
-    @megabytes.setter
-    def megabytes(self, value):
+    @MB.setter
+    def MB(self, value):
         self._bytes = value * (1000 ** 2)
 
     @property
-    def gigabytes(self):
+    def GB(self):
         "1000^3 bytes, GB"
         return round(self._bytes / (1000 ** 3), self.precision)
 
-    @gigabytes.setter
-    def gigabytes(self, value):
+    @GB.setter
+    def GB(self, value):
         self._bytes = value * (1000 ** 3)
 
     @property
-    def terrabytes(self):
+    def TB(self):
         "1000^4 bytes, TB"
         return round(self._bytes / (1000 ** 4), self.precision)
 
-    @terrabytes.setter
-    def terrabytes(self, value):
+    @TB.setter
+    def TB(self, value):
         self._bytes = value * (1000 ** 4)
 
     @property
-    def petabytes(self):
+    def PB(self):
         "1000^5 bytes, PB"
         return round(self._bytes / (1000 ** 5), self.precision)
 
-    @petabytes.setter
-    def petabytes(self, value):
+    @PB.setter
+    def PB(self, value):
         self._bytes = value * (1000 ** 5)
 
     @property
-    def kibibytes(self):
+    def KiB(self):
         "1024 bytes, KB or KiB"
         return round(self._bytes / 1024, self.precision)
 
-    @kibibytes.setter
-    def kibibytes(self, value):
+    @KiB.setter
+    def KiB(self, value):
         self._bytes = value * 1024
 
     @property
-    def mebibytes(self):
+    def MiB(self):
         "1024^2 bytes, MiB"
         return round(self._bytes / (1024 ** 2), self.precision)
 
-    @mebibytes.setter
-    def mebibytes(self, value):
+    @MiB.setter
+    def MiB(self, value):
         self._bytes = value * (1024 ** 2)
 
     @property
-    def gibibytes(self):
+    def GiB(self):
         "1024^3 bytes, GiB"
         return round(self._bytes / (1024 ** 3), self.precision)
 
-    @gibibytes.setter
-    def gibibytes(self, value):
+    @GiB.setter
+    def GiB(self, value):
         self._bytes = value * (1024 ** 3)
 
     @property
-    def tebibytes(self):
+    def TiB(self):
         "1024^4 bytes, TiB"
         return round(self._bytes / (1024 ** 4), self.precision)
 
-    @tebibytes.setter
-    def tebibytes(self, value):
+    @TiB.setter
+    def TiB(self, value):
         self._bytes = value * (1024 ** 4)
 
     @property
-    def pebibytes(self):
+    def PiB(self):
         "1024^5 bytes, PiB"
         return round(self._bytes / (1024 ** 5), self.precision)
 
-    @pebibytes.setter
-    def pebibytes(self, value):
+    @PiB.setter
+    def PiB(self, value):
         self._bytes = value * (1024 ** 5)
-
