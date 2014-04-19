@@ -32,15 +32,14 @@ def format_num(num):
 
 class Converter(QtGui.QWidget):
 
-    def __init__(self, app):
+    def __init__(self):
 
-        self.precision = 10  # Maximum number of decimal points.
-        self.maxlength = 18  # Defunct. Max length of a QLineEdit field.
-        self.app = app
+        self.decplaces = 10  # Number of digits after the decimal point.
+        self.maxdecplaces = 82  # Maximum number of decimal points.
+        self.maxfieldlength = 18  # Maximum length of a QLineEdit field.
         super(Converter, self).__init__()
-        self.initUI()
 
-    def initUI(self):
+    def create_ui(self):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
@@ -50,21 +49,36 @@ class Converter(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon("data/calculator.png"))
 
         # Create the initial UI elements.
-        self.create_data_ui()
+#         tabs = QtGui.QTabWidget()
+#         datatab = QtGui.QWidget()
+#         self.create_data_tab(datatab)
+#         tabs.addTab(datatab, "Data")
+#         layout = QtGui.QVBoxLayout()
+#         layout.addWidget(tabs)
+
+        tabs = QtGui.QTabWidget()
+        datatab = QtGui.QWidget()
+        lengthtab = QtGui.QWidget()
+
+        p1_vertical = QtGui.QVBoxLayout(datatab)
+        p2_vertical = QtGui.QVBoxLayout(lengthtab)
+
+        tabs.addTab(datatab, "Data")
+        tabs.addTab(lengthtab, "Length")
+
+        button1 = QtGui.QPushButton("button1")
+        p1_vertical.addWidget(button1)
+
+        vbox = QtGui.QVBoxLayout()
+#         vbox.addWidget(menu_bar)
+        vbox.addWidget(tabs)
+
+        self.setLayout(vbox)
 
         # Now, show it all.
         self.show()
 
-    def clear_gui(self):
-        "Delete elements so we can switch to a different UI mode."
-
-        for widget in self.app.allWidgets():
-            if isinstance(widget, QtGui.QLineEdit):
-                widget.deleteLater()
-            if isinstance(widget, QtGui.QLabel):
-                widget.deleteLater()
-
-    def create_data_layout(self):
+    def create_byte_layout(self):
         "Create the Data Layout (grid) with LineEdits and Labels"
 
         data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
@@ -89,9 +103,7 @@ class Converter(QtGui.QWidget):
             if i % 2:
                 layout.addWidget(QtGui.QLabel(datapos), pos[i][0], pos[i][1])
             else:
-                field = edits[datapos]
-                # Align text on the right.
-                layout.addWidget(field, pos[i][0], pos[i][1])
+                layout.addWidget(edits[datapos], pos[i][0], pos[i][1])
 
         return layout, edits
 
@@ -104,45 +116,43 @@ class Converter(QtGui.QWidget):
         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
 
         layout = QtGui.QHBoxLayout()
-        layout.addStretch(1)
         layout.addWidget(dbtn)
         layout.addWidget(lbtn)
         layout.addWidget(vbtn)
         layout.addWidget(nbtn)
+        layout.setAlignment(QtCore.Qt.AlignTop)
 
         return layout
 
     def create_precision_layout(self):
 
         prec = QtGui.QLineEdit()
-        prec.setText(str(self.precision))
+        prec.setText(str(self.decplaces))
         prec.setAlignment(QtCore.Qt.AlignCenter)
         prec.textEdited[str].connect(self.update_precision)
 
 
         layout = QtGui.QHBoxLayout()
-        layout.addStretch(1)
         layout.addWidget(prec)
         layout.setAlignment(QtCore.Qt.AlignCenter)
 
         return layout
 
-    def create_data_ui(self):
+    def create_data_tab(self, tab):
 
         self.data = Data()
 
-        data, self.edits = self.create_data_layout()
-        buttons = self.create_buttons_layout()
-        prec = self.create_precision_layout()
+        data, self.edits = self.create_byte_layout()
+#         buttons = self.create_buttons_layout()
+#         prec = self.create_precision_layout()
 
         # Patch it all together in a vertical layout.
-        vbox = QtGui.QVBoxLayout()
-        vbox.addStretch(1)
-        vbox.addLayout(buttons)
-        vbox.addLayout(prec)
-        vbox.addLayout(data)
+        data_layout = QtGui.QVBoxLayout(tab)
+#         data_layout.addStretch(1)
+#         data_layout.addLayout(buttons)
+#         data_layout.addLayout(prec)
+        data_layout.addLayout(data)
 
-        self.setLayout(vbox)
 
         # Set the text alignment for the LineEdits and connect edits to actions.
         for i in self.edits.values():
@@ -152,10 +162,10 @@ class Converter(QtGui.QWidget):
 
     def update_precision(self, text):
         try:
-            self.precision = int(text)
+            self.decplaces = int(text)
             self.update_data()
         except ValueError:
-            pass  # Fail sil2ently if wrong precision format is given.
+            pass  # Fail sil2ently if wrong decplaces format is given.
 
     def update_data(self):
         for k, v in self.edits.items():
@@ -164,7 +174,7 @@ class Converter(QtGui.QWidget):
                 text = format_num(getattr(self.data, k))
                 if "." in text:
                     split = text.split(".")
-                    split[1] = split[1][:self.precision]
+                    split[1] = split[1][:self.decplaces]
                     text = ".".join(split) if split[1] else split[0]
                 v.setText(text)
 
@@ -183,7 +193,8 @@ def main():
     "Main entry point."
 
     app = QtGui.QApplication(sys.argv)
-    c = Converter(app)
+    c = Converter()
+    c.create_ui()
     sys.exit(app.exec_())
 
 
