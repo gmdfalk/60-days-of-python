@@ -75,12 +75,15 @@ class Converter(QtGui.QWidget):
 
         # Create the grid layout from our lists.
         grid = QtGui.QGridLayout()
+        edits = {k: QtGui.QLineEdit() for k in data}
+
 
         for i in range(len(pos)):
             if i % 2:
-                grid.addWidget(QtGui.QLabel(data[i]), pos[i][0], pos[i][1])
+                grid.addWidget(QtGui.QLabel(data[i / 2]), pos[i][0], pos[i][1])
             else:
-                field = setattr(self, data[i / 2], QtGui.QLineEdit())
+                field = edits[data[i / 2]]
+                field.setAlignment(QtCore.Qt.AlignRight)
                 grid.addWidget(field, pos[i][0], pos[i][1])
 
 #         dbtn = QtGui.QPushButton("Data", self)
