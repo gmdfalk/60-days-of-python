@@ -39,35 +39,25 @@ class Converter(QtGui.QWidget):
         self.maxfieldlength = 18  # Maximum length of a QLineEdit field.
         super(Converter, self).__init__()
 
-    def create_ui(self):
-
-        QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
-
         # Main Window
         self.setGeometry(300, 300, 350, 300)
         self.setWindowTitle("UnitConverter")
         self.setWindowIcon(QtGui.QIcon("data/calculator.png"))
 
-        # Create the initial UI elements.
-#         tabs = QtGui.QTabWidget()
-#         datatab = QtGui.QWidget()
-#         self.create_data_tab(datatab)
-#         tabs.addTab(datatab, "Data")
-#         layout = QtGui.QVBoxLayout()
-#         layout.addWidget(tabs)
+        QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
         tabs = QtGui.QTabWidget()
         datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
 
-        p1_vertical = QtGui.QVBoxLayout(datatab)
-        p2_vertical = QtGui.QVBoxLayout(lengthtab)
+        datalayout = QtGui.QVBoxLayout(datatab)
+        lengthlayout = QtGui.QVBoxLayout(lengthtab)
 
         tabs.addTab(datatab, "Data")
         tabs.addTab(lengthtab, "Length")
 
         button1 = QtGui.QPushButton("button1")
-        p1_vertical.addWidget(button1)
+        datalayout.addWidget(button1)
 
         vbox = QtGui.QVBoxLayout()
 #         vbox.addWidget(menu_bar)
@@ -86,13 +76,9 @@ class Converter(QtGui.QWidget):
         # Dictionary that holds our QLineEdit fields for later use.
         edits = {unit: QtGui.QLineEdit() for unit in data}
 
-        pos = [(0, 0), (0, 1), (0, 2), (0, 3),
-               (1, 0), (1, 1), (1, 2), (1, 3),
-               (2, 0), (2, 1), (2, 2), (2, 3),
-               (3, 0), (3, 1), (3, 2), (3, 3),
-               (4, 0), (4, 1), (4, 2), (4, 3),
-               (5, 0), (5, 1), (5, 2), (5, 3)]
-        # GRID
+        # Create our positions grid (0,0), (0,1) etc
+        pos = [(i, j) for i in range(6) for j in range(4)]
+
         layout = QtGui.QGridLayout()
 
         for i in range(len(pos)):
@@ -142,7 +128,7 @@ class Converter(QtGui.QWidget):
 
         self.data = Data()
 
-        data, self.edits = self.create_byte_layout()
+        data, self.data_edits = self.create_byte_layout()
 #         buttons = self.create_buttons_layout()
 #         prec = self.create_precision_layout()
 
@@ -155,7 +141,7 @@ class Converter(QtGui.QWidget):
 
 
         # Set the text alignment for the LineEdits and connect edits to actions.
-        for i in self.edits.values():
+        for i in self.data_edits.values():
             i.setAlignment(QtCore.Qt.AlignLeft)
             i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
@@ -168,7 +154,7 @@ class Converter(QtGui.QWidget):
             pass  # Fail sil2ently if wrong decplaces format is given.
 
     def update_data(self):
-        for k, v in self.edits.items():
+        for k, v in self.data_edits.items():
             # Exclude the sender from being updated.
             if v != self.sender():
                 text = format_num(getattr(self.data, k))
@@ -179,7 +165,7 @@ class Converter(QtGui.QWidget):
                 v.setText(text)
 
     def data_changed(self, text):
-        for k, v in self.edits.items():
+        for k, v in self.data_edits.items():
             if v == self.sender():
                 target = k
                 break
@@ -194,7 +180,6 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
     c = Converter()
-    c.create_ui()
     sys.exit(app.exec_())
 
 
