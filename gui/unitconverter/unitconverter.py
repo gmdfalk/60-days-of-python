@@ -69,10 +69,14 @@ class Converter(QtGui.QWidget):
     def create_byte_layout(self):
         "Create the Data Layout (grid) with LineEdits and Labels"
 
-        data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
-                "GB", "GiB", "TB", "TiB", "PB", "PiB"]
+        # List of (unit, label)-pairs to build our grid from.
+        data = [("bits", "bits"), ("bytes", "bytes"), ("kilobytes", "kB"),
+                ("kibibytes", "KiB"), ("megabytes", "MB"), ("mebibytes", "MiB"),
+                ("gigabytes", "GB"), ("gibibytes", "GiB"), ("terrabytes", "TB"),
+                ("tebibytes", "TiB"), ("petabytes", "PB"), ("pebibytes", "PiB")]
+
         # Dictionary that holds our QLineEdit fields for later use.
-        edits = {unit: QtGui.QLineEdit() for unit in data}
+        edits = {i[0]: QtGui.QLineEdit() for i in data}
 
         # Create our positions grid (0,0), (0,1) etc
         pos = [(i, j) for i in range(6) for j in range(4)]
@@ -82,12 +86,12 @@ class Converter(QtGui.QWidget):
         for i in range(len(pos)):
             # Since data is half as long as pos, we use floor division to get
             # the correct corresponding data index from i.
-            datapos = data[i // 2]
+            edit, label = data[i // 2][0], data[i // 2][1]
             # Add a QLabel for uneven positions and QLineEdits for even ones.
             if i % 2:
-                layout.addWidget(QtGui.QLabel(datapos), pos[i][0], pos[i][1])
+                layout.addWidget(QtGui.QLabel(label), pos[i][0], pos[i][1])
             else:
-                layout.addWidget(edits[datapos], pos[i][0], pos[i][1])
+                layout.addWidget(edits[edit], pos[i][0], pos[i][1])
 
         return layout, edits
 

@@ -83,19 +83,19 @@ class DataTest(unittest.TestCase):
 
     def test_high_precision(self):
         self.d.precision = 10
-        self.d.MB = 1
+        self.d.megabytes = 1
         self.assertEqual(self.d.bits, 8000000)
         self.assertEqual(self.d.bytes, 1000000)
-        self.assertEqual(self.d.KB, 1000)
-        self.assertEqual(self.d.MB, 1)
-        self.assertEqual(self.d.GB, 0.001)
-        self.assertEqual(self.d.TB, 0.000001)
-        self.assertEqual(self.d.PB, 0.000000001)
-        self.assertEqual(self.d.KiB, 976.5625)
-        self.assertEqual(self.d.MiB, 0.9536743164)
-        self.assertEqual(self.d.GiB, 0.0009313226)
-        self.assertEqual(self.d.TiB, 0.0000009095)
-        self.assertEqual(self.d.PiB, 0.0000000009)
+        self.assertEqual(self.d.kilobytes, 1000)
+        self.assertEqual(self.d.megabytes, 1)
+        self.assertEqual(self.d.gigabytes, 0.001)
+        self.assertEqual(self.d.terrabytes, 0.000001)
+        self.assertEqual(self.d.petabytes, 0.000000001)
+        self.assertEqual(self.d.kibibytes, 976.5625)
+        self.assertEqual(self.d.mebibytes, 0.9536743164)
+        self.assertEqual(self.d.gibibytes, 0.0009313226)
+        self.assertEqual(self.d.tebibytes, 0.0000009095)
+        self.assertEqual(self.d.pebibytes, 0.0000000009)
 
 
 if __name__ == "__main__":

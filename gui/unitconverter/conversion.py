@@ -6,8 +6,12 @@ from __future__ import division
 class Data(object):
 
     def __init__(self):
-        self.precision = 100  # Decimal points of accuracy.
+        self.precision = 10  # Decimal points of accuracy.
         self._bytes = 0
+
+#     # Saving some space with lambdas:
+#     megabytes = property(lambda self: self._bytes / (1000 ** 2), lambda self, value:
+#                   setattr(self, '_bytes', value * (1000 ** 2)))
 
     @property
     def bits(self):
@@ -27,97 +31,93 @@ class Data(object):
         self._bytes = value
 
     @property
-    def KB(self):
+    def kilobytes(self):
         "1000 bytes, kB or KB"
         return round(self._bytes / 1000, self.precision)
 
-    @KB.setter
-    def KB(self, value):
+    @kilobytes.setter
+    def kilobytes(self, value):
         self._bytes = value * 1000
 
     @property
-    def MB(self):
+    def megabytes(self):
         "1000^2 bytes, MB"
         return round(self._bytes / (1000 ** 2), self.precision)
 
-    @MB.setter
-    def MB(self, value):
+    @megabytes.setter
+    def megabytes(self, value):
         self._bytes = value * (1000 ** 2)
 
-#     # Saving some space with lambdas:
-#     MB = property(lambda self: self._bytes / (1000 ** 2), lambda self, value:
-#                   setattr(self, '_bytes', value * (1000 ** 2)))
-
     @property
-    def GB(self):
+    def gigabytes(self):
         "1000^3 bytes, GB"
         return round(self._bytes / (1000 ** 3), self.precision)
 
-    @GB.setter
-    def GB(self, value):
+    @gigabytes.setter
+    def gigabytes(self, value):
         self._bytes = value * (1000 ** 3)
 
     @property
-    def TB(self):
+    def terrabytes(self):
         "1000^4 bytes, TB"
         return round(self._bytes / (1000 ** 4), self.precision)
 
-    @TB.setter
-    def TB(self, value):
+    @terrabytes.setter
+    def terrabytes(self, value):
         self._bytes = value * (1000 ** 4)
 
     @property
-    def PB(self):
+    def petabytes(self):
         "1000^5 bytes, PB"
         return round(self._bytes / (1000 ** 5), self.precision)
 
-    @PB.setter
-    def PB(self, value):
+    @petabytes.setter
+    def petabytes(self, value):
         self._bytes = value * (1000 ** 5)
 
     @property
-    def KiB(self):
-        "1024 bytes, KB or KiB"
+    def kibibytes(self):
+        "1024 bytes, KiB or KB"
         return round(self._bytes / 1024, self.precision)
 
-    @KiB.setter
-    def KiB(self, value):
+    @kibibytes.setter
+    def kibibytes(self, value):
         self._bytes = value * 1024
 
     @property
-    def MiB(self):
+    def mebibytes(self):
         "1024^2 bytes, MiB"
         return round(self._bytes / (1024 ** 2), self.precision)
 
-    @MiB.setter
-    def MiB(self, value):
+    @mebibytes.setter
+    def mebibytes(self, value):
         self._bytes = value * (1024 ** 2)
 
     @property
-    def GiB(self):
+    def gibibytes(self):
         "1024^3 bytes, GiB"
         return round(self._bytes / (1024 ** 3), self.precision)
 
-    @GiB.setter
-    def GiB(self, value):
+    @gibibytes.setter
+    def gibibytes(self, value):
         self._bytes = value * (1024 ** 3)
 
     @property
-    def TiB(self):
+    def tebibytes(self):
         "1024^4 bytes, TiB"
         return round(self._bytes / (1024 ** 4), self.precision)
 
-    @TiB.setter
-    def TiB(self, value):
+    @tebibytes.setter
+    def tebibytes(self, value):
         self._bytes = value * (1024 ** 4)
 
     @property
-    def PiB(self):
+    def pebibytes(self):
         "1024^5 bytes, PiB"
         return round(self._bytes / (1024 ** 5), self.precision)
 
-    @PiB.setter
-    def PiB(self, value):
+    @pebibytes.setter
+    def pebibytes(self, value):
         self._bytes = value * (1024 ** 5)
 
 
@@ -266,5 +266,5 @@ class Volume(object):
 
 if __name__ == "__main__":
     d = Data()
-    d.MB = 10
-    print d.MB, d.MiB
+    d.megabytes = 10
+    print d.megabytes, d.mebibytes
