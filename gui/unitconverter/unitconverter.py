@@ -50,25 +50,20 @@ class Converter(QtGui.QWidget):
         datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
 
-        datalayout = QtGui.QVBoxLayout(datatab)
-        lengthlayout = QtGui.QVBoxLayout(lengthtab)
+        self.data = Data()
+        datalayout, self.data_edits = self.create_byte_layout(datatab)
+#         lengthlayout = QtGui.QVBoxLayout(lengthtab)
 
         tabs.addTab(datatab, "Data")
         tabs.addTab(lengthtab, "Length")
 
-        button1 = QtGui.QPushButton("button1")
-        datalayout.addWidget(button1)
+        mainlayout = QtGui.QVBoxLayout()
+        mainlayout.addWidget(tabs)
+        mainlayout.addLayout(datalayout)
 
-        vbox = QtGui.QVBoxLayout()
-#         vbox.addWidget(menu_bar)
-        vbox.addWidget(tabs)
+        self.setLayout(mainlayout)
 
-        self.setLayout(vbox)
-
-        # Now, show it all.
-        self.show()
-
-    def create_byte_layout(self):
+    def create_byte_layout(self, tabs):
         "Create the Data Layout (grid) with LineEdits and Labels"
 
         data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
@@ -93,34 +88,15 @@ class Converter(QtGui.QWidget):
 
         return layout, edits
 
-    def create_buttons_layout(self):
-
-        dbtn = QtGui.QPushButton("Data")
-        lbtn = QtGui.QPushButton("Length")
-        vbtn = QtGui.QPushButton("Volume")
-        nbtn = QtGui.QPushButton("Numbers")
-        dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-
-        layout = QtGui.QHBoxLayout()
-        layout.addWidget(dbtn)
-        layout.addWidget(lbtn)
-        layout.addWidget(vbtn)
-        layout.addWidget(nbtn)
-        layout.setAlignment(QtCore.Qt.AlignTop)
-
-        return layout
-
     def create_precision_layout(self):
 
         prec = QtGui.QLineEdit()
         prec.setText(str(self.decplaces))
-        prec.setAlignment(QtCore.Qt.AlignCenter)
         prec.textEdited[str].connect(self.update_precision)
 
 
         layout = QtGui.QHBoxLayout()
         layout.addWidget(prec)
-        layout.setAlignment(QtCore.Qt.AlignCenter)
 
         return layout
 
@@ -129,20 +105,18 @@ class Converter(QtGui.QWidget):
         self.data = Data()
 
         data, self.data_edits = self.create_byte_layout()
-#         buttons = self.create_buttons_layout()
-#         prec = self.create_precision_layout()
+        prec = self.create_precision_layout()
 
         # Patch it all together in a vertical layout.
         data_layout = QtGui.QVBoxLayout(tab)
 #         data_layout.addStretch(1)
-#         data_layout.addLayout(buttons)
-#         data_layout.addLayout(prec)
+        data_layout.addLayout(prec)
         data_layout.addLayout(data)
 
 
         # Set the text alignment for the LineEdits and connect edits to actions.
         for i in self.data_edits.values():
-            i.setAlignment(QtCore.Qt.AlignLeft)
+            i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
 
@@ -180,6 +154,7 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
     c = Converter()
+    c.show()
     sys.exit(app.exec_())
 
 
