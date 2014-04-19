@@ -21,7 +21,7 @@ class Converter(QtGui.QWidget):
         self.create_buttons()
 
         self.data = Data()
-        self.create_data_fields()
+        self.create_data_ui()
 
         # Main Window
         self.setGeometry(300, 300, 350, 300)
@@ -32,25 +32,7 @@ class Converter(QtGui.QWidget):
 
     def create_buttons(self):
 #         "Creates the buttons at the top."
-#         dbtn = QtGui.QPushButton("Data", self)
-#         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-#
-#         lbtn = QtGui.QPushButton("Length", self)
-#         vbtn = QtGui.QPushButton("Volume", self)
-#         nbtn = QtGui.QPushButton("Numbers", self)
-#
-#         hbox = QtGui.QHBoxLayout()
-#         hbox.addStretch(1)
-#         hbox.addWidget(dbtn)
-#         hbox.addWidget(lbtn)
-#         hbox.addWidget(vbtn)
-#         hbox.addWidget(nbtn)
-#
-#         vbox = QtGui.QVBoxLayout()
-#         vbox.addStretch(1)
-#         vbox.addLayout(hbox)
-#
-#         self.setLayout(vbox)
+
         pass
 
     def clear_gui(self):
@@ -61,7 +43,7 @@ class Converter(QtGui.QWidget):
             if isinstance(widget, QtGui.QLabel):
                 widget.deleteLater()
 
-    def create_data_fields(self):
+    def create_data_ui(self):
 
         data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
                 "GB", "GiB", "TB", "TiB", "PB", "PiB"]
@@ -73,57 +55,48 @@ class Converter(QtGui.QWidget):
                (4, 0), (4, 1), (4, 2), (4, 3),
                (5, 0), (5, 1), (5, 2), (5, 3)]
 
-        # Create the grid layout from our lists.
         grid = QtGui.QGridLayout()
-        edits = {k: QtGui.QLineEdit() for k in data}
-
+        # Dictionary that holds our QLineEdit fields for later use.
+        self.edits = {unit: QtGui.QLineEdit() for unit in data}
 
         for i in range(len(pos)):
+            # Since data is half as long as pos, we use floor division to get
+            # the correct corresponding data index from i.
+            datapos = data[i // 2]
+            # Add a QLabel for uneven positions and QLineEdits for even ones.
             if i % 2:
-                grid.addWidget(QtGui.QLabel(data[i / 2]), pos[i][0], pos[i][1])
+                grid.addWidget(QtGui.QLabel(datapos), pos[i][0], pos[i][1])
             else:
-                field = edits[data[i / 2]]
+                field = self.edits[datapos]
+                # Align text on the right.
                 field.setAlignment(QtCore.Qt.AlignRight)
                 grid.addWidget(field, pos[i][0], pos[i][1])
 
-#         dbtn = QtGui.QPushButton("Data", self)
-#         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-#         lbtn = QtGui.QPushButton("Length", self)
-#         vbtn = QtGui.QPushButton("Volume", self)
-#         nbtn = QtGui.QPushButton("Numbers", self)
+        dbtn = QtGui.QPushButton("Data", self)
+        dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
 
-        grid.addWidget(QtGui.QPushButton("Data", self), 6, 0)
-        grid.addWidget(QtGui.QPushButton("Volume", self), 6, 2)
-        grid.addWidget(QtGui.QPushButton("Length", self), 7, 0)
-        grid.addWidget(QtGui.QPushButton("Numbers", self), 7, 2)
-#         hbox = QtGui.QHBoxLayout()
-#         hbox.addStretch(1)
-#         hbox.addWidget(dbtn)
-#         hbox.addWidget(lbtn)
-#         hbox.addWidget(vbtn)
-#         hbox.addWidget(nbtn)
-#
-#         vbox = QtGui.QVBoxLayout()
-#         vbox.addStretch(1)
-#         vbox.addLayout(hbox)
-        self.setLayout(grid)
+        lbtn = QtGui.QPushButton("Length", self)
+        vbtn = QtGui.QPushButton("Volume", self)
+        nbtn = QtGui.QPushButton("Numbers", self)
+
+        hbox = QtGui.QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(dbtn)
+        hbox.addWidget(lbtn)
+        hbox.addWidget(vbtn)
+        hbox.addWidget(nbtn)
+
+        vbox = QtGui.QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox, grid)
+        self.setLayout(vbox)
 
     def precision_changed(self, text):
         self.data.precision = int(text)
 
     def update_data(self):
-        self.bitfield.setText(str(self.data.bits))
-        self.bytesfield.setText(str(self.data.bytes))
-        self.KBfield.setText(str(self.data.kilobytes))
-        self.KiBfield.setText(str(self.data.kibibytes))
-#         self.MBfield.setText(str(self.data.megabytes))
-        self.MiBfield.setText(str(self.data.mebibytes))
-        self.GBfield.setText(str(self.data.gigabytes))
-        self.GiBfield.setText(str(self.data.gibibytes))
-        self.TBfield.setText(str(self.data.terrabytes))
-        self.TiBfield.setText(str(self.data.tebibytes))
-        self.PBfield.setText(str(self.data.petabytes))
-        self.PiBfield.setText(str(self.data.pebibytes))
+        for i in self.edits:
+            i.setText(str(self.data.i))
 
     def megabytes_changed(self, text):
 
