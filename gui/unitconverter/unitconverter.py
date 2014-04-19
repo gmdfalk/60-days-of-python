@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # TODO: Blank lineedit when entering it.
+# Use maxline and validator to set input/output constraints for lineedits.
 
 import decimal
 import sys
@@ -46,24 +47,26 @@ class Converter(QtGui.QWidget):
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
-        tabs = QtGui.QTabWidget()
-        datatab = QtGui.QWidget()
+        self.tabs = QtGui.QTabWidget()
+        self.datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
 
-        self.data = Data()
-        datalayout, self.data_edits = self.create_byte_layout(datatab)
+#         self.data = Data()
+#         datalayout, self.data_edits = self.create_byte_layout(self.datatab)
 #         lengthlayout = QtGui.QVBoxLayout(lengthtab)
 
-        tabs.addTab(datatab, "Data")
-        tabs.addTab(lengthtab, "Length")
+        datalayout = self.create_data_tab(self.datatab)
+
+        self.tabs.addTab(self.datatab, "Data")
+        self.tabs.addTab(lengthtab, "Length")
 
         mainlayout = QtGui.QVBoxLayout()
-        mainlayout.addWidget(tabs)
+        mainlayout.addWidget(self.tabs)
         mainlayout.addLayout(datalayout)
 
         self.setLayout(mainlayout)
 
-    def create_byte_layout(self, tabs):
+    def create_byte_layout(self):
         "Create the Data Layout (grid) with LineEdits and Labels"
 
         data = ["bits", "bytes", "KB", "KiB", "MB", "MiB",
@@ -91,6 +94,8 @@ class Converter(QtGui.QWidget):
     def create_precision_layout(self):
 
         prec = QtGui.QLineEdit()
+        prec.setFixedWidth(36)
+        prec.setAlignment(QtCore.Qt.AlignCenter)
         prec.setText(str(self.decplaces))
         prec.textEdited[str].connect(self.update_precision)
 
@@ -119,13 +124,17 @@ class Converter(QtGui.QWidget):
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
+#             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
+
+
+        return data_layout
 
     def update_precision(self, text):
         try:
             self.decplaces = int(text)
             self.update_data()
         except ValueError:
-            pass  # Fail sil2ently if wrong decplaces format is given.
+            pass  # Fail silently if wrong decplaces format is given.
 
     def update_data(self):
         for k, v in self.data_edits.items():
