@@ -15,6 +15,7 @@ class Converter(QtGui.QWidget):
         super(Converter, self).__init__()
         self.app = app
         self.initUI()
+        self.maxlength = 18  # Defunct. Max length of a QLineEdit field.
 
     def initUI(self):
 
@@ -73,18 +74,30 @@ class Converter(QtGui.QWidget):
 
     def create_buttons_layout(self):
 
-        self.dbtn = QtGui.QPushButton("Data", self)
-        self.lbtn = QtGui.QPushButton("Length", self)
-        self.vbtn = QtGui.QPushButton("Volume", self)
-        self.nbtn = QtGui.QPushButton("Numbers", self)
-        self.dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        dbtn = QtGui.QPushButton("Data")
+        lbtn = QtGui.QPushButton("Length")
+        vbtn = QtGui.QPushButton("Volume")
+        nbtn = QtGui.QPushButton("Numbers")
+        dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
 
         layout = QtGui.QHBoxLayout()
         layout.addStretch(1)
-        layout.addWidget(self.dbtn)
-        layout.addWidget(self.lbtn)
-        layout.addWidget(self.vbtn)
-        layout.addWidget(self.nbtn)
+        layout.addWidget(dbtn)
+        layout.addWidget(lbtn)
+        layout.addWidget(vbtn)
+        layout.addWidget(nbtn)
+
+        return layout
+
+    def create_precision_layout(self):
+
+        prec = QtGui.QLineEdit()
+        prec.textEdited[str].connect(self.update_precision)
+
+        layout = QtGui.QHBoxLayout()
+        layout.addStretch(1)
+        layout.addWidget(prec)
+        layout.setAlignment(QtCore.Qt.AlignCenter)
 
         return layout
 
@@ -94,33 +107,36 @@ class Converter(QtGui.QWidget):
 
         data, self.edits = self.create_data_layout()
         buttons = self.create_buttons_layout()
+        prec = self.create_precision_layout()
 
         # Patch it all together in a vertical layout.
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
         vbox.addLayout(buttons)
+        vbox.addLayout(prec)
         vbox.addLayout(data)
 
         self.setLayout(vbox)
 
-        # Set the text alignment for the LineEdits.
+        # Set the text alignment for the LineEdits and connect edits to actions.
         for i in self.edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
-            i.textChanged[str].connect(self.data_changed)
+            i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
 
     def update_precision(self, text):
         try:
             self.data.precision = int(text)
+            self.update_data()
         except ValueError as e:
-            print e
+            pass  # Fail silently if wrong precision format is given.
 
     def update_data(self):
         for k, v in self.edits.items():
             # Exclude the sender from being updated.
             if v != self.sender():
                 text = getattr(self.data, k)
-                v.setText("{0:.{1}f}".format(text, self.precision))
+                v.setText("{0:.{1}f}".format(text, self.data.precision))
 
     def data_changed(self, text):
         for k, v in self.edits.items():
