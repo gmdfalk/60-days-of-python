@@ -10,9 +10,9 @@ from conversion import Data, Length, Volume
 
 class Converter(QtGui.QWidget):
 
-    def __init__(self):
+    def __init__(self, app):
         super(Converter, self).__init__()
-
+        self.app = app
         self.initUI()
 
     def initUI(self):
@@ -23,12 +23,6 @@ class Converter(QtGui.QWidget):
 
         self.data = Data()
         self.create_data_input()
-        self.dl = [self.bitlabel, self.byteslabel, self.KBfield, self.KBlabel,
-                    self.bitfield, self.bytesfield, self.MBfield, self.MBlabel,
-                    self.GBfield, self.GBlabel, self.TBfield, self.TBlabel,
-                    self.PBfield, self.PBlabel, self.KiBfield, self.KiBlabel,
-                    self.MiBfield, self.MiBlabel, self.GiBfield, self.GiBlabel,
-                    self.TiBfield, self.TiBlabel, self.PiBfield, self.PiBlabel]
 
         # Main Window
         self.setGeometry(300, 300, 350, 300)
@@ -38,6 +32,7 @@ class Converter(QtGui.QWidget):
         self.show()
 
     def create_buttons(self):
+        "Creates the buttons at the top."
         dbtn = QtGui.QPushButton("Data", self)
         dbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
         dbtn.resize(dbtn.sizeHint())
@@ -45,19 +40,25 @@ class Converter(QtGui.QWidget):
         lbtn = QtGui.QPushButton("Length", self)
         lbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
         lbtn.resize(lbtn.sizeHint())
-        lbtn.move(100, 0)
+        lbtn.move(90, 0)
 
         vbtn = QtGui.QPushButton("Volume", self)
         vbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
         vbtn.resize(vbtn.sizeHint())
-        vbtn.move(200, 0)
+        vbtn.move(180, 0)
 
-    def clear_data_input(self):
-        for i in self.dl:
-            i.deleteLater()
-#         for widget in qApp.allWidgets():
-#             if isinstance(widget, QtGui.QLineEdit):
-#                 widget.clear()
+        nbtn = QtGui.QPushButton("Numbers", self)
+        nbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        nbtn.resize(nbtn.sizeHint())
+        nbtn.move(270, 0)
+
+    def clear_gui(self):
+        "Delete elements so we can switch to a different conversion mode."
+        for widget in self.app.allWidgets():
+            if isinstance(widget, QtGui.QLineEdit):
+                widget.deleteLater()
+            if isinstance(widget, QtGui.QLabel):
+                widget.deleteLater()
 
     def create_data_input(self):
         # Input field
@@ -163,7 +164,7 @@ class Converter(QtGui.QWidget):
 def main():
     app = QtGui.QApplication(sys.argv)
 
-    c = Converter()
+    c = Converter(app)
 
     # Delete widget after 10 seconds.
 #     t = Timer(10, c.deleteLater)
