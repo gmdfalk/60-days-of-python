@@ -106,8 +106,8 @@ class Converter(QtGui.QWidget):
         # Set the text alignment for the LineEdits.
         for i in self.edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
-        self.edits["MB"].textChanged[str].connect(self.data_changed)
-        self.edits["MB"].textChanged[str].connect(self.update_data)
+            i.textChanged[str].connect(self.data_changed)
+            i.textChanged[str].connect(self.update_data)
 
     def update_precision(self, text):
         try:
@@ -119,14 +119,18 @@ class Converter(QtGui.QWidget):
         for k, v in self.edits.items():
             # Exclude the sender from being updated.
             if v != self.sender():
-                text = str(getattr(self.data, k))
-                v.setText(text)
+                text = getattr(self.data, k)
+                v.setText("{0:.{1}f}".format(text, self.precision))
 
     def data_changed(self, text):
+        for k, v in self.edits.items():
+            if v == self.sender():
+                target = k
+                break
         try:
-            self.data.MB = float(text)
+            setattr(self.data, target, float(text))
         except ValueError:
-            self.data.MB = 0
+            setattr(self.data, target, 0)
 
 
 def main():
