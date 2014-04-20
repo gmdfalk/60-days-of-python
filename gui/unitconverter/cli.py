@@ -157,17 +157,20 @@ class CLIConverter(object):
                 try:
                     v.index(i)
                     found.append(k)
-                    print i, k
                 except ValueError:
-                    pass
+                    continue
+
         # Check found for duplicates but preserve the order.
         seen = set()
         seen_add = seen.add
         found = [i for i in found if i not in seen and not seen_add(i)]
         # If we haven't found 2 matching types, exit here.
-        print found
         if len(found) < 2:
             return
+        # OTOH, if we have more than 2 results, get rid of troublemakers.
+        # FIXME: hacky.
+        elif len(found) > 2 and "inches" in found:
+            del found[found.index("inches")]
 
         unit.precision = self.precision
         setattr(unit, found[0], float(self.num))
