@@ -15,9 +15,10 @@ Examples:
     cli.py 10Liters ounce -p 80 -d 80
     cli.py 10 meters to cm -d 3
 """
-
+# TODO: Positional awareness for number arguments.
 import decimal
 import re
+import string
 import sys
 
 from docopt import docopt
@@ -59,14 +60,18 @@ class CLIConverter(object):
             print "Not enough arguments."
             sys.exit(9)
 
-        # Regex that splits the arglist into a number and the rest of the args.
-        rx = re.compile("(.?(?:\d+(?:\.\d+)?))(.*)")
+        # Extract a number (float/int) from the arglist. Allows leading dot.
+        rx = re.compile("(.?(?:\d+(?:\.\d+)?))")
         match = rx.search(" ".join(arglist))
         try:
-            self.num, self.rest = match.group(1), match.group(2).split()
+            self.num = match.group()
         except AttributeError:
             print "Invalid input! Need at least one float/integer."
             sys.exit(1)
+
+        # FIXME: If i strip the number here I can't allow (silly) searches
+        # like "how many cm are 5 m.". Needs positional awareness.
+        self.rest = [i.strip(string.digits) for i in arglist]
 
         # Set and/or correct decimal and precision options.
         try:
@@ -152,6 +157,7 @@ class CLIConverter(object):
                 try:
                     v.index(i)
                     found.append(k)
+                    print i, k
                 except ValueError:
                     pass
         # Check found for duplicates but preserve the order.
@@ -159,6 +165,7 @@ class CLIConverter(object):
         seen_add = seen.add
         found = [i for i in found if i not in seen and not seen_add(i)]
         # If we haven't found 2 matching types, exit here.
+        print found
         if len(found) < 2:
             return
 
