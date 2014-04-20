@@ -70,7 +70,7 @@ class CLIConverter(object):
             sys.exit(1)
 
         # FIXME: If i strip the number here I can't allow (silly) searches
-        # like "how many cm are 5 m.". Needs positional awareness.
+        # like "how many cm are 5 m.". Needs positional awareness, see top TODO
         self.rest = [i.strip(string.digits) for i in arglist]
 
         # Set and/or correct decimal and precision options.
@@ -125,7 +125,7 @@ class CLIConverter(object):
                         "kilometers": ["km", "kilometer", "kilometers"],
                         "inches": ["in", "inches", "inch"],
                         "feet": ["ft", "feet", "foot"],
-                        "yards": ["yd", "yard", "yards"],
+                        "yards": ["yd", "yds", "yard", "yards"],
                         "miles": ["mi", "mile", "miles"]
                         }
         unit = Length()
@@ -138,7 +138,7 @@ class CLIConverter(object):
                         "centiliters": ["cl", "centiliter", "centiliters"],
                         "liters": ["l", "liter", "liters"],
                         "kiloliters": ["kl", "kiloliter", "kiloliters"],
-                        "ounces": ["oz", "floz ounce", "ounces"],
+                        "ounces": ["oz", "floz", "ounce", "ounces"],
                         "pints": ["pt", "pint", "pints"],
                         "gallons": ["gal", "gallon", "gallons"],
                         "barrels": ["bbl", "barrel", "barrels"]
