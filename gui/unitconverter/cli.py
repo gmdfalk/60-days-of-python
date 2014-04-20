@@ -47,8 +47,49 @@ def format_num(num):
     return val
 
 
-def check_data(num, rest, decimals, precision):
-    units = {
+class CLIConverter(object):
+
+    def __init__(self):
+        args = docopt(__doc__, version="0.1")
+
+        # Preliminary input checks.
+        arglist = [i.lower() for i in args["<args>"]]
+        if not arglist or len(arglist) < 2:
+            print "Not enough arguments."
+            sys.exit(9)
+
+        # Regex that splits the arglist into float/int and self.rest. Allow leading dot.
+        rx = re.compile("(.?(?:\d+(?:\.\d+)?))(.*)")
+        match = rx.search(" ".join(arglist))
+
+        try:
+            self.num, self.rest = match.group(1), match.group(2).split()
+        except AttributeError:
+            print "Invalid input! Need at least one float/integer."
+            sys.exit(1)
+
+        # Set and/or correct decimal and precision options.
+        try:
+            self.decimals = int(args["--decimals"])
+        except ValueError:
+            self.decimals = 10
+        try:
+            self.precision = int(args["--precision"])
+        except ValueError:
+            self.precision = 10
+
+        if self.decimals > 82:
+            self.decimals = 82
+        if self.precision > 82:
+            self.precision = 82
+
+        # Initialize the checks.
+        self.check_data()
+        self.check_length()
+        self.check_volume()
+
+    def check_data(self):
+        units = {
                   "bits": ["bit", "bits"],
                   "bytes": ["byte", "bytes"],
                   "kilobytes": ["kb", "kilobytes", "kilobyte"],
@@ -63,108 +104,70 @@ def check_data(num, rest, decimals, precision):
                   "pebibytes": ["pib", "pebibytes", "pebibyte"]
                  }
 
-    unit = Data()
-    convert(unit, units, num, rest, decimals, precision)
+        unit = Data()
+        self.try_conversion(unit, units)
 
 
-def check_length(num, rest, decimals, precision):
-    units = {
-                    "millimeters": ["mm", "millimeter", "millimeters"],
-                    "centimeters": ["cm", "centimeter", "centimeters"],
-                    "meters": ["m", "meter", "meters"],
-                    "kilometers": ["km", "kilometer", "kilometers"],
-                    "inches": ["in", "inches", "inch"],
-                    "feet": ["ft", "feet", "foot"],
-                    "yards": ["yd", "yard", "yards"],
-                    "miles": ["mi", "ml", "mile", "miles"]
-                    }
-    unit = Length()
-    convert(unit, units, num, rest, decimals, precision)
+    def check_length(self):
+        units = {
+                        "millimeters": ["mm", "millimeter", "millimeters"],
+                        "centimeters": ["cm", "centimeter", "centimeters"],
+                        "meters": ["m", "meter", "meters"],
+                        "kilometers": ["km", "kilometer", "kilometers"],
+                        "inches": ["in", "inches", "inch"],
+                        "feet": ["ft", "feet", "foot"],
+                        "yards": ["yd", "yard", "yards"],
+                        "miles": ["mi", "ml", "mile", "miles"]
+                        }
+        unit = Length()
+        self.try_conversion(unit, units)
 
 
-def check_volume(num, rest, decimals, precision):
-    units = {
-                    "milliliters": ["ml", "millimeter", "millimeters"],
-                    "centiliters": ["cl", "centiliter", "centiliters"],
-                    "liters": ["l", "liter", "liters"],
-                    "kiloliters": ["kl", "kiloliter", "kiloliters"],
-                    "ounces": ["oz", "floz ounce", "ounces"],
-                    "pints": ["pt", "pint", "pints"],
-                    "gallons": ["gal", "gallon", "gallons"],
-                    "barrels": ["bbl", "barrel", "barrels"]
-                    }
+    def check_volume(self):
+        units = {
+                        "milliliters": ["ml", "millimeter", "millimeters"],
+                        "centiliters": ["cl", "centiliter", "centiliters"],
+                        "liters": ["l", "liter", "liters"],
+                        "kiloliters": ["kl", "kiloliter", "kiloliters"],
+                        "ounces": ["oz", "floz ounce", "ounces"],
+                        "pints": ["pt", "pint", "pints"],
+                        "gallons": ["gal", "gallon", "gallons"],
+                        "barrels": ["bbl", "barrel", "barrels"]
+                        }
 
-    unit = Volume()
-    convert(unit, units, num, rest, decimals, precision)
+        unit = Volume()
+        self.try_conversion(unit, units)
 
 
-def convert(unit, units, num, rest, decimals, precision):
-    # Abandon all hope, ye who enter here.
-    found, found_count = [], 0
-    for i in rest:
-        for k, v in units.items():
-            try:
-                v.index(i)
-                found.append(k)
-                found_count += 1
-                if found_count == 2:
-                    break
-            except ValueError:
-                pass
-        if found_count == 2:
-            break
-    else:
-        return
+    def try_conversion(self, unit, units):
+        # Abandon all hope, ye who enter here.
+        found, found_count = [], 0
+        for i in self.rest:
+            for k, v in units.items():
+                try:
+                    v.index(i)
+                    found.append(k)
+                    found_count += 1
+                    if found_count == 2:
+                        break
+                except ValueError:
+                    pass
+            if found_count == 2:
+                break
+        else:
+            return
 
-    unit.precision = precision
-    setattr(unit, found[0], float(num))
-    result = format_num(getattr(unit, found[1]))
-    # Trim the result to reflect the -d setting (number of decimal places).
-    if "." in result:
-        split = result.split(".")
-        split[1] = split[1][:decimals]
-        result = ".".join(split) if split[1] else split[0]
-    print "{} {} are {} {}!".format(num, found[0], result, found[1])
-    sys.exit()
-
-def main():
-    args = docopt(__doc__, version="0.1")
-
-    # Preliminary input checks.
-    arglist = [i.lower() for i in args["<args>"]]
-    if not arglist or len(arglist) < 2:
-        print "Not enough arguments."
-        sys.exit(9)
-
-    # Regex that splits the arglist into float/int and rest. Allow leading dot.
-    rx = re.compile("(.?(?:\d+(?:\.\d+)?))(.*)")
-    match = rx.search(" ".join(arglist))
-    try:
-        num, rest = match.group(1), match.group(2).split()
-    except AttributeError:
-        print "Invalid input! Need at least one float/integer."
-        sys.exit(1)
-
-    # Set and/or correct decimal and precision options.
-    try:
-        decimals = int(args["--decimals"])
-    except ValueError:
-        decimals = 10
-    try:
-        precision = int(args["--precision"])
-    except ValueError:
-        precision = 10
-
-    if decimals > 82:
-        decimals = 82
-    if precision > 82:
-        precision = 82
-
-    # The actual work happens here.
-    check_data(num, rest, decimals, precision)
-    check_length(num, rest, decimals, precision)
-    check_volume(num, rest, decimals, precision)
+        unit.precision = self.precision
+        setattr(unit, found[0], float(self.num))
+        result = format_num(getattr(unit, found[1]))
+        # Trim the result to reflect the -d setting (number of decimal places).
+        if "." in result:
+            split = result.split(".")
+            split[1] = split[1][:self.decimals]
+            result = ".".join(split) if split[1] else split[0]
+        print "{} {} are {} {}!".format(self.num, found[0], result, found[1])
+        sys.exit()
 
 
 if __name__ == "__main__":
-    main()
+    c = CLIConverter()
