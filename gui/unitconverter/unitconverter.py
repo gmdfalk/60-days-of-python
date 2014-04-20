@@ -131,7 +131,6 @@ class GUIConverter(QtGui.QWidget):
 
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
-#         data_layout.addStretch(1)
         layout.addLayout(prec)
         layout.addLayout(grid)
 
@@ -145,14 +144,17 @@ class GUIConverter(QtGui.QWidget):
         prec = QtGui.QLineEdit()
         prec.setFixedWidth(36)
         prec.setAlignment(QtCore.Qt.AlignCenter)
-        prec.setText(str(self.precision))
         if unittype == "data":
+            prec.setText(str(self.data.precision))
             prec.textEdited[str].connect(self.update_data_precision)
         if unittype == "length":
+            prec.setText(str(self.length.precision))
             prec.textEdited[str].connect(self.update_length_precision)
         if unittype == "volume":
+            prec.setText(str(self.volume.precision))
             prec.textEdited[str].connect(self.update_volume_precision)
         if unittype == "weight":
+            prec.setText(str(self.weight.precision))
             prec.textEdited[str].connect(self.update_weight_precision)
 
         layout = QtGui.QHBoxLayout()
@@ -182,11 +184,12 @@ class GUIConverter(QtGui.QWidget):
                 % col.name())
 
     def update_data_precision(self, text):
-        try:
-            self.data.precision = int(text)
-            self.update_data_edits()
-        except ValueError:
-            pass
+#         try:
+        print "setting data precision to", text
+        self.data.precision = int(text)
+        self.update_data_edits()
+#         except ValueError:
+#             pass
 
     def update_length_precision(self, text):
         try:
