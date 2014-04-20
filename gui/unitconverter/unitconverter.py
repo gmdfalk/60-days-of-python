@@ -33,14 +33,14 @@ def format_num(num):
     return val
 
 
-class Converter(QtGui.QWidget):
+class GUIConverter(QtGui.QWidget):
 
     def __init__(self):
 
         self.decplaces = 10  # Number of digits after the decimal point.
         self.maxdecplaces = 82  # Maximum number of decimal points.
         self.maxfieldlength = 18  # Maximum length of a QLineEdit field.
-        super(Converter, self).__init__()
+        super(GUIConverter, self).__init__()
 
         # Main Window
         self.setGeometry(300, 300, 350, 300)
@@ -166,7 +166,7 @@ def main():
     "Main entry point."
 
     app = QtGui.QApplication(sys.argv)
-    c = Converter()
+    c = GUIConverter()
     c.show()
     sys.exit(app.exec_())
 

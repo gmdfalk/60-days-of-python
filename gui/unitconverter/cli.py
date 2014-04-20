@@ -5,8 +5,8 @@ Usage:
     cli.py <args>... [-d N] [-p N] [h]
 
 Options:
-    -d, --decimals=<decimals>    Maximum decimal points. [default: 10]
-    -p, --precision=<precision>  Accuracy of the floats. [default: 10]
+    -d, --decimals=<decimals>    Maximum decimal points. Max 82. [default: 10]
+    -p, --precision=<precision>  Accuracy of the floats. Max 82. [default: 10]
     -h, --help                   Print this help text and exit.
     --version                    Show version of this CLI.
 
@@ -27,6 +27,7 @@ from conversion import Data, Length, Volume
 
 
 def format_num(num):
+    "Format a number into a nicer format, i.e. strip trailing 0s, dots etc."
     try:
         dec = decimal.Decimal(num)
     except:
@@ -50,6 +51,7 @@ def format_num(num):
 class CLIConverter(object):
 
     def __init__(self):
+        "Read command-line arguments, assign to self and start the conversion."
         args = docopt(__doc__, version="0.1")
 
         # Preliminary input checks.
@@ -58,10 +60,9 @@ class CLIConverter(object):
             print "Not enough arguments."
             sys.exit(9)
 
-        # Regex that splits the arglist into float/int and self.rest. Allow leading dot.
+        # Regex that splits the arglist into a number and the rest of the args.
         rx = re.compile("(.?(?:\d+(?:\.\d+)?))(.*)")
         match = rx.search(" ".join(arglist))
-
         try:
             self.num, self.rest = match.group(1), match.group(2).split()
         except AttributeError:
@@ -85,8 +86,12 @@ class CLIConverter(object):
 
         # Initialize the checks.
         self.check_data()
-        self.check_length()
         self.check_volume()
+        # Check length last because it has "in" which can cause problems for
+        # searches like "100 liters in ml" if ml were a valid length unit.
+        self.check_length()
+        print "Sorry, could not find two matching measurement units."
+        sys.exit(1)
 
     def check_data(self):
         units = {
@@ -117,7 +122,7 @@ class CLIConverter(object):
                         "inches": ["in", "inches", "inch"],
                         "feet": ["ft", "feet", "foot"],
                         "yards": ["yd", "yard", "yards"],
-                        "miles": ["mi", "ml", "mile", "miles"]
+                        "miles": ["mi", "mile", "miles"]
                         }
         unit = Length()
         self.try_conversion(unit, units)
@@ -125,7 +130,7 @@ class CLIConverter(object):
 
     def check_volume(self):
         units = {
-                        "milliliters": ["ml", "millimeter", "millimeters"],
+                        "milliliters": ["ml", "milliliter", "milliliters"],
                         "centiliters": ["cl", "centiliter", "centiliters"],
                         "liters": ["l", "liter", "liters"],
                         "kiloliters": ["kl", "kiloliter", "kiloliters"],
@@ -141,22 +146,23 @@ class CLIConverter(object):
 
     def try_conversion(self, unit, units):
         # Abandon all hope, ye who enter here.
-        found, found_count = [], 0
+        found = []
         for i in self.rest:
             for k, v in units.items():
                 try:
                     v.index(i)
                     found.append(k)
-                    found_count += 1
-                    if found_count == 2:
-                        break
                 except ValueError:
                     pass
-            if found_count == 2:
-                break
-        else:
+        # Check found for duplicates but preserve the order.
+        seen = set()
+        seen_add = seen.add
+        found = [i for i in found if i not in seen and not seen_add(i)]
+        # If we haven't found 2 matching types, exit here.
+        if len(found) < 2:
             return
 
+        found = list(found)
         unit.precision = self.precision
         setattr(unit, found[0], float(self.num))
         result = format_num(getattr(unit, found[1]))
