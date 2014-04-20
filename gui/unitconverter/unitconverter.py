@@ -113,7 +113,7 @@ class GUIConverter(QtGui.QWidget):
         for i in self.data_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.datatext_changed)
-            i.textChanged[str].connect(self.update_data)
+            i.textChanged[str].connect(self.update_data_edits)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
 
@@ -142,7 +142,7 @@ class GUIConverter(QtGui.QWidget):
 #         for i in self.data_edits.values():
 #             i.setAlignment(QtCore.Qt.AlignRight)
 #             i.textEdited[str].connect(self.datatext_changed)
-#             i.textChanged[str].connect(self.update_data)
+#             i.textChanged[str].connect(self.update_data_edits)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
 
@@ -150,14 +150,14 @@ class GUIConverter(QtGui.QWidget):
 
     def create_volume_tab(self, tab):
 
-        self.vol = Volume()
+        self.volume = Volume()
 
         units = [("milliliters", "ml"), ("ounces", "oz"),
                  ("centiliters", "cl"), ("pints", "pt"),
                  ("liters", "l"), ("gallons", "gal"),
                  ("kiloliters", "kl"), ("barrels", "bbl")]
 
-        grid, self.vol_edits = self.create_grid(units)
+        grid, self.volume_edits = self.create_grid(units)
         prec = self.create_decplaces_layout()
 
         # Patch it all together in a vertical layout.
@@ -171,7 +171,7 @@ class GUIConverter(QtGui.QWidget):
 #         for i in self.data_edits.values():
 #             i.setAlignment(QtCore.Qt.AlignRight)
 #             i.textEdited[str].connect(self.datatext_changed)
-#             i.textChanged[str].connect(self.update_data)
+#             i.textChanged[str].connect(self.update_data_edits)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
 
@@ -215,21 +215,35 @@ class GUIConverter(QtGui.QWidget):
     def update_decplaces(self, text):
         try:
             self.decplaces = int(text)
-            self.update_data()
+            self.update_data_edits()
         except ValueError:
             pass  # Fail silently if wrong decplaces format is given.
 
-    def update_data(self):
-        "Update the values of all Data/Bytes QLineEdits"
-        for k, v in self.data_edits.items():
+    def update_edits(self, unittype, edit):
+        for k, v in edit.items():
             # Exclude the sender from being updated.
             if v != self.sender():
-                text = format_num(getattr(self.data, k))
+                text = format_num(getattr(unittype, k))
                 if "." in text:
                     split = text.split(".")
                     split[1] = split[1][:self.decplaces]
                     text = ".".join(split) if split[1] else split[0]
                 v.setText(text)
+
+    def update_data_edits(self):
+        "Update the values of all Data/Bytes QLineEdits"
+        unittype, edit = self.data, self.data_edits
+        self.update_edits(unittype, edit)
+
+    def update_length_edits(self):
+        "Update the values of all Length QLineEdits"
+        unittype, edit = self.length, self.length_edits
+        self.update_edits(unittype, edit)
+
+    def update_volume_edits(self):
+        "Update the values of all Volume QLineEdits"
+        unittype, edit = self.volume, self.volume_edits
+        self.update_edits(unittype, edit)
 
     def text_changed(self, text, unittype, edits):
         "Set the correct unit in conversion.py to the text we just received."
@@ -243,17 +257,17 @@ class GUIConverter(QtGui.QWidget):
             setattr(unittype, unit, 0)
 
     def datatext_changed(self, text):
-        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        "When a Data/Bytes QLineEdit was changed, we pass its text along"
         unittype, edits = self.data, self.data_edits
         self.text_changed(text, unittype, edits)
 
     def lentext_changed(self, text):
-        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        "When a Length QLineEdit was changed, we pass its text along"
         unittype, edits = self.length, self.length_edits
         self.text_changed(text, unittype, edits)
 
     def voltext_changed(self, text):
-        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        "When a Volume QLineEdit was changed, we pass its text along"
         unittype, edits = self.volume, self.volume_edits
         self.text_changed(text, unittype, edits)
 
