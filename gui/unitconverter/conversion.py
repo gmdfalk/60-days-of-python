@@ -1,17 +1,19 @@
 from __future__ import division
 
-from decimal import Decimal
-
+from decimal import Decimal, getcontext
 
 # TODO: Number systems conversion, Temperature
 def format_num(num, precision=10):
     try:
         dec = Decimal(num)
+        # Cut the decimal off at "precision" decimal places.
         if precision < 1:
-            dec.quantize(Decimal("0"))
+            dec = dec.quantize(Decimal("0"))
         else:
-            dec.quantize(Decimal(".{}".format("0"*precision)))
-        print dec
+            # Set our precision to at least 28 or 5 times our precision. Other-
+            # wise quantize complains "result has too many digits".
+            getcontext().prec = max(28, precision * 4)
+            dec = dec.quantize(Decimal(".{}".format("0"*precision)))
     except:
         return "bad"
     tup = dec.as_tuple()

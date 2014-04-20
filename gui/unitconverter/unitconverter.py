@@ -184,12 +184,11 @@ class GUIConverter(QtGui.QWidget):
                 % col.name())
 
     def update_data_precision(self, text):
-#         try:
-        print "setting data precision to", text
-        self.data.precision = int(text)
-        self.update_data_edits()
-#         except ValueError:
-#             pass
+        try:
+            self.data.precision = int(text)
+            self.update_data_edits()
+        except ValueError:
+            pass
 
     def update_length_precision(self, text):
         try:
