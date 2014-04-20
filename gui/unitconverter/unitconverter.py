@@ -61,6 +61,7 @@ class GUIConverter(QtGui.QWidget):
         mainlayout = QtGui.QVBoxLayout()
         mainlayout.addWidget(tabs)
         mainlayout.addLayout(datalayout)
+        self.create_color_button()
 
         self.setLayout(mainlayout)
 
@@ -127,9 +128,30 @@ class GUIConverter(QtGui.QWidget):
             i.textEdited[str].connect(self.data_changed)
             i.textChanged[str].connect(self.update_data)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
-
+            # focusInEvent?
 
         return data_layout
+
+    def create_color_button(self):
+        col = QtGui.QColor(0, 0, 0)
+
+        self.btn = QtGui.QPushButton('Dialog', self)
+        self.btn.move(20, 20)
+
+        self.btn.clicked.connect(self.show_color_picker)
+
+        self.frm = QtGui.QFrame(self)
+        self.frm.setStyleSheet("QWidget { background-color: %s }"
+            % col.name())
+        self.frm.setGeometry(130, 22, 100, 100)
+
+    def show_color_picker(self):
+
+        col = QtGui.QColorDialog.getColor()
+
+        if col.isValid():
+            self.frm.setStyleSheet("QWidget { background-color: %s }"
+                % col.name())
 
     def update_decplaces(self, text):
         try:
