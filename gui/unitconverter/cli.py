@@ -2,7 +2,7 @@
 """UnitConverter (CLI)
 
 Usage:
-    cli.py <args>... [-d <decimals>] [-p <precision>] [h]
+    cli.py <args>... [-d N] [-p N] [h]
 
 Options:
     -d, --decimals=<decimals>    Maximum decimal points. [default: 10]
@@ -14,20 +14,42 @@ Examples:
     cli.py 10m to centimeter
     cli.py 10 meters to cm -d 3
     cli.py 10GB in bytes
-    cli.py 10 liters oz
+    cli.py 10 liters oz -p 80 -d 80
 """
 
-import sys
+import decimal
 import re
+import sys
 
 from docopt import docopt
 
 from conversion import Data, Length, Volume
 
 
-def check_data(arglist):
+def format_num(num):
+    try:
+        dec = decimal.Decimal(num)
+    except:
+        return "bad"
+    tup = dec.as_tuple()
+    delta = len(tup.digits) + tup.exponent
+    digits = "".join(str(d) for d in tup.digits)
+    if delta <= 0:
+        zeros = abs(tup.exponent) - len(tup.digits)
+        val = "0." + ("0" * zeros) + digits
+    else:
+        val = digits[:delta] + ("0" * tup.exponent) + "." + digits[delta:]
+    val = val.rstrip("0")
+    if val[-1] == ".":
+        val = val[:-1]
+    if tup.sign:
+        return "-" + val
+    return val
+
+
+def check_data(num, rest, decimals, precision):
     d = Data()
-    data_units = {
+    units = {
                   "bits": ["bit", "bits"],
                   "bytes": ["byte", "bytes"],
                   "kilobytes": ["kb", "kilobytes", "kilobyte"],
@@ -35,20 +57,20 @@ def check_data(arglist):
                   "gigabytes": ["gb", "gigabytes", "gigabyte"],
                   "terrabytes": ["tb", "terrabytes", "terrabyte"],
                   "petabytes": ["pb", "petabytes", "petabyte"],
-                  "kibibytes": ["kb", "kibibytes", "kibibyte"],
-                  "mebibytes": ["mb", "mebibytes", "mebibyte"],
-                  "gibibytes": ["gb", "gibibytes", "gibibyte"],
-                  "tebibytes": ["tb", "tebibytes", "tebibyte"],
-                  "pebibytes": ["pb", "pebibytes", "pebibyte"]
+                  "kibibytes": ["kib", "kibibytes", "kibibyte"],
+                  "mebibytes": ["mib", "mebibytes", "mebibyte"],
+                  "gibibytes": ["gib", "gibibytes", "gibibyte"],
+                  "tebibytes": ["tib", "tebibytes", "tebibyte"],
+                  "pebibytes": ["pib", "pebibytes", "pebibyte"]
                  }
 
     # Abandon all hope, ye who enter here.
-    found_units, found_count = [], 0
-    for i in arglist:
-        for k, v in data_units.items():
+    found, found_count = [], 0
+    for i in rest:
+        for k, v in units.items():
             try:
                 v.index(i)
-                found_units.append(k)
+                found.append(k)
                 found_count += 1
                 if found_count == 2:
                     break
@@ -57,14 +79,20 @@ def check_data(arglist):
         if found_count == 2:
             break
     else:
-        print "nothing found"
         return
 
-    print found_count
-    print found_units
+    setattr(d, found[0], float(num))
+    result = format_num(getattr(d, found[1]))
+    # Trim the result to reflect the -d setting (number of decimal places).
+    if "." in result:
+        split = result.split(".")
+        split[1] = split[1][:decimals]
+        result = ".".join(split) if split[1] else split[0]
+    print "{} {} are {} {}!".format(num, found[0], result, found[1])
+    sys.exit()
 
 
-def check_length(arglist):
+def check_length(num, rest, decimals, precision):
     l = Length()
     length_units = {
                     l.millimeters: ["mm", "millimeter", "millimeters"],
@@ -78,7 +106,7 @@ def check_length(arglist):
                     }
 
 
-def check_volume(arglist):
+def check_volume(num, rest, decimals, precision):
     v = Volume()
     volume_units = {
                     v.milliliters: ["ml", "millimeter", "millimeters"],
@@ -101,7 +129,7 @@ def main():
         print "Not enough arguments."
         sys.exit(9)
 
-    # Regex that splits the arglist into float/int and rest.
+    # Regex that splits the arglist into float/int and rest. Allow leading dot.
     rx = re.compile("(.?(?:\d+(?:\.\d+)?))(.*)")
     match = rx.search(" ".join(arglist))
     try:
@@ -110,10 +138,25 @@ def main():
         print "Invalid input! Need at least one float/integer."
         sys.exit(1)
 
+    # Set and/or correct decimal and precision options.
+    try:
+        decimals = int(args["--decimals"])
+    except ValueError:
+        decimals = 10
+    try:
+        precision = int(args["--precision"])
+    except ValueError:
+        precision = 10
 
-    check_data(arglist)
-    check_length(arglist)
-    check_volume(arglist)
+    if decimals > 82:
+        decimals = 82
+    if precision > 82:
+        precision = 82
+
+    # The actual work happens here.
+    check_data(num, rest, decimals, precision)
+    check_length(num, rest, decimals, precision)
+    check_volume(num, rest, decimals, precision)
 
 
 if __name__ == "__main__":
