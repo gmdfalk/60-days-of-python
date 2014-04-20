@@ -48,7 +48,6 @@ def format_num(num):
 
 
 def check_data(num, rest, decimals, precision):
-    d = Data()
     units = {
                   "bits": ["bit", "bits"],
                   "bytes": ["byte", "bytes"],
@@ -64,6 +63,42 @@ def check_data(num, rest, decimals, precision):
                   "pebibytes": ["pib", "pebibytes", "pebibyte"]
                  }
 
+    unit = Data()
+    convert(unit, units, num, rest, decimals, precision)
+
+
+def check_length(num, rest, decimals, precision):
+    units = {
+                    "millimeters": ["mm", "millimeter", "millimeters"],
+                    "centimeters": ["cm", "centimeter", "centimeters"],
+                    "meters": ["m", "meter", "meters"],
+                    "kilometers": ["km", "kilometer", "kilometers"],
+                    "inches": ["in", "inches", "inch"],
+                    "feet": ["ft", "feet", "foot"],
+                    "yards": ["yd", "yard", "yards"],
+                    "miles": ["mi", "ml", "mile", "miles"]
+                    }
+    unit = Length()
+    convert(unit, units, num, rest, decimals, precision)
+
+
+def check_volume(num, rest, decimals, precision):
+    units = {
+                    "milliliters": ["ml", "millimeter", "millimeters"],
+                    "centiliters": ["cl", "centiliter", "centiliters"],
+                    "liters": ["l", "liter", "liters"],
+                    "kiloliters": ["kl", "kiloliter", "kiloliters"],
+                    "ounces": ["oz", "floz ounce", "ounces"],
+                    "pints": ["pt", "pint", "pints"],
+                    "gallons": ["gal", "gallon", "gallons"],
+                    "barrels": ["bbl", "barrel", "barrels"]
+                    }
+
+    unit = Volume()
+    convert(unit, units, num, rest, decimals, precision)
+
+
+def convert(unit, units, num, rest, decimals, precision):
     # Abandon all hope, ye who enter here.
     found, found_count = [], 0
     for i in rest:
@@ -81,8 +116,9 @@ def check_data(num, rest, decimals, precision):
     else:
         return
 
-    setattr(d, found[0], float(num))
-    result = format_num(getattr(d, found[1]))
+    unit.precision = precision
+    setattr(unit, found[0], float(num))
+    result = format_num(getattr(unit, found[1]))
     # Trim the result to reflect the -d setting (number of decimal places).
     if "." in result:
         split = result.split(".")
@@ -90,35 +126,6 @@ def check_data(num, rest, decimals, precision):
         result = ".".join(split) if split[1] else split[0]
     print "{} {} are {} {}!".format(num, found[0], result, found[1])
     sys.exit()
-
-
-def check_length(num, rest, decimals, precision):
-    l = Length()
-    length_units = {
-                    l.millimeters: ["mm", "millimeter", "millimeters"],
-                    l.centimeters: ["cm", "centimeter", "centimeters"],
-                    l.meters: ["m", "meter", "meters"],
-                    l.kilometers: ["km", "kilometer", "kilometers"],
-                    l.inches: ["in", "inches", "inch"],
-                    l.feet: ["ft", "feet", "foot"],
-                    l.yards: ["yd", "yard", "yards"],
-                    l.miles: ["mi", "ml", "mile", "miles"]
-                    }
-
-
-def check_volume(num, rest, decimals, precision):
-    v = Volume()
-    volume_units = {
-                    v.milliliters: ["ml", "millimeter", "millimeters"],
-                    v.centiliters: ["cl", "centiliter", "centiliters"],
-                    v.liters: ["l", "liter", "liters"],
-                    v.kiloliters: ["kl", "kiloliter", "kiloliters"],
-                    v.ounces: ["oz", "floz ounce", "ounces"],
-                    v.pints: ["pt", "pint", "pints"],
-                    v.gallons: ["gal", "gallon", "gallons"],
-                    v.barrels: ["bbl", "barrel", "barrels"]
-                    }
-
 
 def main():
     args = docopt(__doc__, version="0.1")
