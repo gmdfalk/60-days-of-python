@@ -2,19 +2,18 @@
 """UnitConverter (CLI)
 
 Usage:
-    cli.py <args>... [-d N] [-p N] [h]
+    cli.py <args>... [-d <decimals>] [-p <precision>] [h]
 
 Options:
     -d, --decimals=<decimals>    Maximum decimal points. Max 82. [default: 10]
     -p, --precision=<precision>  Accuracy of the floats. Max 82. [default: 10]
     -h, --help                   Print this help text and exit.
-    --version                    Show version of this CLI.
+    --version                    Show the version of UnitConverter.
 
 Examples:
     cli.py 10m to centimeter
+    cli.py 10Liters ounce -p 80 -d 80
     cli.py 10 meters to cm -d 3
-    cli.py 10GB in bytes
-    cli.py 10 liters oz -p 80 -d 80
 """
 
 import decimal
@@ -145,7 +144,8 @@ class CLIConverter(object):
 
 
     def try_conversion(self, unit, units):
-        # Abandon all hope, ye who enter here.
+        """The main loop. Tries to find 2 measurement units of the same type.
+        If it finds those, it will print a conversion result and exit."""
         found = []
         for i in self.rest:
             for k, v in units.items():
@@ -162,7 +162,6 @@ class CLIConverter(object):
         if len(found) < 2:
             return
 
-        found = list(found)
         unit.precision = self.precision
         setattr(unit, found[0], float(self.num))
         result = format_num(getattr(unit, found[1]))
