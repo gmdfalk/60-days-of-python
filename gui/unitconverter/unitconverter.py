@@ -54,9 +54,9 @@ class GUIConverter(QtGui.QWidget):
         lengthtab = QtGui.QWidget()
         volumetab = QtGui.QWidget()
 
-        datalayout = self.create_data_tab(datatab)
-        lengthlayout = self.create_length_tab(lengthtab)
-        volumelayout = self.create_volume_tab(volumetab)
+        self.create_data_tab(datatab)
+        self.create_length_tab(lengthtab)
+        self.create_volume_tab(volumetab)
 
         tabs.addTab(datatab, "Data")
         tabs.addTab(lengthtab, "Length")
@@ -69,6 +69,7 @@ class GUIConverter(QtGui.QWidget):
 
 
     def create_grid(self, units, gridsize=4):
+        "Creates the grid of conversion unit QLineEdits and QLabels for a tab."
         # Dictionary that holds our QLineEdit fields for later use.
         edits = {i[0]: QtGui.QLineEdit() for i in units}
 
@@ -88,20 +89,6 @@ class GUIConverter(QtGui.QWidget):
                 layout.addWidget(edits[edit], pos[i][0], pos[i][1])
 
         return layout, edits
-
-    def create_decplaces_layout(self):
-
-        prec = QtGui.QLineEdit()
-        prec.setFixedWidth(36)
-        prec.setAlignment(QtCore.Qt.AlignCenter)
-        prec.setText(str(self.decplaces))
-        prec.textEdited[str].connect(self.update_decplaces)
-
-
-        layout = QtGui.QHBoxLayout()
-        layout.addWidget(prec)
-
-        return layout
 
     def create_data_tab(self, tab):
 
@@ -125,7 +112,7 @@ class GUIConverter(QtGui.QWidget):
         # Set the text alignment for the LineEdits and connect edits to actions.
         for i in self.data_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
-            i.textEdited[str].connect(self.data_changed)
+            i.textEdited[str].connect(self.datatext_changed)
             i.textChanged[str].connect(self.update_data)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
@@ -154,7 +141,7 @@ class GUIConverter(QtGui.QWidget):
         # Set the text alignment for the LineEdits and connect edits to actions.
 #         for i in self.data_edits.values():
 #             i.setAlignment(QtCore.Qt.AlignRight)
-#             i.textEdited[str].connect(self.data_changed)
+#             i.textEdited[str].connect(self.datatext_changed)
 #             i.textChanged[str].connect(self.update_data)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
@@ -183,7 +170,7 @@ class GUIConverter(QtGui.QWidget):
         # Set the text alignment for the LineEdits and connect edits to actions.
 #         for i in self.data_edits.values():
 #             i.setAlignment(QtCore.Qt.AlignRight)
-#             i.textEdited[str].connect(self.data_changed)
+#             i.textEdited[str].connect(self.datatext_changed)
 #             i.textChanged[str].connect(self.update_data)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
@@ -211,6 +198,20 @@ class GUIConverter(QtGui.QWidget):
             self.frm.setStyleSheet("QWidget { background-color: %s }"
                 % col.name())
 
+    def create_decplaces_layout(self):
+        "QLineEdit that allows adjusting of decimal places."
+        prec = QtGui.QLineEdit()
+        prec.setFixedWidth(36)
+        prec.setAlignment(QtCore.Qt.AlignCenter)
+        prec.setText(str(self.decplaces))
+        prec.textEdited[str].connect(self.update_decplaces)
+
+
+        layout = QtGui.QHBoxLayout()
+        layout.addWidget(prec)
+
+        return layout
+
     def update_decplaces(self, text):
         try:
             self.decplaces = int(text)
@@ -230,16 +231,31 @@ class GUIConverter(QtGui.QWidget):
                     text = ".".join(split) if split[1] else split[0]
                 v.setText(text)
 
-    def data_changed(self, text):
-        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
-        for k, v in self.data_edits.items():
+    def text_changed(self, text, unittype, edits):
+        "Set the correct unit in conversion.py to the text we just received."
+        for k, v in edits.items():
             if v == self.sender():
-                target = k
+                unit = k
                 break
         try:
-            setattr(self.data, target, float(text))
+            setattr(unittype, unit, float(text))
         except ValueError:
-            setattr(self.data, target, 0)
+            setattr(unittype, unit, 0)
+
+    def datatext_changed(self, text):
+        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        unittype, edits = self.data, self.data_edits
+        self.text_changed(text, unittype, edits)
+
+    def lentext_changed(self, text):
+        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        unittype, edits = self.length, self.length_edits
+        self.text_changed(text, unittype, edits)
+
+    def voltext_changed(self, text):
+        "When a Data/Bytes QLineEdit was changed, we call the conversion logic"
+        unittype, edits = self.volume, self.volume_edits
+        self.text_changed(text, unittype, edits)
 
 
 def main():
