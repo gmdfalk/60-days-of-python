@@ -12,7 +12,7 @@ def format_num(num, precision=10):
         else:
             # Set our precision to at least 28 or 5 times our precision. Other-
             # wise quantize complains "result has too many digits".
-            getcontext().prec = max(28, precision * 4)
+            getcontext().prec = max(28, int(precision * 2))
             dec = dec.quantize(Decimal(".{}".format("0"*precision)))
     except:
         return "bad"
@@ -190,35 +190,35 @@ class Length(object):
 
     @property
     def inches(self):
-        return format_num(self._meters * 39.3701, self.precision)
+        return format_num(self._meters * 39.37007874, self.precision)
 
     @inches.setter
     def inches(self, value):
-        self._meters = value / 39.3701
+        self._meters = value / 39.37007874
 
     @property
     def feet(self):
-        return format_num(self._meters * 3.28084, self.precision)
+        return format_num(self._meters * 3.280839895, self.precision)
 
     @feet.setter
     def feet(self, value):
-        self._meters = value / 3.28084
+        self._meters = value / 3.280839895
 
     @property
     def yards(self):
-        return format_num(self._meters * 1.09361, self.precision)
+        return format_num(self._meters * 1.0936132983, self.precision)
 
     @yards.setter
     def yards(self, value):
-        self._meters = value / 1.09361
+        self._meters = value / 1.0936132983
 
     @property
     def miles(self):
-        return format_num(self._meters * 0.000621371, self.precision)
+        return format_num(self._meters * 0.00062137119224, self.precision)
 
     @miles.setter
     def miles(self, value):
-        self._meters = value / 0.000621371
+        self._meters = value / 0.00062137119224
 
 
 class Volume(object):
@@ -262,38 +262,111 @@ class Volume(object):
 
     @property
     def ounces(self):
-        return format_num(self._liters * 33.8140227, self.precision)
+        return format_num(self._liters * 33.814022701, self.precision)
 
     @ounces.setter
     def ounces(self, value):
-        self._liters = value / 33.8140227
+        self._liters = value / 33.814022701
 
     @property
     def pints(self):
-        return format_num(self._liters * 2.11337642, self.precision)
+        return format_num(self._liters * 2.1133764189, self.precision)
 
     @pints.setter
     def pints(self, value):
-        self._liters = value / 2.11337642
+        self._liters = value / 2.1133764189
 
     @property
     def gallons(self):
-        return format_num(self._liters * 0.26417205, self.precision)
+        return format_num(self._liters * 0.26417205236, self.precision)
 
     @gallons.setter
     def gallons(self, value):
-        self._liters = value / 0.26417205
+        self._liters = value / 0.26417205236
 
     @property
     def barrels(self):
-        return format_num(self._liters * 0.00838641436, self.precision)
+        return format_num(self._liters * 0.0083864143603, self.precision)
 
     @barrels.setter
     def barrels(self, value):
-        self._liters = value / 0.00838641436
+        self._liters = value / 0.0083864143603
+
+
+class Weight(object):
+
+    def __init__(self):
+        # NOTE: maybe pass decplaces as an argument instead of keeping it here.
+        self.precision = 4  # Decimal points of accuracy.
+        self._kilograms = 0
+
+    @property
+    def milligrams(self):
+        return format_num(self._kilograms * 1000000, self.precision)
+
+    @milligrams.setter
+    def milligrams(self, value):
+        self._kilograms = value / 1000000
+
+    @property
+    def grams(self):
+        return format_num(self._kilograms * 1000, self.precision)
+
+    @grams.setter
+    def grams(self, value):
+        self._kilograms = value / 1000
+
+    @property
+    def kilograms(self):
+        return format_num(self._kilograms, self.precision)
+
+    @kilograms.setter
+    def kilograms(self, value):
+        self._kilograms = value
+
+    @property
+    def tons(self):
+        return format_num(self._kilograms / 1000, self.precision)
+
+    @tons.setter
+    def tons(self, value):
+        self._kilograms = value * 1000
+
+    @property
+    def drams(self):
+        return format_num(self._kilograms * 564.3833912, self.precision)
+
+    @drams.setter
+    def drams(self, value):
+        self._kilograms = value / 564.3833912
+
+    @property
+    def ounces(self):
+        return format_num(self._kilograms * 35.27396195, self.precision)
+
+    @ounces.setter
+    def ounces(self, value):
+        self._kilograms = value / 35.27396195
+
+    @property
+    def pounds(self):
+        "lbs"
+        return format_num(self._kilograms * 2.2046226218, self.precision)
+
+    @pounds.setter
+    def pounds(self, value):
+        self._kilograms = value / 2.2046226218
+
+    @property
+    def ustons(self):
+        return format_num(self._kilograms * 0.0011023113109, self.precision)
+
+    @ustons.setter
+    def ustons(self, value):
+        self._kilograms = value / 0.0011023113109
 
 
 if __name__ == "__main__":
-    d = Data()
-    d.megabytes = 10
-    print d.megabytes, d.mebibytes
+    w = Weight()
+    w.kilograms = 1
+    print w.kilograms, w.tons, w.drams, w.ounces, w.pounds, w.ustons
