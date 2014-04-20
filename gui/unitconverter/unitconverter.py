@@ -9,7 +9,7 @@ import sys
 
 from PyQt4 import QtGui, QtCore
 
-from conversion import Data
+from conversion import Data, Length, Volume
 
 
 def format_num(num):
@@ -52,20 +52,22 @@ class GUIConverter(QtGui.QWidget):
         tabs = QtGui.QTabWidget()
         datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
+        volumetab = QtGui.QWidget()
 
         datalayout = self.create_data_tab(datatab)
+        lengthlayout = self.create_length_tab(lengthtab)
+        volumelayout = self.create_volume_tab(volumetab)
 
         tabs.addTab(datatab, "Data")
         tabs.addTab(lengthtab, "Length")
+        tabs.addTab(volumetab, "Volume")
 
         mainlayout = QtGui.QVBoxLayout()
         mainlayout.addWidget(tabs)
-        mainlayout.addLayout(datalayout)
-        self.create_color_button()
 
         self.setLayout(mainlayout)
 
-    def create_byte_layout(self):
+    def create_data_grid(self):
         "Create the Data Layout (grid) with LineEdits and Labels"
 
         # List of (unit, label)-pairs to build our grid from.
@@ -94,6 +96,64 @@ class GUIConverter(QtGui.QWidget):
 
         return layout, edits
 
+    def create_length_grid(self):
+        "Create the Length layout (grid) with LineEdits and Labels"
+
+        # List of (unit, label)-pairs to build our grid from.
+        units = [("millimeters", "mm"), ("inches", "in"),
+                 ("centimeters", "cm"), ("feet", "ft"),
+                 ("meters", "m"), ("yards", "yd"),
+                 ("kilometers", "km"), ("miles", "mi")]
+
+        # Dictionary that holds our QLineEdit fields for later use.
+        edits = {u[0]: QtGui.QLineEdit() for u in units}
+
+        # Create our positions grid (0,0), (0,1) etc
+        pos = [(i, j) for i in range(4) for j in range(4)]
+
+        layout = QtGui.QGridLayout()
+
+        for i in range(len(pos)):
+            # Since data is half as long as pos, we use floor division to get
+            # the correct corresponding data index from i.
+            edit, label = units[i // 2][0], units[i // 2][1]
+            # Add a QLabel for uneven positions and QLineEdits for even ones.
+            if i % 2:
+                layout.addWidget(QtGui.QLabel(label), pos[i][0], pos[i][1])
+            else:
+                layout.addWidget(edits[edit], pos[i][0], pos[i][1])
+
+        return layout, edits
+
+    def create_volume_grid(self):
+        "Create the Length layout (grid) with LineEdits and Labels"
+
+        # List of (unit, label)-pairs to build our grid from.
+        units = [("milliliters", "ml"), ("ounces", "oz"),
+                 ("centiliters", "cl"), ("pints", "pt"),
+                 ("liters", "l"), ("gallons", "gal"),
+                 ("kiloliters", "kl"), ("barrels", "bbl")]
+
+        # Dictionary that holds our QLineEdit fields for later use.
+        edits = {u[0]: QtGui.QLineEdit() for u in units}
+
+        # Create our positions grid (0,0), (0,1) etc
+        pos = [(i, j) for i in range(4) for j in range(4)]
+
+        layout = QtGui.QGridLayout()
+
+        for i in range(len(pos)):
+            # Since data is half as long as pos, we use floor division to get
+            # the correct corresponding data index from i.
+            edit, label = units[i // 2][0], units[i // 2][1]
+            # Add a QLabel for uneven positions and QLineEdits for even ones.
+            if i % 2:
+                layout.addWidget(QtGui.QLabel(label), pos[i][0], pos[i][1])
+            else:
+                layout.addWidget(edits[edit], pos[i][0], pos[i][1])
+
+        return layout, edits
+
     def create_decplaces_layout(self):
 
         prec = QtGui.QLineEdit()
@@ -112,14 +172,13 @@ class GUIConverter(QtGui.QWidget):
 
         self.data = Data()
 
-        data, self.data_edits = self.create_byte_layout()
+        data_grid, self.data_edits = self.create_data_grid()
         prec = self.create_decplaces_layout()
 
         # Patch it all together in a vertical layout.
         data_layout = QtGui.QVBoxLayout(tab)
-#         data_layout.addStretch(1)
         data_layout.addLayout(prec)
-        data_layout.addLayout(data)
+        data_layout.addLayout(data_grid)
 
 
         # Set the text alignment for the LineEdits and connect edits to actions.
@@ -131,6 +190,54 @@ class GUIConverter(QtGui.QWidget):
             # focusInEvent?
 
         return data_layout
+
+    def create_length_tab(self, tab):
+
+        self.length = Length()
+
+        length_grid, self.length_edits = self.create_length_grid()
+        prec = self.create_decplaces_layout()
+
+        # Patch it all together in a vertical layout.
+        length_layout = QtGui.QVBoxLayout(tab)
+#         data_layout.addStretch(1)
+        length_layout.addLayout(prec)
+        length_layout.addLayout(length_grid)
+
+
+        # Set the text alignment for the LineEdits and connect edits to actions.
+#         for i in self.data_edits.values():
+#             i.setAlignment(QtCore.Qt.AlignRight)
+#             i.textEdited[str].connect(self.data_changed)
+#             i.textChanged[str].connect(self.update_data)
+#             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
+            # focusInEvent?
+
+        return length_layout
+
+    def create_volume_tab(self, tab):
+
+        self.vol = Volume()
+
+        grid, self.vol_edits = self.create_volume_grid()
+        prec = self.create_decplaces_layout()
+
+        # Patch it all together in a vertical layout.
+        layout = QtGui.QVBoxLayout(tab)
+#         data_layout.addStretch(1)
+        layout.addLayout(prec)
+        layout.addLayout(grid)
+
+
+        # Set the text alignment for the LineEdits and connect edits to actions.
+#         for i in self.data_edits.values():
+#             i.setAlignment(QtCore.Qt.AlignRight)
+#             i.textEdited[str].connect(self.data_changed)
+#             i.textChanged[str].connect(self.update_data)
+#             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
+            # focusInEvent?
+
+        return layout
 
     def create_color_button(self):
         col = QtGui.QColor(0, 0, 0)
