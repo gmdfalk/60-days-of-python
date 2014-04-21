@@ -1,7 +1,6 @@
 from __future__ import division
 
 from decimal import Decimal, getcontext
-from string import digits, lowercase, punctuation, uppercase
 
 
 def format_num(num, decplaces=10):
@@ -17,19 +16,23 @@ def format_num(num, decplaces=10):
             dec = dec.quantize(Decimal(".{}".format("0" * decplaces)))
     except:
         return "bad"
+    # Split the decimal into sign, digits and exponent.
     tup = dec.as_tuple()
     delta = len(tup.digits) + tup.exponent
-    digits = ''.join(str(d) for d in tup.digits)
+    digits = "".join(str(d) for d in tup.digits)
+    # Put the number back together considering the delta.
     if delta <= 0:
         zeros = abs(tup.exponent) - len(tup.digits)
-        val = '0.' + ('0' * zeros) + digits
+        val = "0." + ("0" * zeros) + digits
     else:
-        val = digits[:delta] + ('0' * tup.exponent) + '.' + digits[delta:]
-    val = val.rstrip('0')
-    if val[-1] == '.':
+        val = digits[:delta] + ("0" * tup.exponent) + '.' + digits[delta:]
+    # Strip trailing 0s and/or trailing dot:
+    val = val.rstrip("0")
+    if val[-1] == ".":
         val = val[:-1]
+
     if tup.sign:
-        return '-' + val
+        return "-" + val
     return val
 
 
@@ -70,9 +73,10 @@ class Base(object):
 
     def baseconvert(self, n, base=10):
         assert base < 65
-        s = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        s = "0123456789" + alphabet
         if 63 <= base <= 64:
-            s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+            s = alphabet + "0123456789+/"
         if n < base:
             return s[n]
         # return self.baseconvert(n // base, base) + s[n % base]
@@ -88,10 +92,6 @@ class Data(object):
     def __init__(self):
         self.decplaces = 4  # Decimal points of accuracy.
         self._bytes = 0
-
-#     # Saving some space with lambdas:
-#     megabytes = property(lambda self: self._bytes / (1000 ** 2), lambda self, value:
-#                   setattr(self, '_bytes', value * (1000 ** 2)))
 
     @property
     def bits(self):

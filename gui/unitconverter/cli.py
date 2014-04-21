@@ -16,36 +16,13 @@ Examples:
     cli.py 10 meters to cm -d 3
 """
 # TODO: Positional awareness for number arguments.
-import decimal
+from string import digits, punctuation
 import re
-import string
 import sys
 
 from docopt import docopt
 
 from conversion import Data, Length, Volume
-
-
-def format_num(num):
-    "Format a number into a nicer format, i.e. strip trailing 0s, dots etc."
-    try:
-        dec = decimal.Decimal(num)
-    except:
-        return "bad"
-    tup = dec.as_tuple()
-    delta = len(tup.digits) + tup.exponent
-    digits = "".join(str(d) for d in tup.digits)
-    if delta <= 0:
-        zeros = abs(tup.exponent) - len(tup.digits)
-        val = "0." + ("0" * zeros) + digits
-    else:
-        val = digits[:delta] + ("0" * tup.exponent) + "." + digits[delta:]
-    val = val.rstrip("0")
-    if val[-1] == ".":
-        val = val[:-1]
-    if tup.sign:
-        return "-" + val
-    return val
 
 
 class CLIConverter(object):
@@ -61,18 +38,18 @@ class CLIConverter(object):
             sys.exit(9)
 
         # Extract a number (float/int) from the arglist. Allows leading dot.
-        rx = re.compile("(\d+(?:\.\d+)?|\.\d+)")
+        rx = re.compile("\d+(?:\.\d+)?|\.\d+")
         match = rx.search(" ".join(arglist))
         try:
             self.num = match.group()
         except AttributeError:
             print "Invalid input! Need at least one float/integer."
             sys.exit(1)
-
+        print self.num
         # FIXME: If i strip the number here I can't allow (silly) searches
         # like "how many cm are 5 m.". Needs positional awareness, see top TODO
-        self.rest = [i.strip(string.digits) for i in arglist]
-
+        self.rest = [i.strip(digits + punctuation) for i in arglist]
+        print self.rest
         # Set and/or correct decimal and precision options.
         try:
             self.decimals = int(args["--decimals"])
@@ -174,12 +151,7 @@ class CLIConverter(object):
 
         unit.precision = self.precision
         setattr(unit, found[0], float(self.num))
-        result = format_num(getattr(unit, found[1]))
-        # Trim the result to reflect the -d setting (number of decimal places).
-        if "." in result:
-            split = result.split(".")
-            split[1] = split[1][:self.decimals]
-            result = ".".join(split) if split[1] else split[0]
+        result = getattr(unit, found[1])
         print "{} {} are {} {}!".format(self.num, found[0], result, found[1])
         sys.exit()
 
