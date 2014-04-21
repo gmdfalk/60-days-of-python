@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # TODO: Blank lineedit when entering it or select all text.
 # Use maxline and validator to set input/output constraints for lineedits.
-# TODO: roughly complete: mass/weight, length/distance, capacity/volume, temp.
+# TODO: temp, colors, rot13
 
 import sys
 

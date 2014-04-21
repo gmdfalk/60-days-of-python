@@ -72,23 +72,19 @@ class Base(object):
                      lambda self, value: setattr(self, "_decimal", value))
 
     def baseconvert(self, n, base=10):
-        # Only allow bases 2-36
-        if not 1 < base < 37:
-            return
-
-
-
-        if base <= 10:
-            basecases = digits
-        else:
-            first10 = digits
-            next26 = uppercase[:base - 10]
-            basecases = first10 + next26
-
+        assert base < 65
+        s = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        if 63 <= base <= 64:
+            s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
         if n < base:
-            return basecases[n]
+            return s[n]
+        # return self.baseconvert(n // base, base) + s[n % base]
 
-        return self.baseconvert(n // base, base) + basecases[n % base]
+        encoded = []
+        while n:
+            remainder, n = n % base, n // base
+            encoded.insert(0, s[remainder])
+        return "".join(encoded)
 
 class Data(object):
 
@@ -427,3 +423,4 @@ if __name__ == "__main__":
     b = Base()
     b.base2 = 10
     print b.base2, b.base10
+    print b.baseconvert(100, 64)
