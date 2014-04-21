@@ -6,7 +6,7 @@ import sys
 
 from PyQt4 import QtGui, QtCore
 
-from conversion import Base, Data, Length, Volume, Weight
+from conversion import Base, Data, Length, Volume, Weight, rot
 
 
 class GUIConverter(QtGui.QWidget):
@@ -24,14 +24,14 @@ class GUIConverter(QtGui.QWidget):
 
         tabs = QtGui.QTabWidget()
         basetab = QtGui.QWidget()
-        colorstab = QtGui.QWidget()
+        caesartab = QtGui.QWidget()
         datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
         volumetab = QtGui.QWidget()
         weighttab = QtGui.QWidget()
 
         self.create_base_tab(basetab)
-#         self.create_colors_tab(colorstab)
+        self.create_caesar_tab(caesartab)
         self.create_data_tab(datatab)
         self.create_length_tab(lengthtab)
         self.create_volume_tab(volumetab)
@@ -42,7 +42,7 @@ class GUIConverter(QtGui.QWidget):
         tabs.addTab(lengthtab, "Length")
         tabs.addTab(volumetab, "Volume")
         tabs.addTab(weighttab, "Weight")
-        tabs.addTab(colorstab, "Colors")
+        tabs.addTab(caesartab, "Caesar")
 
         mainlayout = QtGui.QVBoxLayout()
         mainlayout.addWidget(tabs)
@@ -92,6 +92,33 @@ class GUIConverter(QtGui.QWidget):
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.base_text_changed)
             i.textEdited[str].connect(self.update_base_edits)
+
+    def create_caesar_tab(self, tab):
+
+        input_edit = QtGui.QLineEdit()
+        output_edit = QtGui.QLineEdit()
+
+        grid = QtGui.QGridLayout()
+        grid.setSpacing(10)
+        # create a vertical splitter
+        v_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
+        v_splitter.addWidget(input_edit)
+        v_splitter.addWidget(output_edit)
+
+        grid.addWidget(v_splitter)
+
+#         layout = QVBoxLayout()
+#         layout.addWidget(v_splitter)
+        # Patch it all together in a vertical layout.
+        layout = QtGui.QVBoxLayout(tab)
+
+        # TODO: Add color picker here.
+        layout.addLayout(grid)
+
+        # Set the text alignment for the LineEdits and connect edits to actions.
+#         for i in self.caesar_edits.values():
+#             i.textEdited[str].connect(self.caesar_text_changed)
+#             i.textEdited[str].connect(self.update_base_edits)
 
     def create_data_tab(self, tab):
 

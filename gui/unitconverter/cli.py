@@ -3,16 +3,20 @@
 
 Usage:
     cli.py <args>... [-d N] [h]
+    cli.py base <num> <ibase> [<obase>] [h]
+    cli.py rot <msg>... [-s N] [h]
 
 Options:
-    -d, --decplaces=N  Number of decimal places. [default: 10]
-    -h, --help         Print this help text and exit.
-    --version          Show the version of UnitConverter.
+    -d, --decimals=N  Number of decimal places. [default: 10]
+    -s, --shift=N     Caesar cipher shift. [default: 13]
+    -h, --help        Print this help text and exit.
+    --version         Show the version of UnitConverter.
 
 Examples:
-    cli.py 10m to centimeter
-    cli.py 10 meters in Cm -d 3
-    cli.py 10.9in oz
+    cli.py 10.4m in km
+    cli.py -d 30 100 meters inch
+    cli.py rot this is the message -s 10
+    cli.py base "100" 2 16 (will convert binary to hex)
 """
 from string import digits, punctuation
 import re
@@ -20,17 +24,31 @@ import sys
 
 from docopt import docopt
 
-from conversion import Base, Data, Length, Volume, Weight
+from conversion import Base, Data, Length, Volume, Weight, rot
 
 
 class CLIConverter(object):
 
     def __init__(self):
         "Read command-line arguments, assign to self and start the conversion."
-        args = docopt(__doc__, version="0.1")
+        self.args = docopt(__doc__, version="0.1")
+        print self.args
 
+        if self.args["rot"]:
+            self.start_caesar_conversion()
+        elif self.args["base"]:
+            pass
+        else:
+            self.start_unit_conversion()
+
+    def start_caesar_conversion(self):
+        msg = " ".join(self.args["<msg>"])
+        shift = int(self.args["--shift"])
+        print rot(msg, shift)
+
+    def start_unit_conversion(self):
         # Preliminary input checks.
-        arglist = [i.lower() for i in args["<args>"]]
+        arglist = [i.lower() for i in self.args["<args>"]]
         if not arglist or len(arglist) < 2:
             print "Not enough arguments."
             sys.exit(9)
@@ -45,7 +63,7 @@ class CLIConverter(object):
             sys.exit(1)
 
         self.rest = [i.strip(digits + punctuation) for i in arglist]
-        self.decplaces = int(args["--decplaces"])
+        self.decplaces = int(self.args["--decimals"])
 
         # Initialize the checks.
         self.check_data()
@@ -75,7 +93,7 @@ class CLIConverter(object):
                   "pebibytes": ["pib", "pebibytes", "pebibyte"]
                  }
 
-        self.try_conversion(unittype, units)
+        self.convert_unit(unittype, units)
 
 
     def check_length(self):
@@ -92,7 +110,7 @@ class CLIConverter(object):
                         "miles": ["mi", "mile", "miles"]
                         }
 
-        self.try_conversion(unittype, units)
+        self.convert_unit(unittype, units)
 
 
     def check_volume(self):
@@ -109,7 +127,7 @@ class CLIConverter(object):
                         "barrels": ["bbl", "barrel", "barrels"]
                         }
 
-        self.try_conversion(unittype, units)
+        self.convert_unit(unittype, units)
 
     def check_weight(self):
 
@@ -125,10 +143,10 @@ class CLIConverter(object):
                         "ustons": ["ust", "ustons", "us tons"]
                         }
 
-        self.try_conversion(unittype, units)
+        self.convert_unit(unittype, units)
 
 
-    def try_conversion(self, unittype, units):
+    def convert_unit(self, unittype, units):
         """The main loop. Tries to find 2 measurement units of the same type.
         If it finds those, it will print a conversion result and exit."""
         found = []
