@@ -1,8 +1,9 @@
 from __future__ import division
 
 from decimal import Decimal, getcontext
+from string import digits, lowercase, punctuation, uppercase
 
-# TODO: Number systems conversion, Temperature
+
 def format_num(num, decplaces=10):
     try:
         dec = Decimal(num)
@@ -10,8 +11,8 @@ def format_num(num, decplaces=10):
         if decplaces < 1:
             dec = dec.quantize(Decimal("0"))
         else:
-            # Set our precision to at least 28 or 5 times our precision. Other-
-            # wise quantize complains "result has too many digits".
+            # Set our precision to at least 28 or twice our precision, lest
+            # Decimal.quantize complains about "result has too many digits".
             getcontext().prec = max(28, int(decplaces * 2))
             dec = dec.quantize(Decimal(".{}".format("0" * decplaces)))
     except:
@@ -33,7 +34,61 @@ def format_num(num, decplaces=10):
 
 
 class Base(object):
-    pass
+
+    def __init__(self):
+        self._decimal = 0
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 2),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 4),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base8 = property(lambda self: self.baseconvert(self._decimal, 6),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base8 = property(lambda self: self.baseconvert(self._decimal, 8),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base10 = property(lambda self: self.baseconvert(self._decimal, 10),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 12),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 14),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 16),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 60),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 64),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    base2 = property(lambda self: self.baseconvert(self._decimal, 256),
+                     lambda self, value: setattr(self, "_decimal", value))
+
+    def baseconvert(self, n, base=10):
+        # Only allow bases 2-36
+        if not 1 < base < 37:
+            return
+
+
+
+        if base <= 10:
+            basecases = digits
+        else:
+            first10 = digits
+            next26 = uppercase[:base - 10]
+            basecases = first10 + next26
+
+        if n < base:
+            return basecases[n]
+
+        return self.baseconvert(n // base, base) + basecases[n % base]
 
 class Data(object):
 
@@ -353,7 +408,6 @@ class Weight(object):
 
     @property
     def pounds(self):
-        "lbs"
         return format_num(self._kilograms * 2.2046226218, self.decplaces)
 
     @pounds.setter
@@ -370,6 +424,6 @@ class Weight(object):
 
 
 if __name__ == "__main__":
-    w = Weight()
-    w.kilograms = 1
-    print w.kilograms, w.tons, w.drams, w.ounces, w.pounds, w.ustons
+    b = Base()
+    b.base2 = 10
+    print b.base2, b.base10

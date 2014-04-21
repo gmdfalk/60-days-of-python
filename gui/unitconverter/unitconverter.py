@@ -24,16 +24,19 @@ class GUIConverter(QtGui.QWidget):
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 
         tabs = QtGui.QTabWidget()
+        basetab = QtGui.QWidget()
+        colorstab = QtGui.QWidget()
         datatab = QtGui.QWidget()
         lengthtab = QtGui.QWidget()
         volumetab = QtGui.QWidget()
         weighttab = QtGui.QWidget()
-        basetab = QtGui.QWidget()
-        colorstab = QtGui.QWidget()
 
+#         self.create_base_tab(basetab)
+#         self.create_colors_tab(colorstab)
         self.create_data_tab(datatab)
         self.create_length_tab(lengthtab)
         self.create_volume_tab(volumetab)
+        self.create_weight_tab(weighttab)
 
         tabs.addTab(basetab, "Base")
         tabs.addTab(datatab, "Data")
@@ -143,7 +146,7 @@ class GUIConverter(QtGui.QWidget):
 
         self.weight = Weight()
 
-        units = [("milligrams", "mg"), ("drams", "dr")
+        units = [("milligrams", "mg"), ("drams", "dr"),
                  ("grams", "g"), ("ounces", "oz"),
                  ("kilograms", "kg"), ("pounds", "lbs"),
                  ("tons", "t"), ("ustons", "t (US)")]
