@@ -1,10 +1,11 @@
 from __future__ import division
 
 from decimal import Decimal, getcontext
-import re
+from string import ascii_lowercase, maketrans
 
 
 def format_num(num, decplaces=10):
+    "Converts a number into a more a readable string-version."
     try:
         dec = Decimal(num)
         # Cut the decimal off at "precision" decimal places.
@@ -35,6 +36,14 @@ def format_num(num, decplaces=10):
     if tup.sign:
         return "-" + val
     return val
+
+
+def rot(message, shift=3):
+    "Employs the Ceasar Cipher to encode/decode messages."
+    alphabet = ascii_lowercase
+    shifted_alphabet = alphabet[shift:] + alphabet[:shift]
+    table = maketrans(alphabet, shifted_alphabet)
+    return message.lower().translate(table)
 
 
 class Base(object):
@@ -83,12 +92,13 @@ class Base(object):
         n, idx = 0, 0
         for c in s:
             if c not in basecases:
-                return
+                return "NaN"
             power = slen - (idx + 1)
             n += basecases.index(c) * (base ** power)
             idx += 1
 
         return n
+
 
 class Data(object):
 
@@ -418,8 +428,3 @@ class Weight(object):
     def ustons(self, value):
         self._kilograms = value / 0.0011023113109
 
-
-if __name__ == "__main__":
-    b = Base()
-    print b.from_decimal(21, 65)
-    print b.to_decimal("10101", 65)
