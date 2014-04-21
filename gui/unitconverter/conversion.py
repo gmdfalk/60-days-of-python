@@ -40,7 +40,6 @@ def format_num(num, decplaces=10):
 
 def rot(message, shift=3):
     "Employs the Ceasar Cipher to encode/decode messages."
-    message = str(message)
     alphabet = ascii_lowercase
     shifted_alphabet = alphabet[shift:] + alphabet[:shift]
     table = maketrans(alphabet, shifted_alphabet)

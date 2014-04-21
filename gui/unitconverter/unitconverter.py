@@ -116,8 +116,7 @@ class GUIConverter(QtGui.QWidget):
         layout.addLayout(grid)
 
         # Set the text alignment for the LineEdits and connect edits to actions.
-        for i in self.caesar_edits.values():
-            i.textChanged.connect(self.update_caesar_edits)
+        self.caesar_edits["input"].textChanged.connect(self.update_caesar_edits)
 
     def create_data_tab(self, tab):
 
@@ -324,7 +323,7 @@ class GUIConverter(QtGui.QWidget):
         text = self.caesar_edits["input"].toPlainText()
 
         output = self.caesar_edits["output"]
-        message = rot(text, self.caesar_shift)
+        message = rot(str(text), self.caesar_shift)
         output.setText(message)
 
     def update_data_edits(self):
