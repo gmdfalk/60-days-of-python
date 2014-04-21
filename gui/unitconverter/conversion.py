@@ -43,43 +43,14 @@ class Base(object):
         self._decimal = 0
         self.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 2),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base4 = property(lambda self: self.baseconvert(self._decimal, 4),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base6 = property(lambda self: self.baseconvert(self._decimal, 6),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base8 = property(lambda self: self.baseconvert(self._decimal, 8),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base10 = property(lambda self: self.baseconvert(self._decimal, 10),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base12 = property(lambda self: self.baseconvert(self._decimal, 12),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base14 = property(lambda self: self.baseconvert(self._decimal, 14),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base16 = property(lambda self: self.baseconvert(self._decimal, 16),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base60 = property(lambda self: self.baseconvert(self._decimal, 60),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base64 = property(lambda self: self.baseconvert(self._decimal, 64),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    def encode(self, n, base=10):
+    def from_decimal(self, n, base=10):
+        "Input: base10 integer. Output: base2-64 string."
         assert base < 65
 
         try:
             n = int(n)
-        except ValueError:
-            return
+        except (ValueError, TypeError):
+            return "bad"
 
         basecases = "0123456789" + self.alphabet
         if 63 <= base <= 64:
@@ -91,9 +62,11 @@ class Base(object):
         while n:
             remainder, n = n % base, n // base
             encoded.insert(0, basecases[remainder])
+
         return "".join(encoded)
 
-    def decode(self, s, base=10):
+    def to_decimal(self, s, base=10):
+        "Input: base2-64 string. Output: base10 integer."
         # Horrible duck-typing and assert checks incoming.
         assert base < 65
         try:
@@ -111,16 +84,12 @@ class Base(object):
 
         slen = len(s)
         n, idx = 0, 0
-        decoded = []
         for c in s:
             power = slen - (idx + 1)
             n += basecases.index(c) * (base ** power)
             idx += 1
 
         return n
-
-
-
 
 class Data(object):
 
@@ -453,5 +422,5 @@ class Weight(object):
 
 if __name__ == "__main__":
     b = Base()
-    print b.encode(100, 64)
-    print b.decode("100", 16)
+    print b.encode(100, 16)
+    print b.decode("64", 16)

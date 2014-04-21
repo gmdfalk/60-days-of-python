@@ -77,9 +77,7 @@ class GUIConverter(QtGui.QWidget):
         self.base = Base()
 
         # List of (unit, label)-pairs to build our grid from.
-        units = [("base2", "bin"), ("base4", "4"), ("base6", "6"), ("base8", "8"),
-                 ("base10", "dec"), ("base12", "12"), ("base14", "14"),
-                 ("base16", "16"), ("base60", "60"), ("base64", "64")]
+        units = [(i, str(i)) for i in (2, 4, 6, 8, 10, 12, 14, 16, 60, 64)]
 
         grid, self.base_edits = self.create_grid(units, 5)
 
@@ -278,7 +276,12 @@ class GUIConverter(QtGui.QWidget):
 
     def update_base_edits(self):
         "Update the values of all Base/Numbers QLineEdits"
-        self.update_edits(self.base, self.base_edits)
+        for k, v in self.base_edits.items():
+            # Exclude the sender from being updated.
+            if v != self.sender():
+                dec = getattr(self.base, "_decimal")
+                text = self.base.from_decimal(dec, k)
+                v.setText(text)
 
     def update_data_edits(self):
         self.update_edits(self.data, self.data_edits)
@@ -296,9 +299,11 @@ class GUIConverter(QtGui.QWidget):
         "When a Base/Numbers QLineEdit was changed, we pass its text along"
         for k, v in self.base_edits.items():
             if v == self.sender():
-                unit = k
+                base = k
                 break
-        setattr(self.base, unit, text)
+
+        dec = self.base.to_decimal(text, base)
+        setattr(self.base, "_decimal", dec)
 
     def data_text_changed(self, text):
         self.text_changed(text, self.data, self.data_edits)
