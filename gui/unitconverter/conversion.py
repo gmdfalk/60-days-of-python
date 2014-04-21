@@ -3,17 +3,17 @@ from __future__ import division
 from decimal import Decimal, getcontext
 
 # TODO: Number systems conversion, Temperature
-def format_num(num, precision=10):
+def format_num(num, decplaces=10):
     try:
         dec = Decimal(num)
         # Cut the decimal off at "precision" decimal places.
-        if precision < 1:
+        if decplaces < 1:
             dec = dec.quantize(Decimal("0"))
         else:
             # Set our precision to at least 28 or 5 times our precision. Other-
             # wise quantize complains "result has too many digits".
-            getcontext().prec = max(28, int(precision * 2))
-            dec = dec.quantize(Decimal(".{}".format("0"*precision)))
+            getcontext().prec = max(28, int(decplaces * 2))
+            dec = dec.quantize(Decimal(".{}".format("0" * decplaces)))
     except:
         return "bad"
     tup = dec.as_tuple()
@@ -32,10 +32,13 @@ def format_num(num, precision=10):
     return val
 
 
+class Base(object):
+    pass
+
 class Data(object):
 
     def __init__(self):
-        self.precision = 10  # Decimal points of accuracy.
+        self.decplaces = 4  # Decimal points of accuracy.
         self._bytes = 0
 
 #     # Saving some space with lambdas:
@@ -44,7 +47,7 @@ class Data(object):
 
     @property
     def bits(self):
-        return format_num(self._bytes * 8, self.precision)
+        return format_num(self._bytes * 8, self.decplaces)
 
     @bits.setter
     def bits(self, value):
@@ -53,7 +56,7 @@ class Data(object):
     @property
     def bytes(self):
         "8 bits"
-        return format_num(self._bytes, self.precision)
+        return format_num(self._bytes, self.decplaces)
 
     @bytes.setter
     def bytes(self, value):
@@ -62,7 +65,7 @@ class Data(object):
     @property
     def kilobytes(self):
         "1000 bytes, kB or KB"
-        return format_num(self._bytes / 1000, self.precision)
+        return format_num(self._bytes / 1000, self.decplaces)
 
     @kilobytes.setter
     def kilobytes(self, value):
@@ -71,7 +74,7 @@ class Data(object):
     @property
     def megabytes(self):
         "1000^2 bytes, MB"
-        return format_num(self._bytes / (1000 ** 2), self.precision)
+        return format_num(self._bytes / (1000 ** 2), self.decplaces)
 
     @megabytes.setter
     def megabytes(self, value):
@@ -80,7 +83,7 @@ class Data(object):
     @property
     def gigabytes(self):
         "1000^3 bytes, GB"
-        return format_num(self._bytes / (1000 ** 3), self.precision)
+        return format_num(self._bytes / (1000 ** 3), self.decplaces)
 
     @gigabytes.setter
     def gigabytes(self, value):
@@ -89,7 +92,7 @@ class Data(object):
     @property
     def terrabytes(self):
         "1000^4 bytes, TB"
-        return format_num(self._bytes / (1000 ** 4), self.precision)
+        return format_num(self._bytes / (1000 ** 4), self.decplaces)
 
     @terrabytes.setter
     def terrabytes(self, value):
@@ -98,7 +101,7 @@ class Data(object):
     @property
     def petabytes(self):
         "1000^5 bytes, PB"
-        return format_num(self._bytes / (1000 ** 5), self.precision)
+        return format_num(self._bytes / (1000 ** 5), self.decplaces)
 
     @petabytes.setter
     def petabytes(self, value):
@@ -107,7 +110,7 @@ class Data(object):
     @property
     def kibibytes(self):
         "1024 bytes, KiB or KB"
-        return format_num(self._bytes / 1024, self.precision)
+        return format_num(self._bytes / 1024, self.decplaces)
 
     @kibibytes.setter
     def kibibytes(self, value):
@@ -116,7 +119,7 @@ class Data(object):
     @property
     def mebibytes(self):
         "1024^2 bytes, MiB"
-        return format_num(self._bytes / (1024 ** 2), self.precision)
+        return format_num(self._bytes / (1024 ** 2), self.decplaces)
 
     @mebibytes.setter
     def mebibytes(self, value):
@@ -125,7 +128,7 @@ class Data(object):
     @property
     def gibibytes(self):
         "1024^3 bytes, GiB"
-        return format_num(self._bytes / (1024 ** 3), self.precision)
+        return format_num(self._bytes / (1024 ** 3), self.decplaces)
 
     @gibibytes.setter
     def gibibytes(self, value):
@@ -134,7 +137,7 @@ class Data(object):
     @property
     def tebibytes(self):
         "1024^4 bytes, TiB"
-        return format_num(self._bytes / (1024 ** 4), self.precision)
+        return format_num(self._bytes / (1024 ** 4), self.decplaces)
 
     @tebibytes.setter
     def tebibytes(self, value):
@@ -143,7 +146,7 @@ class Data(object):
     @property
     def pebibytes(self):
         "1024^5 bytes, PiB"
-        return format_num(self._bytes / (1024 ** 5), self.precision)
+        return format_num(self._bytes / (1024 ** 5), self.decplaces)
 
     @pebibytes.setter
     def pebibytes(self, value):
@@ -153,12 +156,12 @@ class Data(object):
 class Length(object):
 
     def __init__(self):
-        self.precision = 4  # Decimal points of accuracy.
+        self.decplaces = 4  # Decimal points of accuracy.
         self._meters = 0
 
     @property
     def millimeters(self):
-        return format_num(self._meters * 1000, self.precision)
+        return format_num(self._meters * 1000, self.decplaces)
 
     @millimeters.setter
     def millimeters(self, value):
@@ -166,7 +169,7 @@ class Length(object):
 
     @property
     def centimeters(self):
-        return format_num(self._meters * 100, self.precision)
+        return format_num(self._meters * 100, self.decplaces)
 
     @centimeters.setter
     def centimeters(self, value):
@@ -174,7 +177,7 @@ class Length(object):
 
     @property
     def meters(self):
-        return format_num(self._meters, self.precision)
+        return format_num(self._meters, self.decplaces)
 
     @meters.setter
     def meters(self, value):
@@ -182,7 +185,7 @@ class Length(object):
 
     @property
     def kilometers(self):
-        return format_num(self._meters / 1000, self.precision)
+        return format_num(self._meters / 1000, self.decplaces)
 
     @kilometers.setter
     def kilometers(self, value):
@@ -190,7 +193,7 @@ class Length(object):
 
     @property
     def inches(self):
-        return format_num(self._meters * 39.37007874, self.precision)
+        return format_num(self._meters * 39.37007874, self.decplaces)
 
     @inches.setter
     def inches(self, value):
@@ -198,7 +201,7 @@ class Length(object):
 
     @property
     def feet(self):
-        return format_num(self._meters * 3.280839895, self.precision)
+        return format_num(self._meters * 3.280839895, self.decplaces)
 
     @feet.setter
     def feet(self, value):
@@ -206,7 +209,7 @@ class Length(object):
 
     @property
     def yards(self):
-        return format_num(self._meters * 1.0936132983, self.precision)
+        return format_num(self._meters * 1.0936132983, self.decplaces)
 
     @yards.setter
     def yards(self, value):
@@ -214,7 +217,7 @@ class Length(object):
 
     @property
     def miles(self):
-        return format_num(self._meters * 0.00062137119224, self.precision)
+        return format_num(self._meters * 0.00062137119224, self.decplaces)
 
     @miles.setter
     def miles(self, value):
@@ -225,12 +228,12 @@ class Volume(object):
 
     def __init__(self):
         # NOTE: maybe pass decplaces as an argument instead of keeping it here.
-        self.precision = 4  # Decimal points of accuracy.
+        self.decplaces = 4  # Decimal points of accuracy.
         self._liters = 0
 
     @property
     def milliliters(self):
-        return format_num(self._liters * 1000, self.precision)
+        return format_num(self._liters * 1000, self.decplaces)
 
     @milliliters.setter
     def milliliters(self, value):
@@ -238,7 +241,7 @@ class Volume(object):
 
     @property
     def centiliters(self):
-        return format_num(self._liters * 100, self.precision)
+        return format_num(self._liters * 100, self.decplaces)
 
     @centiliters.setter
     def centiliters(self, value):
@@ -246,7 +249,7 @@ class Volume(object):
 
     @property
     def liters(self):
-        return format_num(self._liters, self.precision)
+        return format_num(self._liters, self.decplaces)
 
     @liters.setter
     def liters(self, value):
@@ -254,7 +257,7 @@ class Volume(object):
 
     @property
     def kiloliters(self):
-        return format_num(self._liters / 1000, self.precision)
+        return format_num(self._liters / 1000, self.decplaces)
 
     @kiloliters.setter
     def kiloliters(self, value):
@@ -262,7 +265,7 @@ class Volume(object):
 
     @property
     def ounces(self):
-        return format_num(self._liters * 33.814022701, self.precision)
+        return format_num(self._liters * 33.814022701, self.decplaces)
 
     @ounces.setter
     def ounces(self, value):
@@ -270,7 +273,7 @@ class Volume(object):
 
     @property
     def pints(self):
-        return format_num(self._liters * 2.1133764189, self.precision)
+        return format_num(self._liters * 2.1133764189, self.decplaces)
 
     @pints.setter
     def pints(self, value):
@@ -278,7 +281,7 @@ class Volume(object):
 
     @property
     def gallons(self):
-        return format_num(self._liters * 0.26417205236, self.precision)
+        return format_num(self._liters * 0.26417205236, self.decplaces)
 
     @gallons.setter
     def gallons(self, value):
@@ -286,7 +289,7 @@ class Volume(object):
 
     @property
     def barrels(self):
-        return format_num(self._liters * 0.0083864143603, self.precision)
+        return format_num(self._liters * 0.0083864143603, self.decplaces)
 
     @barrels.setter
     def barrels(self, value):
@@ -297,12 +300,12 @@ class Weight(object):
 
     def __init__(self):
         # NOTE: maybe pass decplaces as an argument instead of keeping it here.
-        self.precision = 4  # Decimal points of accuracy.
+        self.decplaces = 4  # Decimal points of accuracy.
         self._kilograms = 0
 
     @property
     def milligrams(self):
-        return format_num(self._kilograms * 1000000, self.precision)
+        return format_num(self._kilograms * 1000000, self.decplaces)
 
     @milligrams.setter
     def milligrams(self, value):
@@ -310,7 +313,7 @@ class Weight(object):
 
     @property
     def grams(self):
-        return format_num(self._kilograms * 1000, self.precision)
+        return format_num(self._kilograms * 1000, self.decplaces)
 
     @grams.setter
     def grams(self, value):
@@ -318,7 +321,7 @@ class Weight(object):
 
     @property
     def kilograms(self):
-        return format_num(self._kilograms, self.precision)
+        return format_num(self._kilograms, self.decplaces)
 
     @kilograms.setter
     def kilograms(self, value):
@@ -326,7 +329,7 @@ class Weight(object):
 
     @property
     def tons(self):
-        return format_num(self._kilograms / 1000, self.precision)
+        return format_num(self._kilograms / 1000, self.decplaces)
 
     @tons.setter
     def tons(self, value):
@@ -334,7 +337,7 @@ class Weight(object):
 
     @property
     def drams(self):
-        return format_num(self._kilograms * 564.3833912, self.precision)
+        return format_num(self._kilograms * 564.3833912, self.decplaces)
 
     @drams.setter
     def drams(self, value):
@@ -342,7 +345,7 @@ class Weight(object):
 
     @property
     def ounces(self):
-        return format_num(self._kilograms * 35.27396195, self.precision)
+        return format_num(self._kilograms * 35.27396195, self.decplaces)
 
     @ounces.setter
     def ounces(self, value):
@@ -351,7 +354,7 @@ class Weight(object):
     @property
     def pounds(self):
         "lbs"
-        return format_num(self._kilograms * 2.2046226218, self.precision)
+        return format_num(self._kilograms * 2.2046226218, self.decplaces)
 
     @pounds.setter
     def pounds(self, value):
@@ -359,7 +362,7 @@ class Weight(object):
 
     @property
     def ustons(self):
-        return format_num(self._kilograms * 0.0011023113109, self.precision)
+        return format_num(self._kilograms * 0.0011023113109, self.decplaces)
 
     @ustons.setter
     def ustons(self, value):

@@ -7,7 +7,7 @@ import sys
 
 from PyQt4 import QtGui, QtCore
 
-from conversion import Data, Length, Volume
+from conversion import Base, Data, Length, Volume, Weight
 
 
 class GUIConverter(QtGui.QWidget):
@@ -28,18 +28,18 @@ class GUIConverter(QtGui.QWidget):
         lengthtab = QtGui.QWidget()
         volumetab = QtGui.QWidget()
         weighttab = QtGui.QWidget()
-        numberstab = QtGui.QWidget()
+        basetab = QtGui.QWidget()
         colorstab = QtGui.QWidget()
 
         self.create_data_tab(datatab)
         self.create_length_tab(lengthtab)
         self.create_volume_tab(volumetab)
 
+        tabs.addTab(basetab, "Base")
         tabs.addTab(datatab, "Data")
         tabs.addTab(lengthtab, "Length")
         tabs.addTab(volumetab, "Volume")
         tabs.addTab(weighttab, "Weight")
-        tabs.addTab(numberstab, "Nums")
         tabs.addTab(colorstab, "Colors")
 
         mainlayout = QtGui.QVBoxLayout()
@@ -81,7 +81,7 @@ class GUIConverter(QtGui.QWidget):
                 ("tebibytes", "TiB"), ("petabytes", "PB"), ("pebibytes", "PiB")]
 
         grid, self.data_edits = self.create_grid(units, 6)
-        prec = self.create_precision_layout("data")
+        prec = self.create_decplaces_layout("data")
 
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
@@ -106,7 +106,7 @@ class GUIConverter(QtGui.QWidget):
                  ("kilometers", "km"), ("miles", "mi")]
 
         grid, self.length_edits = self.create_grid(units)
-        prec = self.create_precision_layout("length")
+        prec = self.create_decplaces_layout("length")
 
         layout = QtGui.QVBoxLayout(tab)
         layout.addLayout(prec)
@@ -127,7 +127,7 @@ class GUIConverter(QtGui.QWidget):
                  ("kiloliters", "kl"), ("barrels", "bbl")]
 
         grid, self.volume_edits = self.create_grid(units)
-        prec = self.create_precision_layout("volume")
+        prec = self.create_decplaces_layout("volume")
 
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
@@ -139,23 +139,45 @@ class GUIConverter(QtGui.QWidget):
             i.textEdited[str].connect(self.volume_text_changed)
             i.textChanged[str].connect(self.update_volume_edits)
 
-    def create_precision_layout(self, unittype):
+    def create_weight_tab(self, tab):
+
+        self.weight = Weight()
+
+        units = [("milligrams", "mg"), ("drams", "dr")
+                 ("grams", "g"), ("ounces", "oz"),
+                 ("kilograms", "kg"), ("pounds", "lbs"),
+                 ("tons", "t"), ("ustons", "t (US)")]
+
+        grid, self.weight_edits = self.create_grid(units)
+        prec = self.create_decplaces_layout("weight")
+
+        # Patch it all together in a vertical layout.
+        layout = QtGui.QVBoxLayout(tab)
+        layout.addLayout(prec)
+        layout.addLayout(grid)
+
+        for i in self.weight_edits.values():
+            i.setAlignment(QtCore.Qt.AlignRight)
+            i.textEdited[str].connect(self.weight_text_changed)
+            i.textChanged[str].connect(self.update_weight_edits)
+
+    def create_decplaces_layout(self, unittype):
         "QLineEdit that allows adjusting of decimal places."
         prec = QtGui.QLineEdit()
         prec.setFixedWidth(36)
         prec.setAlignment(QtCore.Qt.AlignCenter)
         if unittype == "data":
-            prec.setText(str(self.data.precision))
-            prec.textEdited[str].connect(self.update_data_precision)
+            prec.setText(str(self.data.decplaces))
+            prec.textEdited[str].connect(self.update_data_decplaces)
         if unittype == "length":
-            prec.setText(str(self.length.precision))
-            prec.textEdited[str].connect(self.update_length_precision)
+            prec.setText(str(self.length.decplaces))
+            prec.textEdited[str].connect(self.update_length_decplaces)
         if unittype == "volume":
-            prec.setText(str(self.volume.precision))
-            prec.textEdited[str].connect(self.update_volume_precision)
+            prec.setText(str(self.volume.decplaces))
+            prec.textEdited[str].connect(self.update_volume_decplaces)
         if unittype == "weight":
-            prec.setText(str(self.weight.precision))
-            prec.textEdited[str].connect(self.update_weight_precision)
+            prec.setText(str(self.weight.decplaces))
+            prec.textEdited[str].connect(self.update_weight_decplaces)
 
         layout = QtGui.QHBoxLayout()
         layout.addWidget(prec)
@@ -183,35 +205,36 @@ class GUIConverter(QtGui.QWidget):
             self.frm.setStyleSheet("QWidget { background-color: %s }"
                 % col.name())
 
-    def update_data_precision(self, text):
+    def update_data_decplaces(self, text):
         try:
-            self.data.precision = int(text)
+            self.data.decplaces = int(text)
             self.update_data_edits()
         except ValueError:
             pass
 
-    def update_length_precision(self, text):
+    def update_length_decplaces(self, text):
         try:
-            self.length.precision = int(text)
+            self.length.decplaces = int(text)
             self.update_length_edits()
         except ValueError:
             pass
 
-    def update_volume_precision(self, text):
+    def update_volume_decplaces(self, text):
         try:
-            self.volume.precision = int(text)
+            self.volume.decplaces = int(text)
             self.update_volume_edits()
         except ValueError:
             pass
 
-#     def update_weight_precision(self, text):
-#         try:
-#             self.weight.precision = int(text)
-#             self.update_weight_edits()
-#         except ValueError:
-#             pass
+    def update_weight_decplaces(self, text):
+        try:
+            self.weight.decplaces = int(text)
+            self.update_weight_edits()
+        except ValueError:
+            pass
 
     def update_edits(self, unittype, edit):
+        "Update all QLineEdits of the unittype (e.g. data)."
         for k, v in edit.items():
             # Exclude the sender from being updated.
             if v != self.sender():
@@ -229,35 +252,37 @@ class GUIConverter(QtGui.QWidget):
         except ValueError:
             setattr(unittype, unit, 0)
 
+    def update_base_edits(self):
+        "Update the values of all Base/Numbers QLineEdits"
+        self.update_edits(self.base, self.base_edits)
+
     def update_data_edits(self):
-        "Update the values of all Data/Bytes QLineEdits"
-        unittype, edit = self.data, self.data_edits
-        self.update_edits(unittype, edit)
+        self.update_edits(self.data, self.data_edits)
 
     def update_length_edits(self):
-        "Update the values of all Length QLineEdits"
-        unittype, edit = self.length, self.length_edits
-        self.update_edits(unittype, edit)
+        self.update_edits(self.length, self.length_edits)
 
     def update_volume_edits(self):
-        "Update the values of all Volume QLineEdits"
-        unittype, edit = self.volume, self.volume_edits
-        self.update_edits(unittype, edit)
+        self.update_edits(self.volume, self.volume_edits)
+
+    def update_weight_edits(self):
+        self.update_edits(self.weight, self.weight_edits)
+
+    def base_text_changed(self, text):
+        "When a Base/Numbers QLineEdit was changed, we pass its text along"
+        self.text_changed(text, self.base, self.base_edits)
 
     def data_text_changed(self, text):
-        "When a Data/Bytes QLineEdit was changed, we pass its text along"
-        unittype, edits = self.data, self.data_edits
-        self.text_changed(text, unittype, edits)
+        self.text_changed(text, self.data, self.data_edits)
 
     def length_text_changed(self, text):
-        "When a Length QLineEdit was changed, we pass its text along"
-        unittype, edits = self.length, self.length_edits
-        self.text_changed(text, unittype, edits)
+        self.text_changed(text, self.length, self.length_edits)
 
     def volume_text_changed(self, text):
-        "When a Volume QLineEdit was changed, we pass its text along"
-        unittype, edits = self.volume, self.volume_edits
-        self.text_changed(text, unittype, edits)
+        self.text_changed(text, self.volume, self.volume_edits)
+
+    def weight_text_changed(self, text):
+        self.text_changed(text, self.weight, self.weight_edits)
 
 
 def main():
