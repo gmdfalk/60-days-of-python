@@ -31,7 +31,7 @@ class GUIConverter(QtGui.QWidget):
         volumetab = QtGui.QWidget()
         weighttab = QtGui.QWidget()
 
-#         self.create_base_tab(basetab)
+        self.create_base_tab(basetab)
 #         self.create_colors_tab(colorstab)
         self.create_data_tab(datatab)
         self.create_length_tab(lengthtab)
@@ -73,6 +73,28 @@ class GUIConverter(QtGui.QWidget):
 
         return layout, edits
 
+    def create_base_tab(self, tab):
+
+        self.base = Base()
+
+        # List of (unit, label)-pairs to build our grid from.
+        units = [("base2", "bin"), ("base4", "4"), ("base6", "6"), ("base8", "8"),
+                 ("base10", "dec"), ("base12", "12"), ("base14", "14"),
+                 ("base16", "16"), ("base60", "60"), ("base64", "64")]
+
+        grid, self.base_edits = self.create_grid(units, 5)
+
+        # Patch it all together in a vertical layout.
+        layout = QtGui.QVBoxLayout(tab)
+        # TODO: Add color picker here.
+        layout.addLayout(grid)
+
+        # Set the text alignment for the LineEdits and connect edits to actions.
+        for i in self.base_edits.values():
+            i.setAlignment(QtCore.Qt.AlignRight)
+            i.textEdited[str].connect(self.base_text_changed)
+            i.textEdited[str].connect(self.update_base_edits)
+
     def create_data_tab(self, tab):
 
         self.data = Data()
@@ -95,7 +117,7 @@ class GUIConverter(QtGui.QWidget):
         for i in self.data_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.data_text_changed)
-            i.textChanged[str].connect(self.update_data_edits)
+            i.textEdited.connect(self.update_data_edits)
 #             i.selectionChanged.connect(i.selectAll)  # FIXME: selectall :(
             # focusInEvent?
 
@@ -118,7 +140,7 @@ class GUIConverter(QtGui.QWidget):
         for i in self.length_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.length_text_changed)
-            i.textChanged[str].connect(self.update_length_edits)
+            i.textEdited[str].connect(self.update_length_edits)
 
     def create_volume_tab(self, tab):
 
@@ -140,7 +162,7 @@ class GUIConverter(QtGui.QWidget):
         for i in self.volume_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.volume_text_changed)
-            i.textChanged[str].connect(self.update_volume_edits)
+            i.textEdited[str].connect(self.update_volume_edits)
 
     def create_weight_tab(self, tab):
 
@@ -162,7 +184,7 @@ class GUIConverter(QtGui.QWidget):
         for i in self.weight_edits.values():
             i.setAlignment(QtCore.Qt.AlignRight)
             i.textEdited[str].connect(self.weight_text_changed)
-            i.textChanged[str].connect(self.update_weight_edits)
+            i.textEdited[str].connect(self.update_weight_edits)
 
     def create_decplaces_layout(self, unittype):
         "QLineEdit that allows adjusting of decimal places."
@@ -243,6 +265,9 @@ class GUIConverter(QtGui.QWidget):
             if v != self.sender():
                 text = getattr(unittype, k)
                 v.setText(text)
+                print "not a sender:", k
+            else:
+                print "sender is:", self.sender()
 
     def text_changed(self, text, unittype, edits):
         "Set the correct unit in conversion.py to the text we just received."
@@ -251,7 +276,7 @@ class GUIConverter(QtGui.QWidget):
                 unit = k
                 break
         try:
-            setattr(unittype, unit, float(text))
+            setattr(unittype, unit, int(text))
         except ValueError:
             setattr(unittype, unit, 0)
 

@@ -41,10 +41,10 @@ class Base(object):
     base2 = property(lambda self: self.baseconvert(self._decimal, 2),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 4),
+    base4 = property(lambda self: self.baseconvert(self._decimal, 4),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base8 = property(lambda self: self.baseconvert(self._decimal, 6),
+    base6 = property(lambda self: self.baseconvert(self._decimal, 6),
                      lambda self, value: setattr(self, "_decimal", value))
 
     base8 = property(lambda self: self.baseconvert(self._decimal, 8),
@@ -53,22 +53,19 @@ class Base(object):
     base10 = property(lambda self: self.baseconvert(self._decimal, 10),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 12),
+    base12 = property(lambda self: self.baseconvert(self._decimal, 12),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 14),
+    base14 = property(lambda self: self.baseconvert(self._decimal, 14),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 16),
+    base16 = property(lambda self: self.baseconvert(self._decimal, 16),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 60),
+    base60 = property(lambda self: self.baseconvert(self._decimal, 60),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    base2 = property(lambda self: self.baseconvert(self._decimal, 64),
-                     lambda self, value: setattr(self, "_decimal", value))
-
-    base2 = property(lambda self: self.baseconvert(self._decimal, 256),
+    base64 = property(lambda self: self.baseconvert(self._decimal, 64),
                      lambda self, value: setattr(self, "_decimal", value))
 
     def baseconvert(self, n, base=10):
