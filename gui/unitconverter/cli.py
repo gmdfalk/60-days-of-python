@@ -16,7 +16,7 @@ Examples:
     cli.py 10.4m in km
     cli.py -d 30 100 meters inch
     cli.py rot this is the message -s 10
-    cli.py base "100" 2 16 (will convert binary to hex)
+    cli.py base "100" 2 16 (NYI, this would convert binary 100 to hex)
 """
 from string import digits, punctuation
 import re
@@ -32,7 +32,6 @@ class CLIConverter(object):
     def __init__(self):
         "Read command-line arguments, assign to self and start the conversion."
         self.args = docopt(__doc__, version="0.1")
-        print self.args
 
         if self.args["rot"]:
             self.start_caesar_conversion()

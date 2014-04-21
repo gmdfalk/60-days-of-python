@@ -1,12 +1,20 @@
 #!/usr/bin/env python2
 # TODO: Blank lineedit when entering it or select all text.
-# temp, colors, rot13
-
+# Inherit from OnFocus event and override the focusInEvent
+# ( QFocusEvent * event )  or enterEvent ( QEvent * event )  or
+# mousePressEvent ( QMouseEvent * event )
 import sys
 
 from PyQt4 import QtGui, QtCore
 
 from conversion import Base, Data, Length, Volume, Weight, rot
+
+
+class SelectAllLineEdit(QtGui.QLineEdit):
+    "Overloaded QLineEdit to select all text when clicked into."
+
+    def mousePressEvent (self, e):
+        self.selectAll()
 
 
 class GUIConverter(QtGui.QWidget):
@@ -49,11 +57,10 @@ class GUIConverter(QtGui.QWidget):
 
         self.setLayout(mainlayout)
 
-
     def create_grid(self, units, gridsize=4):
         "Creates the grid of conversion unit QLineEdits and QLabels for a tab."
         # Dictionary that holds our QLineEdit fields for later use.
-        edits = {i[0]: QtGui.QLineEdit() for i in units}
+        edits = {i[0]: SelectAllLineEdit() for i in units}
 
         # Create our positions grid (0,0), (0,1) etc
         pos = [(i, j) for i in range(gridsize) for j in range(4)]
@@ -81,10 +88,11 @@ class GUIConverter(QtGui.QWidget):
         units = [(i, str(i)) for i in bases]
 
         grid, self.base_edits = self.create_grid(units, 6)
+        colors = self.create_color_layout()
 
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
-        # TODO: Add color picker here.
+        layout.addLayout(colors)
         layout.addLayout(grid)
 
         # Set the text alignment for the LineEdits and connect edits to actions.
@@ -211,7 +219,7 @@ class GUIConverter(QtGui.QWidget):
 
     def create_caesarshift_layout(self):
         "QLineEdit that allows adjusting of decimal places."
-        shift = QtGui.QLineEdit()
+        shift = SelectAllLineEdit()
         shift.setFixedWidth(36)
         shift.setAlignment(QtCore.Qt.AlignCenter)
         shift.setText(str(self.caesar_shift))
@@ -224,7 +232,7 @@ class GUIConverter(QtGui.QWidget):
 
     def create_decplaces_layout(self, unittype):
         "QLineEdit that allows adjusting of decimal places."
-        prec = QtGui.QLineEdit()
+        prec = SelectAllLineEdit()
         prec.setFixedWidth(36)
         prec.setAlignment(QtCore.Qt.AlignCenter)
         if unittype == "data":
@@ -245,26 +253,28 @@ class GUIConverter(QtGui.QWidget):
 
         return layout
 
-    def create_color_button(self):
-        col = QtGui.QColor(0, 0, 0)
+    def create_color_layout(self):
 
-        self.btn = QtGui.QPushButton('Dialog', self)
-        self.btn.move(20, 20)
-
-        self.btn.clicked.connect(self.show_color_picker)
+        button = QtGui.QPushButton("ColorPicker", self)
+        button.clicked.connect(self.show_color_picker)
 
         self.frm = QtGui.QFrame(self)
-        self.frm.setStyleSheet("QWidget { background-color: %s }"
-            % col.name())
         self.frm.setGeometry(130, 22, 100, 100)
+
+        layout = QtGui.QHBoxLayout()
+        layout.addWidget(button)
+
+        return layout
+
+    def printcol(self, *args):
+        print "yay", args
 
     def show_color_picker(self):
 
         col = QtGui.QColorDialog.getColor()
-
+#
         if col.isValid():
-            self.frm.setStyleSheet("QWidget { background-color: %s }"
-                % col.name())
+            print col.name()
 
     def update_caesar_shift(self, text):
         try:
@@ -277,29 +287,29 @@ class GUIConverter(QtGui.QWidget):
         try:
             self.data.decplaces = int(text)
             self.update_data_edits()
-        except ValueError as e:
-            print e
+        except ValueError:
+            pass
 
     def update_length_decplaces(self, text):
         try:
             self.length.decplaces = int(text)
             self.update_length_edits()
-        except ValueError as e:
-            print e
+        except ValueError:
+            pass
 
     def update_volume_decplaces(self, text):
         try:
             self.volume.decplaces = int(text)
             self.update_volume_edits()
-        except ValueError as e:
-            print e
+        except ValueError:
+            pass
 
     def update_weight_decplaces(self, text):
         try:
             self.weight.decplaces = int(text)
             self.update_weight_edits()
-        except ValueError as e:
-            print e
+        except ValueError:
+            pass
 
     def update_edits(self, unittype, edit):
         "Update all QLineEdits of the unittype (e.g. data)."
