@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 # TODO: Blank lineedit when entering it or select all text.
-# Use maxline and validator to set input/output constraints for lineedits.
-# TODO: temp, colors, rot13
+# temp, colors, rot13
 
 import sys
 
@@ -295,7 +294,11 @@ class GUIConverter(QtGui.QWidget):
 
     def base_text_changed(self, text):
         "When a Base/Numbers QLineEdit was changed, we pass its text along"
-        self.text_changed(text, self.base, self.base_edits)
+        for k, v in self.base_edits.items():
+            if v == self.sender():
+                unit = k
+                break
+        setattr(self.base, unit, text)
 
     def data_text_changed(self, text):
         self.text_changed(text, self.data, self.data_edits)

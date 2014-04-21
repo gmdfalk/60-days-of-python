@@ -1,6 +1,7 @@
 from __future__ import division
 
 from decimal import Decimal, getcontext
+import re
 
 
 def format_num(num, decplaces=10):
@@ -40,6 +41,7 @@ class Base(object):
 
     def __init__(self):
         self._decimal = 0
+        self.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
     base2 = property(lambda self: self.baseconvert(self._decimal, 2),
                      lambda self, value: setattr(self, "_decimal", value))
@@ -71,21 +73,50 @@ class Base(object):
     base64 = property(lambda self: self.baseconvert(self._decimal, 64),
                      lambda self, value: setattr(self, "_decimal", value))
 
-    def baseconvert(self, n, base=10):
+    def encode(self, n, base=10):
         assert base < 65
-        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        s = "0123456789" + alphabet
+
+        try:
+            n = int(n)
+        except ValueError:
+            return
+
+        basecases = "0123456789" + self.alphabet
         if 63 <= base <= 64:
-            s = alphabet + "0123456789+/"
+            basecases = self.alphabet + "0123456789+/"
         if n < base:
-            return s[n]
-        # return self.baseconvert(n // base, base) + s[n % base]
+            return basecases[n]
 
         encoded = []
         while n:
             remainder, n = n % base, n // base
-            encoded.insert(0, s[remainder])
+            encoded.insert(0, basecases[remainder])
         return "".join(encoded)
+
+    def decode(self, s, base=10):
+        assert base < 65
+        try:
+            s = str(s)
+        except ValueError:
+            return
+        assert s == re.search("[a-zA-Z0-9+\/]*", s).group()
+
+        basecases = "0123456789" + self.alphabet
+        if 63 <= base <= 64:
+            basecases = self.alphabet + "0123456789+/"
+
+        slen = len(s)
+        n, idx = 0, 0
+        decoded = []
+        for c in s:
+            power = slen - (idx + 1)
+            n += basecases.index(c) * (base ** power)
+            idx += 1
+
+        return n
+
+
+
 
 class Data(object):
 
@@ -418,6 +449,5 @@ class Weight(object):
 
 if __name__ == "__main__":
     b = Base()
-    b.base2 = 10
-    print b.base2, b.base10
-    print b.baseconvert(100, 64)
+    print b.encode(100, 64)
+    print b.decode("100", 16)
