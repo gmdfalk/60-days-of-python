@@ -232,29 +232,29 @@ class GUIConverter(QtGui.QWidget):
         try:
             self.data.decplaces = int(text)
             self.update_data_edits()
-        except ValueError:
-            pass
+        except ValueError as e:
+            print e
 
     def update_length_decplaces(self, text):
         try:
             self.length.decplaces = int(text)
             self.update_length_edits()
-        except ValueError:
-            pass
+        except ValueError as e:
+            print e
 
     def update_volume_decplaces(self, text):
         try:
             self.volume.decplaces = int(text)
             self.update_volume_edits()
-        except ValueError:
-            pass
+        except ValueError as e:
+            print e
 
     def update_weight_decplaces(self, text):
         try:
             self.weight.decplaces = int(text)
             self.update_weight_edits()
-        except ValueError:
-            pass
+        except ValueError as e:
+            print e
 
     def update_edits(self, unittype, edit):
         "Update all QLineEdits of the unittype (e.g. data)."
@@ -271,7 +271,7 @@ class GUIConverter(QtGui.QWidget):
                 unit = k
                 break
         try:
-            setattr(unittype, unit, int(text))
+            setattr(unittype, unit, float(text))
         except ValueError:
             setattr(unittype, unit, 0)
 

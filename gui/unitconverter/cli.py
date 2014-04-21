@@ -2,11 +2,9 @@
 """UnitConverter (CLI)
 
 Usage:
-    cli.py (<args>...|<args> <obase> [-i N]) [-d N] [h]
+    cli.py <args>... [-d N] [h]
 
 Options:
-    -i, --ibase=N      Input base for number conversion. [default: 10]
-    -o, --obase=N      Output base for number conversion. [default: 10]
     -d, --decplaces=N  Number of decimal places. [default: 10]
     -h, --help         Print this help text and exit.
     --version          Show the version of UnitConverter.
@@ -16,7 +14,6 @@ Examples:
     cli.py 10 meters in Cm -d 3
     cli.py 10.9in oz
 """
-# TODO: Positional awareness for number arguments.
 from string import digits, punctuation
 import re
 import sys
@@ -31,13 +28,6 @@ class CLIConverter(object):
     def __init__(self):
         "Read command-line arguments, assign to self and start the conversion."
         args = docopt(__doc__, version="0.1")
-        print args
-
-        # Correct the base:
-        for i in (args["--obase"], args["--ibase"]):
-            if i < 2 or i > 64:
-                print "Invalid base ({}). Valid range is 2-64.".format(i)
-                sys.exit(1)
 
         # Preliminary input checks.
         arglist = [i.lower() for i in args["<args>"]]
@@ -58,7 +48,6 @@ class CLIConverter(object):
         self.decplaces = int(args["--decplaces"])
 
         # Initialize the checks.
-        self.check_base()
         self.check_data()
         self.check_volume()
         self.check_length()
@@ -67,26 +56,6 @@ class CLIConverter(object):
         # If we arrive here, we didn't get any results.
         print "Sorry, could not find two matching measurement units."
         sys.exit(1)
-
-    def check_base(self):
-
-        unittype = Base()
-        units = {
-                  "bits": ["bit", "bits"],
-                  "bytes": ["byte", "bytes"],
-                  "kilobytes": ["kb", "kilobytes", "kilobyte"],
-                  "megabytes": ["mb", "megabytes", "megabyte"],
-                  "gigabytes": ["gb", "gigabytes", "gigabyte"],
-                  "terrabytes": ["tb", "terrabytes", "terrabyte"],
-                  "petabytes": ["pb", "petabytes", "petabyte"],
-                  "kibibytes": ["kib", "kibibytes", "kibibyte"],
-                  "mebibytes": ["mib", "mebibytes", "mebibyte"],
-                  "gibibytes": ["gib", "gibibytes", "gibibyte"],
-                  "tebibytes": ["tib", "tebibytes", "tebibyte"],
-                  "pebibytes": ["pib", "pebibytes", "pebibyte"]
-                 }
-
-        self.try_conversion(unittype, units)
 
     def check_data(self):
 
