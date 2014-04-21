@@ -45,12 +45,12 @@ class Base(object):
 
     def from_decimal(self, n, base=10):
         "Input: base10 integer. Output: base2-64 string."
-        assert base < 65
-
         try:
             n = int(n)
         except (ValueError, TypeError):
-            return "bad"
+            return "NaN"
+        if base < 2 or base > 64:
+            return "N/A"
 
         basecases = "0123456789" + self.alphabet
         if 63 <= base <= 64:
@@ -67,24 +67,23 @@ class Base(object):
 
     def to_decimal(self, s, base=10):
         "Input: base2-64 string. Output: base10 integer."
-        # Horrible duck-typing and assert checks incoming.
-        assert base < 65
         try:
             s = str(s)
-        except ValueError:
-            return
-        if base <= 10:
-            assert s.isdigit()
-        else:
-            assert s == re.search("[a-zA-Z0-9+\/]*", s).group()
+        except (ValueError, TypeError) as e:
+            return "NaN"
+        if base < 2 or base > 64:
+            return "N/A"
 
         basecases = "0123456789" + self.alphabet
         if 63 <= base <= 64:
             basecases = self.alphabet + "0123456789+/"
+        basecases = basecases[:base]
 
         slen = len(s)
         n, idx = 0, 0
         for c in s:
+            if c not in basecases:
+                return
             power = slen - (idx + 1)
             n += basecases.index(c) * (base ** power)
             idx += 1
@@ -422,5 +421,5 @@ class Weight(object):
 
 if __name__ == "__main__":
     b = Base()
-    print b.encode(100, 16)
-    print b.decode("64", 16)
+    print b.from_decimal(21, 65)
+    print b.to_decimal("10101", 65)

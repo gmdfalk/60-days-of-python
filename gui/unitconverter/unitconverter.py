@@ -77,9 +77,10 @@ class GUIConverter(QtGui.QWidget):
         self.base = Base()
 
         # List of (unit, label)-pairs to build our grid from.
-        units = [(i, str(i)) for i in (2, 4, 6, 8, 10, 12, 14, 16, 60, 64)]
+        bases = (2, 3, 5, 8, 10, 12, 16, 20, 32, 36, 60, 64)
+        units = [(i, str(i)) for i in bases]
 
-        grid, self.base_edits = self.create_grid(units, 5)
+        grid, self.base_edits = self.create_grid(units, 6)
 
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
