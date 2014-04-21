@@ -265,9 +265,6 @@ class GUIConverter(QtGui.QWidget):
             if v != self.sender():
                 text = getattr(unittype, k)
                 v.setText(text)
-                print "not a sender:", k
-            else:
-                print "sender is:", self.sender()
 
     def text_changed(self, text, unittype, edits):
         "Set the correct unit in conversion.py to the text we just received."

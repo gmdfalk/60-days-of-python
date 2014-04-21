@@ -61,7 +61,7 @@ class CLIConverter(object):
             sys.exit(9)
 
         # Extract a number (float/int) from the arglist. Allows leading dot.
-        rx = re.compile("(.?(?:\d+(?:\.\d+)?))")
+        rx = re.compile("(\d+(?:\.\d+)?|\.\d+)")
         match = rx.search(" ".join(arglist))
         try:
             self.num = match.group()
