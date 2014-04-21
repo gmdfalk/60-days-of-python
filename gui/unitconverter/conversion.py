@@ -94,12 +94,16 @@ class Base(object):
         return "".join(encoded)
 
     def decode(self, s, base=10):
+        # Horrible duck-typing and assert checks incoming.
         assert base < 65
         try:
             s = str(s)
         except ValueError:
             return
-        assert s == re.search("[a-zA-Z0-9+\/]*", s).group()
+        if base <= 10:
+            assert s.isdigit()
+        else:
+            assert s == re.search("[a-zA-Z0-9+\/]*", s).group()
 
         basecases = "0123456789" + self.alphabet
         if 63 <= base <= 64:
