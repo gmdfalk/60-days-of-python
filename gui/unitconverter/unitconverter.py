@@ -95,30 +95,29 @@ class GUIConverter(QtGui.QWidget):
 
     def create_caesar_tab(self, tab):
 
-        input_edit = QtGui.QLineEdit()
-        output_edit = QtGui.QLineEdit()
+        self.caesar_shift = 13
+        self.caesar_edits = {"input": QtGui.QTextEdit(),
+                             "output": QtGui.QTextEdit()}
+
+        # Put those QLineEdits into a vertical splitter.
+        splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
+        splitter.addWidget(self.caesar_edits["input"])
+        splitter.addWidget(self.caesar_edits["output"])
 
         grid = QtGui.QGridLayout()
-        grid.setSpacing(10)
-        # create a vertical splitter
-        v_splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
-        v_splitter.addWidget(input_edit)
-        v_splitter.addWidget(output_edit)
+#         grid.setSpacing(10)
+        grid.addWidget(splitter)
 
-        grid.addWidget(v_splitter)
+        shift = self.create_caesarshift_layout()
 
-#         layout = QVBoxLayout()
-#         layout.addWidget(v_splitter)
         # Patch it all together in a vertical layout.
         layout = QtGui.QVBoxLayout(tab)
-
-        # TODO: Add color picker here.
+        layout.addLayout(shift)
         layout.addLayout(grid)
 
         # Set the text alignment for the LineEdits and connect edits to actions.
-#         for i in self.caesar_edits.values():
-#             i.textEdited[str].connect(self.caesar_text_changed)
-#             i.textEdited[str].connect(self.update_base_edits)
+        for i in self.caesar_edits.values():
+            i.textChanged.connect(self.update_caesar_edits)
 
     def create_data_tab(self, tab):
 
@@ -211,6 +210,19 @@ class GUIConverter(QtGui.QWidget):
             i.textEdited[str].connect(self.weight_text_changed)
             i.textEdited[str].connect(self.update_weight_edits)
 
+    def create_caesarshift_layout(self):
+        "QLineEdit that allows adjusting of decimal places."
+        shift = QtGui.QLineEdit()
+        shift.setFixedWidth(36)
+        shift.setAlignment(QtCore.Qt.AlignCenter)
+        shift.setText(str(self.caesar_shift))
+        shift.textEdited[str].connect(self.update_caesar_shift)
+
+        layout = QtGui.QHBoxLayout()
+        layout.addWidget(shift)
+
+        return layout
+
     def create_decplaces_layout(self, unittype):
         "QLineEdit that allows adjusting of decimal places."
         prec = QtGui.QLineEdit()
@@ -255,6 +267,13 @@ class GUIConverter(QtGui.QWidget):
             self.frm.setStyleSheet("QWidget { background-color: %s }"
                 % col.name())
 
+    def update_caesar_shift(self, text):
+        try:
+            self.caesar_shift = int(text)
+            self.update_caesar_edits()
+        except ValueError:
+            pass
+
     def update_data_decplaces(self, text):
         try:
             self.data.decplaces = int(text)
@@ -291,17 +310,6 @@ class GUIConverter(QtGui.QWidget):
                 text = getattr(unittype, k)
                 v.setText(text)
 
-    def text_changed(self, text, unittype, edits):
-        "Set the correct unit in conversion.py to the text we just received."
-        for k, v in edits.items():
-            if v == self.sender():
-                unit = k
-                break
-        try:
-            setattr(unittype, unit, float(text))
-        except ValueError:
-            setattr(unittype, unit, 0)
-
     def update_base_edits(self):
         "Update the values of all Base/Numbers QLineEdits"
         for k, v in self.base_edits.items():
@@ -310,6 +318,14 @@ class GUIConverter(QtGui.QWidget):
                 dec = getattr(self.base, "_decimal")
                 text = self.base.from_decimal(dec, k)
                 v.setText(text)
+
+    def update_caesar_edits(self):
+        "Set the correct unit in conversion.py to the text we just received."
+        text = self.caesar_edits["input"].toPlainText()
+
+        output = self.caesar_edits["output"]
+        message = rot(text, self.caesar_shift)
+        output.setText(message)
 
     def update_data_edits(self):
         self.update_edits(self.data, self.data_edits)
@@ -322,6 +338,17 @@ class GUIConverter(QtGui.QWidget):
 
     def update_weight_edits(self):
         self.update_edits(self.weight, self.weight_edits)
+
+    def text_changed(self, text, unittype, edits):
+        "Set the correct unit in conversion.py to the text we just received."
+        for k, v in edits.items():
+            if v == self.sender():
+                unit = k
+                break
+        try:
+            setattr(unittype, unit, float(text))
+        except ValueError:
+            setattr(unittype, unit, 0)
 
     def base_text_changed(self, text):
         "When a Base/Numbers QLineEdit was changed, we pass its text along"
