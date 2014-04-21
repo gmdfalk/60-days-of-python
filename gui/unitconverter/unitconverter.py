@@ -1,8 +1,5 @@
 #!/usr/bin/env python2
-# TODO: Blank lineedit when entering it or select all text.
-# Inherit from OnFocus event and override the focusInEvent
-# ( QFocusEvent * event )  or enterEvent ( QEvent * event )  or
-# mousePressEvent ( QMouseEvent * event )
+# Todo: Add rbg and hex color lineedits after colorpicker button
 import sys
 
 from PyQt4 import QtGui, QtCore
