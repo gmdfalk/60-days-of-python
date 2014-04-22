@@ -1,5 +1,6 @@
 
 class Calculation(object):
 
-    def evaluate(self, *args):
-        print eval(args)
+    def evaluate(self, s):
+        print s
+        return eval(s)

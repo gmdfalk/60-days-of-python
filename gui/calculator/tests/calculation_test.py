@@ -17,6 +17,7 @@ class CalculationTest(unittest.TestCase):
     def test_evaluate(self):
         self.c.test = 10
         self.assertEqual(self.c.test, 10)
+        self.assertEqual(self.c.evaluate("17*3"), 51)
 
 
 if __name__ == "__main__":
