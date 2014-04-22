@@ -30,8 +30,8 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**IRC-Bot**](https://github.com/mikar/60-days-of-python/blob/master/ircbot)
   * [**Port Scanner**](https://github.com/mikar/60-days-of-python/blob/master/networking/portscanner)
   * [**Mail Client**](https://github.com/mikar/60-days-of-python/blob/master/networking/mailclient)
-  * [**Unit Converter (GUI)**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
-  * Calculator (both command-line and GUI)
+  * [**Unit Converter**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
+  * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
   * Text Editor (GUI)
   * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
