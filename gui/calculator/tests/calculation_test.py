@@ -19,6 +19,11 @@ class CalculationTest(unittest.TestCase):
         self.assertEqual(self.c.test, 10)
         self.assertEqual(self.c.evaluate("17*3"), 51)
 
+    def test_eval_bad_input(self):
+        baddies = "\Af_:{'"
+        for i in baddies:
+            self.assertEqual(self.c.evaluate(i), None)
+
 
 if __name__ == "__main__":
     unittest.main()

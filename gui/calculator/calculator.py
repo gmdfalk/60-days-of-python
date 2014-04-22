@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
-# TODO: Use stylesheet to merge lineedits?
+# TODO: Fix stylesheets for lineedits.
+# setMinimumSize (something is setting this. unset it)
 # Store buttons in variables.
 
 import sys
@@ -48,9 +49,11 @@ class GUICalculator(QtGui.QWidget):
         return layout, None
 
     def create_edit_layout(self):
-        layout = QtGui.QVBoxLayout()
         self.in_edit = QtGui.QLineEdit()
         self.out_edit = QtGui.QLineEdit()
+        self.in_edit.setStyleSheet("padding: 0px;")
+        self.out_edit.setStyleSheet("padding: 0px;")
+        layout = QtGui.QVBoxLayout()
         layout.setSpacing(0)
         layout.addWidget(self.in_edit)
         layout.addWidget(self.out_edit)
