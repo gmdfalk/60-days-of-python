@@ -78,7 +78,7 @@ class Base(object):
         "Input: base2-64 string. Output: base10 integer."
         try:
             s = str(s)
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError):
             return "NaN"
         if base < 2 or base > 64:
             return "N/A"
@@ -90,6 +90,9 @@ class Base(object):
 
         slen = len(s)
         n, idx = 0, 0
+        # Allow lowercase letters for base11-36 (single alphabet).
+        if base <= 36:
+            s = s.upper()
         for c in s:
             if c not in basecases:
                 return "NaN"

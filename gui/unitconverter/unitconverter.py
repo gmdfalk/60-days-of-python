@@ -14,7 +14,6 @@ class SelectAllLineEdit(QtGui.QLineEdit):
     def mousePressEvent (self, e):
         self.selectAll()
 
-
 class GUIConverter(QtGui.QWidget):
 
     def __init__(self):
