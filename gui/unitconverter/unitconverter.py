@@ -99,7 +99,8 @@ class GUIConverter(QtGui.QWidget):
             i.textEdited[str].connect(self.update_base_edits)
 
     def create_caesar_tab(self, tab):
-
+        "Tab that does encoding/decoding of caesar ciphers."
+        # Default to rot13.
         self.caesar_shift = 13
         self.caesar_edits = {"input": QtGui.QTextEdit(),
                              "output": QtGui.QTextEdit()}
@@ -122,6 +123,7 @@ class GUIConverter(QtGui.QWidget):
 
         # Set the text alignment for the LineEdits and connect edits to actions.
         self.caesar_edits["input"].textChanged.connect(self.update_caesar_edits)
+        # TODO: Make the lineedits interchangable (input/output).
 
     def create_data_tab(self, tab):
 
