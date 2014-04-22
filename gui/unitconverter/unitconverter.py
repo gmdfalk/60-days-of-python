@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
-# Todo: Add rbg and hex color lineedits after colorpicker button
+# TODO: Add rbg and hex color lineedits after colorpicker button
+# FIXME: Leading 0 for Base.
 import sys
 
 from PyQt4 import QtGui, QtCore
@@ -263,13 +264,11 @@ class GUIConverter(QtGui.QWidget):
 
         return layout
 
-    def printcol(self, *args):
-        print "yay", args
-
     def show_color_picker(self):
 
         col = QtGui.QColorDialog.getColor()
 #
+        # Prints the selected color as hex value to console.
         if col.isValid():
             print col.name()
 
