@@ -12,4 +12,4 @@ class Calculation(object):
 
 if __name__ == "__main__":
     c = Calculation()
-    print c.evaluate("10*3")
+    print c.evaluate("1+2*3/4-5")

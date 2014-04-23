@@ -33,16 +33,16 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Unit Converter**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
   * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
   * Text Editor (GUI)
+  * IMDB Browser 
+  * File Browser (Mass Renaming with Simulation)
+  * Chess/Sudoku
   * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
   	  * Forum
-	  * Drawing Board  and To-Do-List
-	  * TV Show Tracker
-	  * Fortune Teller
 	  * Guestbook/Journal/Notes
+	  * Drawing Board (FFA)
+	  * optional: TV Show Tracker
+	  * optional: To-Do-List
 	  * optional: PDF Generator and Name Scrambler
-  * optional: IMDB Browser 
-  * optional: File Browser (Mass Renaming with Simulation)
-  * optional: Chess
   * [**Py3: OOP**](https://github.com/mikar/60-days-of-python/tree/master/oop) (working through the book)
  
