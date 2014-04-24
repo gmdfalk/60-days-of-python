@@ -13,18 +13,19 @@ log = logging.getLogger("client")
 
 
 class Client(irc.IRCClient):
-    "The actual protocol/bot, instanced by the Factory."
+    "The actual protocol/client, instanced by the Factory."
 
     def __init__(self, factory):
         self.factory = factory
-        self.nickname = self.factory.network["identity"]["nickname"]
-        self.realname = self.factory.network["identity"]["realname"]
-        self.username = self.factory.network["identity"]["username"]
+        self.nickname = self.factory.network["nickname"]
+        self.realname = self.factory.network.get("realname") or "demibot"
+        self.username = self.factory.network.get("username") or "demibot"
+        print self.realname, self.username
         self.sourceURL = self.factory.URL  # CTCP source queries to the github.
         self.lineRate = 1  # Print at most n lines per second.
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)
         self.lead = "."
-        log.info("Bot initialized")
+        log.info("Bot initialized.")
 
     def __repr__(self):
         return "demibot v{}({}, {})".format(self.nickname, self.factory.VERSION,
@@ -127,9 +128,9 @@ class Client(irc.IRCClient):
 
         network = self.factory.network
 
-        if network["identity"]["nickserv_pw"]:
+        if network["nickserv_pw"]:
             self.msg("NickServ", "IDENTIFY {}"
-                     .format(network["identity"]["nickserv_pw"]))
+                     .format(network["nickserv_pw"]))
 
         for channel in network["channels"]:
             self.join(channel)
@@ -172,7 +173,7 @@ class Client(irc.IRCClient):
             url = self.factory.get_url(msg)
             if url:
                 log.debug("URL detected: {}".format(url))
-                if self.factory.titles_enabled:
+                if self.factory.urltitles_enabled:
                     self.say(channel, self.factory.get_title(url))
                 if self.factory.logs_enabled:
                     self.chatlogger.log_url("<{}> {}".format(

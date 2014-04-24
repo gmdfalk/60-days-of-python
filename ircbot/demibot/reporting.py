@@ -75,28 +75,22 @@ class ChatLogger(object):
         self.logfiles = {}
 
 
-def init_syslog(logdir, loglevel, nologs, quiet):
+def init_logger(logdir, loglevel, nologs, quiet):
     "Initializes the logger for system messages."
     logger = logging.getLogger()
 
     # Set the loglevel.
+    if loglevel > 3:  # Cap at 3, incase someone likes their v-key too much.
+        loglevel = 3
     levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
     logger.setLevel(levels[loglevel])
+    log.info("Loglevel is {}.".format(levels[loglevel]))
 
     logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
 
     formatter = logging.Formatter(logformat)
 
-    # This discards all logging messages of ERROR and below.
-#     logging.disable(logging.ERROR)
-    # By default, we log to both file and stdout, unless quiet is enabled.
-    if not quiet:
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-        log.debug("Added logging console handler.")
-
-    # If nologs is True, we do not log to any file.
+    # Only attach a file handler, if the --no-logs option is not enabled.
     if not nologs:
         try:
             logfile = os.path.join(logdir, "demibot.log")
@@ -106,3 +100,10 @@ def init_syslog(logdir, loglevel, nologs, quiet):
             log.debug("Added logging file handler.")
         except IOError:
             log.error("Could not attach file handler. Only logging to stdout.")
+
+        # Only attach a console handler if both nologs and quiet are disabled.
+        if not quiet:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
+            log.debug("Added logging console handler.")

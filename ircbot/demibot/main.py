@@ -1,9 +1,14 @@
 #!/usr/bin/env python2
 # TODO:
 # Database (User info, channel stats, quiz, permission levels, alternate nicks)
-# Modules: Seen+Tell, RSS+Github, IMDB/TVcal, Twitter, madcow
-# Replace logging with syslog
+# Modules: Seen+Tell, RSS+Github, IMDB/TVcal, Twitter, madcow, uptime
 # Add support for channelpasswords
+# Improve config file concept:
+#     Maybe use environment variable to get config dir. That way, we can put
+#     config.py there, too.
+#     Or use ConfigParser with some tweaks and build the dictionary myself like
+#     {sec:dict(cfg.items(sec)) for sec in cfg.sections()}.
+#     Or use JSON.
 """demibot - A multipurpose IRC bot (depends on twisted and requests)
 
 Usage:
@@ -28,22 +33,20 @@ Options:
     -v                  Logging verbosity, up to -vvv.
 """
 
+from ConfigParser import SafeConfigParser
 import os
 import sys
 
 from docopt import docopt
 from twisted.internet import reactor, ssl
 
-import config
 from factory import Factory
-from reporting import init_syslog
+from reporting import init_logger
 
 
-def main():
-    args = docopt(__doc__, version="0.2")
-
-    # If ~/.demibot or ~/.config/demibot exist, we use that as location for
-    # the logs and auth file.
+def get_configdir():
+    # If ~/.demibot or ~/.config/demibot exist, we use that as source and
+    # target for logs and config file.
     configdir = os.path.dirname(os.path.realpath(__file__))  # We are here.
 #     if not args["<server>"] and not args["--logdir"]:
     home = os.path.join(os.path.expanduser("~"), ".demibot")
@@ -53,7 +56,40 @@ def main():
     elif os.path.isdir(home):
         configdir = home
 
-    # If no --logdir is specified, use the path to the running script + "logs".
+    return configdir
+
+
+def parse_config(configdir):
+    config = SafeConfigParser()
+    config.read(os.path.join(configdir, "demibot.ini"))
+    networks = {}
+    for s in config.sections():
+        networks[s] = {k:v for k, v in config.items(s)}
+
+    # Correct a couple of values.
+    for n in networks:
+        networks[n]["port"] = config.getint(n, "port")
+        networks[n]["ssl"] = config.getboolean(n, "ssl")
+        networks[n]["urltitles_enabled"] = config.getboolean(n, "urltitles_enabled")
+        networks[n]["minperms"] = config.getint(n, "minperms")
+        networks[n]["lost_delay"] = config.getint(n, "lost_delay")
+        networks[n]["failed_delay"] = config.getint(n, "failed_delay")
+        networks[n]["rejoin_delay"] = config.getint(n, "rejoin_delay")
+        for k, v in networks[n].items():
+            if k == "superadmins":
+                networks[n]["superadmins"] = set(v.replace(" ", "").split(","))
+            elif k == "admins":
+                networks[n]["admins"] = set(v.replace(" ", "").split(","))
+            elif k == "channels":
+                networks[n]["channels"] = {i if i.startswith("#") else "#" + i\
+                                           for i in v.replace(" ", "").split(",")}
+
+    return networks
+
+
+def main():
+    configdir = get_configdir()
+
     if not args["--logdir"]:
         args["--logdir"] = os.path.join(configdir, "logs")
 
@@ -62,27 +98,16 @@ def main():
     try:
         os.makedirs(args["--logdir"])
     except OSError as e:
-        # If the error number is anything but 13 we assume we have write
-        # permissions.
         if e.errno == 13:  # Permission denied
-            # No write permissions. Turn off all file logging.
             args["--no-logs"] = True
-            print "ERROR: No write permissions ({})".format(e)
+            print "ERROR: No write permissions ({}). Chatlogs off.".format(e)
 
-    # If there is no server argument, read the connection infos from config.py.
+
     if not args["<server>"]:
-        networks = config.create_options(configdir)
-    # Otherwise we turn the docopt args into a config.py compatible format.
-    else:
-        # The default identity to connect with if we're not using config.py.
-        identities = {
-            "default": {
-                "nickname": args["--nick"],
-                "realname": "demibot",
-                "username": args["--nick"],
-                "nickserv_pw": args["--pass"],
-            }
-        }
+        # If there is no server argument, read the connection information from
+        # demibot.ini in configdir.
+        networks = parse_config(configdir)
+    else:  # Parse connection info from command-line.
         # Split server argument into server and port, if necessary.
         if ":" in args["<server>"]:
             args["<server>"], args["--port"] = args["<server>"].split(":")
@@ -104,21 +129,17 @@ def main():
                 "server": args["<server>"],
                 "port": int(args["--port"]),
                 "ssl": args["--ssl"],
-                "password": None,  # Server password, if you need one.
-                "identity": identities["default"],
-                "superadmins": {args["--admin"]},
-                "admins": {},
+                "nickname": args["--nick"],
+                "nickserv_pw": args["--pass"],
+                "superadmins": {args["--admin"]} or set(),
+                "admins": set(),
                 "channels": channels,
             }
         }
 
-    # Cap verbosity count at 3 to avoid index errors.
-    if args["-v"] > 3:
-        args["-v"] = 3
-
     # Set up our logger for system events. Chat is logged separately.
     # Both will be disabled if --no-logs is True.
-    init_syslog(args["--logdir"], args["-v"], args["--no-logs"], args["--quiet"])
+    init_logger(args["--logdir"], args["-v"], args["--no-logs"], args["--quiet"])
     # Set up the connection info for each network.
     for name in networks.keys():
 
@@ -138,4 +159,5 @@ def main():
     reactor.run()
 
 if __name__ == "__main__":
+    args = docopt(__doc__, version="0.3")
     main()

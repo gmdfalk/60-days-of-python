@@ -25,7 +25,7 @@ except ImportError as e:
 class Factory(protocol.ClientFactory):
     "Factory that creates a client and handles its connection."
 
-    VERSION = "0.2"  # current demibot version
+    VERSION = "0.3"  # current demibot version
     URL = "https://github.com/mikar/demibot"
     clients = {}
     basedir = os.path.dirname(os.path.realpath(__file__))
@@ -36,22 +36,21 @@ class Factory(protocol.ClientFactory):
         self.network = network
         self.configdir = configdir
         self.logdir = logdir
+        # Namespace for modules:
+        self.ns = {}
         # Use XOR to set this to False if nologs is True. Could also use
         # not and or is not.
         self.logs_enabled = True ^ nologs
         self.retry_enabled = True  # Retry if connection lost/failed.
-        self.titles_enabled = False
         self.quiz_enabled = False
+        self.urltitles_enabled = network.get("urltitles_enabled", False)
+        self.lost_delay = network.get("lost_delay", 10)
+        self.failed_delay = network.get("failed_delay", 30)
         # Set minperms to disable access to commands for certain permission
         # levels. Anything above 0 will disable most public commands.
-        self.minperms = 1  # 20 is the maximum.
+        self.minperms = network.get("minperms", 0)  # 20 is the maximum.
         if self.minperms:
             log.info("Minperms are set! To enable public commands: .setmin 0")
-        # Namespace for modules:
-        self.ns = {}
-        # Connection retry delays:
-        self.lost_delay = 10
-        self.failed_delay = 30
 
     def startFactory(self):
         log.info("Starting Factory.")
@@ -109,7 +108,6 @@ class Factory(protocol.ClientFactory):
 
         for m in removed_modules:
             # Finalize module before deleting it.
-            # TODO: Use general _finalize_modules instead of copy-paste.
             if "finalize" in self.ns[m][0]:
                 log.info("Finalize - {}".format(m))
                 self.ns[m][0]["finalize"]()

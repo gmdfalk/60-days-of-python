@@ -11,16 +11,16 @@ def command_urls(bot, user, channel, args):
                        "{}, your permission level is not high enough.".format(
                         get_nick(user)))
 
-    if args == "off" and bot.factory.titles_enabled:
-        bot.factory.titles_enabled = False
+    if args == "off" and bot.factory.urltitles_enabled:
+        bot.factory.urltitles_enabled = False
         log.debug("URL title display disabled.")
         return bot.say(channel, "URL title display is now disabled.")
-    elif args == "on" and not bot.factory.titles_enabled:
-        bot.factory.titles_enabled = True
+    elif args == "on" and not bot.factory.urltitles_enabled:
+        bot.factory.urltitles_enabled = True
         log.debug("URL title display enabled.")
         return bot.say(channel, "URL title display is now enabled.")
     else:
-        if bot.factory.titles_enabled:
+        if bot.factory.urltitles_enabled:
             return bot.say(channel,
                 "URL title display is enabled. Use {}urls off to disable."
                 .format(bot.lead))

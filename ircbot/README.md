@@ -4,7 +4,8 @@
   
 ##### What it currently provides:  
   * Logs both system messages and chat. URLs are logged to a separate file.
-  * Modularity/Plugins. "Borrowed" from [**Pyfibot**](https://github.com/lepinkainen/pyfibot) (thanks guys), so their modules are mostly compatible with demibot, some of which are already included here.
+  * Modularity, borrowed from [**Pyfibot**](https://github.com/lepinkainen/pyfibot) (which also means their modules are mostly compatible with demibot, some of which are already included here).
+  * Configuration file.
   * Lots of commands:
     * Admin actions:
       * update: Pull the bot sources from the official github.
@@ -18,12 +19,14 @@
       * admins: Add/delete/list admins.
       * join/leave/channels: Join, leave or list channels.
       * quit: Quit this bot instance or optionally the whole program.
-      * mode: Set a mode on a user. This is used for mose channel operations.
+      * mode: Set a mode on a user e.g. +o, -v, +b (OP, voice, ban).
       * kick, tempban
     * Mildly useful:
       * bmi: calculate your body-mass-index.
       * btc: show bitcoin exchange rate (from mtgox, no idea if this is accurate).
       * g: perform a google search.
+      * yt: perform a youtube search.
+      * wiki: perform a wikipedia search.
       * quiz: a very rudimentary quizbot. gives no hints, takes no answers. just guess. to be improved.
       * translate and transliterate: uses google to translate text to english.
     * Fun stuff:
@@ -45,11 +48,10 @@
   * Log rotation and maybe use syslog or twisteds logger instead of logging.
   * Database logging (would allow many interesting functionalities).
   * Collecting and displaying notes and quotes (!give, !grab, !q nick, !rq etc).
-  * Channel password support.
+  * Channel and server password support.
   * Search channel log.
   * Possible modules:
     * Weather
-    * Dictionary/Wiki queries
     * Seen+Tell
     * RSS+Github
     * IMDB/TVcal
@@ -67,24 +69,15 @@
  pip install .
  ```  
  
- There you go, that's it.  
+ You probably want to create either $HOME/.demibot or $HOME/.config/demibot, customize
+ your demibot.ini and store it there.
  
  ### Usage:  
- 
- You probably want to modify config.py in the installation directory of demibot,
- which provides you with multi-server support and fine-grained configuration.  
- You can create a file called "auth" in either the installation directory or
- $HOME/.config/demibot or $HOME/.demibot from which nickserv and server passwords
- can be read, if you don't write them in plaintext to config.py.
- By default, public commands and url title display are enabled. You can disable
- them with `.setmin 1` and `.urls off` or permanently in the Factory class by setting
- `self.titles_enabled = False` and `self.minperms = 1`.
- 
  
  For a simple test run, on-the-fly changes/setups or bot stacking, there is a command-line interface.  
    
  Examples:  
  ```
  demibot irc.freenode.net:6667 python,bash,linux -a adminnick -n botnick -p nickservpw
- demibot irc.quakenet #cs,#offtopic -a adminnick --ssl -l /mnt/share/weird/place/for/logs
+ demibot irc.quakenet.org #cs,#offtopic -a adminnick --ssl -l /your/log/dir
  ```

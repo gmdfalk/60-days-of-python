@@ -41,7 +41,7 @@ def command_admins(bot, user, channel, args):
                        get_nick(user)))
 
     superadmins = bot.factory.network["superadmins"]
-    admins = superadmins ^ bot.factory.network["admins"]
+    admins = set(superadmins) ^ set(bot.factory.network["admins"])
 
     str_sadmins = " ".join(superadmins)
     str_admins = " ".join(admins) if admins else 0
@@ -217,8 +217,8 @@ def command_setnick(bot, user, channel, args):
     if len(args) > 1:
         return
 
-    bot.factory.network["identity"]["nickname"] = args[0]
-    bot.nickname = bot.factory.network["identity"]["nickname"]
+    bot.factory.network["nickname"] = args[0]
+    bot.nickname = bot.factory.network["nickname"]
     bot.setNick(bot.nickname)
     log.info("Changed nickname to {}".format(args[0]))
 
@@ -377,7 +377,6 @@ def command_logs(bot, user, channel, args):
         log.info("Chatlogs disabled")
         return bot.say(channel, "Chatlogs are now enabled.")
     elif args == "level":
-        # FIXME: Somehow, this shows WARN even though -vvv is enabled.
         level = logging.getLogger().getEffectiveLevel()
         levels = ["notset", "debug [-vvv]", "info [-vv]",
                   "warn [-v]", "error, least verbose"]
@@ -430,8 +429,8 @@ def command_setvar(bot, user, channel, args):
         f.retry_enabled = not f.retry_enabled
         return bot.say(channel, "retry_enabled: {}".format(f.retry_enabled))
     if args[0] == "titles" or args[0] == "url":
-        f.titles_enabled = not f.titles_enabled
-        return bot.say(channel, "titles_enabled: {}".format(f.titles_enabled))
+        f.urltitles_enabled = not f.urltitles_enabled
+        return bot.say(channel, "urltitles_enabled: {}".format(f.urltitles_enabled))
     elif args[0] == "minperms":
         f.minperms = int(args[1])
         return bot.say(channel, "minperms: {}".format(f.minperms))
@@ -460,9 +459,9 @@ def command_printvars(bot, user, channel, args):
 
     if not args:
         bot.say(channel, "logs_enabled: {}, retry_enabled: {},"\
-                " titles_enabled: {}, minperms: {}, lost_delay: {},"\
+                " urltitles_enabled: {}, minperms: {}, lost_delay: {},"\
                 " failed_delay: {}".format(f.logs_enabled, f.retry_enabled,
-                                           f.titles_enabled, f.minperms,
+                                           f.urltitles_enabled, f.minperms,
                                            f.lost_delay, f.failed_delay))
         bot.say(channel, "logdir: {}, configdir: {}, moduledir: {}"
                 .format(f.logdir, f.configdir, f.moduledir))
@@ -482,9 +481,9 @@ def command_printvars(bot, user, channel, args):
                        .format(f.logdir, f.configdir, f.moduledir))
     elif args == "factory":
         return bot.say(channel, "logs_enabled: {}, retry_enabled: {},"\
-                       " titles_enabled: {}, minperms: {}, lost_delay: {},"\
+                       " urltitles_enabled: {}, minperms: {}, lost_delay: {},"\
                        " failed_delay: {}".format(f.logs_enabled, f.retry_enabled,
-                                                  f.titles_enabled, f.minperms,
+                                                  f.urltitles_enabled, f.minperms,
                                                   f.lost_delay, f.failed_delay))
 
 
