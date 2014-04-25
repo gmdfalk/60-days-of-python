@@ -14,6 +14,12 @@ class SelectAllLineEdit(QtGui.QLineEdit):
     def mousePressEvent (self, e):
         self.selectAll()
 
+class SelectAllTextEdit(QtGui.QTextEdit):
+    "Overloaded QLineEdit to select all text when clicked into."
+
+    def mousePressEvent (self, e):
+        self.selectAll()
+
 class GUIConverter(QtGui.QWidget):
 
     def __init__(self):
@@ -103,7 +109,7 @@ class GUIConverter(QtGui.QWidget):
         # Default to rot13.
         self.caesar_shift = 13
         self.caesar_edits = {"input": QtGui.QTextEdit(),
-                             "output": QtGui.QTextEdit()}
+                             "output": SelectAllTextEdit()}
 
         # Put those QLineEdits into a vertical splitter.
         splitter = QtGui.QSplitter(QtCore.Qt.Vertical, self)
@@ -123,6 +129,7 @@ class GUIConverter(QtGui.QWidget):
 
         # Set the text alignment for the LineEdits and connect edits to actions.
         self.caesar_edits["input"].textChanged.connect(self.update_caesar_edits)
+        self.caesar_edits["output"].setReadOnly(True)
         # TODO: Make the lineedits interchangable (input/output).
 
     def create_data_tab(self, tab):
