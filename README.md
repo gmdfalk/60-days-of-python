@@ -32,6 +32,7 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Mail Client**](https://github.com/mikar/60-days-of-python/blob/master/networking/mailclient)
   * [**Unit Converter**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
   * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
+  * [**Blockify**](https://github.com/mikar/blockify/), almost entirely rewritten.
   * Text Editor (GUI)
   * IMDB Browser 
   * File Browser (Mass Renaming with Simulation)
