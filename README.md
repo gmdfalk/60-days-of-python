@@ -33,8 +33,8 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Unit Converter**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
   * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
   * [**Blockify**](https://github.com/mikar/blockify/), almost entirely rewritten.
+  * File Browser (Mass Renaming)
   * IMDB Browser 
-  * File Browser (Mass Renaming with Simulation)
   * Chess/Sudoku
   * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
