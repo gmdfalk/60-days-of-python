@@ -10,6 +10,13 @@ from PyQt4 import QtGui, QtCore
 from calculation import evaluate
 
 
+class SelectAllLineEdit(QtGui.QLineEdit):
+    "Overloaded QLineEdit to select all text when clicked into."
+
+    def mousePressEvent (self, e):
+        self.selectAll()
+
+
 class GUICalculator(QtGui.QWidget):
 
     def __init__(self):
@@ -30,16 +37,31 @@ class GUICalculator(QtGui.QWidget):
     def create_button_layout(self):
         "Creates the grid of calculator buttons."
 
-        labels = ["Close", "mrc", "m+", "m-", "Clear", "(", ")", "!",
+        labels = ["Close", "mrc", "m+", "m-",
+                  "Clear", "(", ")", "!",
                   "sqrt", "pow", "%", "/",
-                  "7", "8", "9", "*", "4", "5", "6", "-",
-                  "1", "2", "3", "+", "0", ".", "C", "="]
+                  "7", "8", "9", "*",
+                  "4", "5", "6", "-",
+                  "1", "2", "3", "+",
+                  "0", ".", "C", "="]
 
         buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-#         for i in buttons:
-#             i.setReadOnly(True)
-
+        for l in labels:
+            btn = buttons[l]
+            if l in "0123456789.-+/%()**":
+                func = lambda: self.in_edit.setText(self.in_edit.text() + l)
+                btn.clicked.connect(func)
+            elif l == "=":
+                btn.clicked.connect(self.equals_pressed)
+            elif l == "Close":
+                btn.clicked.connect(self.close_pressed)
+            elif l == "Clear":
+                btn.clicked.connect(self.clear_pressed)
+            elif l == "sqrt":
+                btn.clicked.connect(self.sqrt_pressed)
+            elif l == "pow":
+                btn.clicked.connect(self.pow_pressed)
 
         # Create our positions grid (0,0), (0,1) etc.
         pos = [(i, j) for i in range(7) for j in range(4)]
@@ -54,9 +76,8 @@ class GUICalculator(QtGui.QWidget):
     def create_edit_layout(self):
         self.in_edit = QtGui.QLineEdit()
         self.in_edit.setStyleSheet("padding: 0px;")
-#         self.in_edit.textEdited[str].connect(self.input_changed)
         self.in_edit.returnPressed.connect(self.update_output)
-        self.out_edit = QtGui.QLineEdit()
+        self.out_edit = SelectAllLineEdit()
         self.out_edit.setStyleSheet("padding: 0px;")
         self.out_edit.setReadOnly(True)
         layout = QtGui.QVBoxLayout()
@@ -66,9 +87,23 @@ class GUICalculator(QtGui.QWidget):
 
         return layout
 
-    def input_changed(self, text):
-        text = str(text)
-        print evaluate(text)
+    def close_pressed(self):
+        print "close pressed"
+
+    def c_pressed(self):
+        print "c pressed"
+
+    def clear_pressed(self):
+        print "clear pressed"
+
+    def sqrt_pressed(self):
+        print "sqrt pressed"
+
+    def pow_pressed(self):
+        print "pow pressed"
+
+    def equals_pressed(self):
+        print "equals pressed"
 
     def update_output(self):
         output = evaluate(str(self.in_edit.text()))
