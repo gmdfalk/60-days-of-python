@@ -37,8 +37,8 @@ class GUICalculator(QtGui.QWidget):
     def create_button_layout(self):
         "Creates the grid of calculator buttons."
 
-        labels = ["Close", "mrc", "m+", "m-",
-                  "Clear", "(", ")", "!",
+        labels = ["close", "mrc", "m+", "m-",
+                  "clear", "(", ")", "!",
                   "sqrt", "pow", "%", "/",
                   "7", "8", "9", "*",
                   "4", "5", "6", "-",
@@ -47,21 +47,8 @@ class GUICalculator(QtGui.QWidget):
 
         buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-        for l in labels:
-            btn = buttons[l]
-            if l in "0123456789.-+/%()**":
-                func = lambda: self.in_edit.setText(self.in_edit.text() + l)
-                btn.clicked.connect(func)
-            elif l == "=":
-                btn.clicked.connect(self.equals_pressed)
-            elif l == "Close":
-                btn.clicked.connect(self.close_pressed)
-            elif l == "Clear":
-                btn.clicked.connect(self.clear_pressed)
-            elif l == "sqrt":
-                btn.clicked.connect(self.sqrt_pressed)
-            elif l == "pow":
-                btn.clicked.connect(self.pow_pressed)
+        for b in buttons.values():
+            b.clicked.connect(self.button_clicked())
 
         # Create our positions grid (0,0), (0,1) etc.
         pos = [(i, j) for i in range(7) for j in range(4)]
@@ -87,23 +74,10 @@ class GUICalculator(QtGui.QWidget):
 
         return layout
 
-    def close_pressed(self):
-        print "close pressed"
-
-    def c_pressed(self):
-        print "c pressed"
-
-    def clear_pressed(self):
-        print "clear pressed"
-
-    def sqrt_pressed(self):
-        print "sqrt pressed"
-
-    def pow_pressed(self):
-        print "pow pressed"
-
-    def equals_pressed(self):
-        print "equals pressed"
+    def button_clicked(self):
+        text = self.sender.text()
+        if text in "0123456789.-+/%()**":
+            self.in_edit.setText(self.in_edit.text() + self.sender.text())
 
     def update_output(self):
         output = evaluate(str(self.in_edit.text()))
