@@ -3,7 +3,7 @@
 # setMinimumSize (something is setting this. unset it)
 # Store buttons in variables.
 
-from functools import partial
+from math import factorial
 import sys
 
 from PyQt4 import QtGui, QtCore
@@ -26,6 +26,7 @@ class GUICalculator(QtGui.QWidget):
         self.setWindowTitle("Calculator")
         self.setWindowIcon(QtGui.QIcon("calculator.png"))
 
+        self.mrc = None  # Memory recall variable.
         edits = self.create_edit_layout()
         grid = self.create_button_layout()
 
@@ -38,18 +39,18 @@ class GUICalculator(QtGui.QWidget):
     def create_button_layout(self):
         "Creates the grid of calculator buttons."
 
-        labels = ["close", "mrc", "m+", "m-",
+        labels = ["exit", "mrc", "m+", "m-",
                   "clear", "(", ")", "!",
                   "sqrt", "pow", "%", "/",
                   "7", "8", "9", "*",
                   "4", "5", "6", "-",
                   "1", "2", "3", "+",
-                  "0", ".", "C", "="]
+                  "0", ".", "c", "="]
 
         buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-        for k, v in buttons.items():
-            v.clicked.connect(partial(self.button_clicked, text=k))
+        for b in buttons.values():
+            b.clicked.connect(self.button_clicked)
 
         # Create our positions grid (0,0), (0,1) etc.
         pos = [(i, j) for i in range(7) for j in range(4)]
@@ -62,12 +63,14 @@ class GUICalculator(QtGui.QWidget):
         return layout
 
     def create_edit_layout(self):
+
         self.in_edit = QtGui.QLineEdit()
         self.in_edit.setStyleSheet("padding: 0px;")
         self.in_edit.returnPressed.connect(self.update_output)
         self.out_edit = SelectAllLineEdit()
         self.out_edit.setStyleSheet("padding: 0px;")
         self.out_edit.setReadOnly(True)
+
         layout = QtGui.QVBoxLayout()
         layout.setSpacing(0)
         layout.addWidget(self.in_edit)
@@ -75,13 +78,37 @@ class GUICalculator(QtGui.QWidget):
 
         return layout
 
-    def button_clicked(self, text):
+    def button_clicked(self):
+        text = str(self.sender().text())
         if text in "0123456789.-+/%()**":
             self.in_edit.setText(self.in_edit.text() + text)
-        elif text == "close":
-            sys.exit()
         elif text == "=":
-            self.in_edit()
+            self.update_output()
+        elif text == "exit":
+            sys.exit()
+        elif text == "c":
+            self.in_edit.setText(self.in_edit.text()[:-1])
+        elif text == "clear":
+            self.in_edit.setText("")
+        elif text == "!":
+            factor = str(factorial(int(self.in_edit.text())))
+            self.out_edit.setText(factor)
+            self.in_edit.setText("")
+        elif text == "sqrt":
+            self.in_edit.setText("({})**0.5".format(self.in_edit.text()))
+            self.update_output()
+        elif text == "pow":
+            self.in_edit.setText(self.in_edit.text() + "**")
+        elif text == "mrc":
+            self.mrc = str(self.in_edit.text())
+        elif text == "m+":
+            self.in_edit.setText(self.in_edit.text() + self.mrc)
+        elif text == "m-":
+            t = str(self.in_edit.text())
+            if self.mrc in t:
+                length = len(self.mrc)
+                idx = t.rfind(self.mrc)
+                self.in_edit.setText(t[:idx] + t[idx + length:])
 
     def update_output(self):
         output = evaluate(str(self.in_edit.text()))
