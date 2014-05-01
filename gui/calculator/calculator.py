@@ -3,6 +3,7 @@
 # setMinimumSize (something is setting this. unset it)
 # Store buttons in variables.
 
+from functools import partial
 import sys
 
 from PyQt4 import QtGui, QtCore
@@ -47,8 +48,8 @@ class GUICalculator(QtGui.QWidget):
 
         buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-        for b in buttons.values():
-            b.clicked.connect(self.button_clicked())
+        for k, v in buttons.items():
+            v.clicked.connect(partial(self.button_clicked, text=k))
 
         # Create our positions grid (0,0), (0,1) etc.
         pos = [(i, j) for i in range(7) for j in range(4)]
@@ -74,10 +75,13 @@ class GUICalculator(QtGui.QWidget):
 
         return layout
 
-    def button_clicked(self):
-        text = self.sender.text()
+    def button_clicked(self, text):
         if text in "0123456789.-+/%()**":
-            self.in_edit.setText(self.in_edit.text() + self.sender.text())
+            self.in_edit.setText(self.in_edit.text() + text)
+        elif text == "close":
+            sys.exit()
+        elif text == "=":
+            self.in_edit()
 
     def update_output(self):
         output = evaluate(str(self.in_edit.text()))
