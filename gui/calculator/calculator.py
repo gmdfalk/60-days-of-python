@@ -18,7 +18,7 @@ class GUICalculator(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon("calculator.png"))
 
         edits = self.create_edit_layout()
-        grid, self.buttons = self.create_button_layout()
+        grid = self.create_button_layout()
 
         mainlayout = QtGui.QVBoxLayout()
         mainlayout.addLayout(edits)
@@ -27,26 +27,28 @@ class GUICalculator(QtGui.QWidget):
         self.setLayout(mainlayout)
 
     def create_button_layout(self):
-        "Creates the grid of conversion unit QLineEdits and QLabels for a tab."
-        # Dictionary that holds our QLineEdit fields for later use.
-#         edits = {i[0]: SelectAllLineEdit() for i in units}
+        "Creates the grid of calculator buttons."
+
         labels = ["Close", "mrc", "m+", "m-", "Clear", "(", ")", "!",
                   "sqrt", "pow", "%", "/",
                   "7", "8", "9", "*", "4", "5", "6", "-",
                   "1", "2", "3", "+", "0", ".", "C", "="]
 
-#         buttons = {i: QtGui.QPushButton() for i in labels}
+        buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-        # Create our positions grid (0,0), (0,1) etc
+        for i in buttons:
+            i.connect()
+
+
+        # Create our positions grid (0,0), (0,1) etc.
         pos = [(i, j) for i in range(7) for j in range(4)]
 
         layout = QtGui.QGridLayout()
 
         for i in range(len(labels)):
-            layout.addWidget(QtGui.QLabel(labels[i]), pos[i][0], pos[i][1])
-            layout.addWidget(QtGui.QPushButton(labels[i]), pos[i][0], pos[i][1])
+            layout.addWidget(buttons[labels[i]], pos[i][0], pos[i][1])
 
-        return layout, None
+        return layout
 
     def create_edit_layout(self):
         self.in_edit = QtGui.QLineEdit()
