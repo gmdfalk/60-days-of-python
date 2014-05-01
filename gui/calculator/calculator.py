@@ -7,6 +7,7 @@ import sys
 
 from PyQt4 import QtGui, QtCore
 
+from calculation import evaluate
 
 
 class GUICalculator(QtGui.QWidget):
@@ -36,8 +37,8 @@ class GUICalculator(QtGui.QWidget):
 
         buttons = {i: QtGui.QPushButton(i) for i in labels}
 
-        for i in buttons:
-            i.connect()
+#         for i in buttons:
+#             i.setReadOnly(True)
 
 
         # Create our positions grid (0,0), (0,1) etc.
@@ -52,9 +53,12 @@ class GUICalculator(QtGui.QWidget):
 
     def create_edit_layout(self):
         self.in_edit = QtGui.QLineEdit()
-        self.out_edit = QtGui.QLineEdit()
         self.in_edit.setStyleSheet("padding: 0px;")
+#         self.in_edit.textEdited[str].connect(self.input_changed)
+        self.in_edit.returnPressed.connect(self.update_output)
+        self.out_edit = QtGui.QLineEdit()
         self.out_edit.setStyleSheet("padding: 0px;")
+        self.out_edit.setReadOnly(True)
         layout = QtGui.QVBoxLayout()
         layout.setSpacing(0)
         layout.addWidget(self.in_edit)
@@ -62,6 +66,15 @@ class GUICalculator(QtGui.QWidget):
 
         return layout
 
+    def input_changed(self, text):
+        text = str(text)
+        print evaluate(text)
+
+    def update_output(self):
+        output = evaluate(str(self.in_edit.text()))
+        if output:
+            self.out_edit.setText(str(output))
+            self.in_edit.setText("")
 
 def main():
     app = QtGui.QApplication(sys.argv)

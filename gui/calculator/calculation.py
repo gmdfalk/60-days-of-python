@@ -128,11 +128,14 @@ def parse(program):
     return expression()
 
 # The cheap way, without a parse tree.
-def evaluate(self, s):
+def evaluate(s):
     invalids = letters + "!#$&\',:;<=>?@[\\]_`{|}~"
     if any(c in invalids for c in s) or not any(c in digits for c in s):
         return
-    return eval(s)
+    try:
+        return eval(s)
+    except SyntaxError:
+        print "Bad syntax. Could not evaluate {}.".format(s)
 
 
 
