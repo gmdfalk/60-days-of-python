@@ -11,26 +11,33 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 
-class FileBrowser(QtGui.QWidget):
+class FileBrowser(QtGui.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, parent=None):
 
-        super(FileBrowser, self).__init__()
+        super(FileBrowser, self).__init__(parent)
 
         # Main Window
-        self.setGeometry(300, 300, 350, 300)
+        self.setGeometry(300, 200, 760, 600)
         self.setWindowTitle("FileBrowser")
         self.setWindowIcon(QtGui.QIcon("data/icon.png"))
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
+
+        model = QtGui.QFileSystemModel()
+        model.setRootPath("")
+        model.setFilter(QtCore.QDir.AllDirs)
+        view = QtGui.QTreeView()
+        view.setModel(model)
+        self.setCentralWidget(view)
 
 
 def main():
     "Main entry point."
 
     app = QtGui.QApplication(sys.argv)
-    c = FileBrowser()
-    c.show()
+    browser = FileBrowser()
+    browser.show()
     sys.exit(app.exec_())
 
 
