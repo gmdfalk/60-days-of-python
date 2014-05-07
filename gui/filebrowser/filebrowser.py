@@ -34,7 +34,7 @@ class FileBrowser(QtGui.QMainWindow):
 #         view.setColumnHidden(2, True)
 #         view.setColumnHidden(3, True)
 #         view.header().hide()
-#         self.setCentralWidget(view)
+#          self.setCentralWidget(view)
 
 
 def main():
