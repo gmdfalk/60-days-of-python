@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="treewidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="dirtree_tab">
          <attribute name="title">
@@ -69,21 +69,21 @@
          </attribute>
          <layout class="QHBoxLayout" name="replacerlayout">
           <item>
-           <widget class="QRadioButton" name="radioButton_3">
+           <widget class="QRadioButton" name="nocaseradio">
             <property name="text">
              <string>No case changes</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_2">
+           <widget class="QRadioButton" name="lowerradio">
             <property name="text">
              <string>Lowercase</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton">
+           <widget class="QRadioButton" name="upperradio">
             <property name="text">
              <string>Uppercase</string>
             </property>
@@ -180,32 +180,59 @@
         <item>
          <widget class="QTabWidget" name="browsertabs">
           <property name="currentIndex">
-           <number>4</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="both_tab">
            <attribute name="title">
             <string>Both</string>
            </attribute>
+           <layout class="QHBoxLayout" name="bothlayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QListView" name="bothlist"/>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="dirs_tab">
            <attribute name="title">
             <string>Dirs</string>
            </attribute>
+           <layout class="QHBoxLayout" name="dirslayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QListView" name="dirslist"/>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="files_tab">
            <attribute name="title">
             <string>Files</string>
            </attribute>
-          </widget>
-          <widget class="QWidget" name="error_tab">
-           <attribute name="title">
-            <string>Errors</string>
-           </attribute>
+           <layout class="QHBoxLayout" name="fileslayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QListView" name="fileslist"/>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="history_tab">
            <attribute name="title">
             <string>History</string>
            </attribute>
+           <layout class="QHBoxLayout" name="historylayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QTreeView" name="historytree"/>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
@@ -215,6 +242,13 @@
            <widget class="QPushButton" name="previewbutton">
             <property name="text">
              <string>Preview</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refreshbutton">
+            <property name="text">
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
@@ -233,9 +267,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="refreshbutton">
+           <widget class="QPushButton" name="redobutton">
             <property name="text">
-             <string>Refresh</string>
+             <string>Redo</string>
             </property>
            </widget>
           </item>
