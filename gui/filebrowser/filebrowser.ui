@@ -16,17 +16,17 @@
   <widget class="QWidget" name="mainwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_6">
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="mainsplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QSplitter" name="splitter">
+      <widget class="QSplitter" name="leftsplitter">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
        <widget class="QTabWidget" name="treewidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="dirtree_tab">
          <attribute name="title">
@@ -62,7 +62,7 @@
        </widget>
        <widget class="QTabWidget" name="actiontabs">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="replacer_tab">
          <attribute name="title">
@@ -164,7 +164,7 @@
        </widget>
       </widget>
       <widget class="QWidget" name="horizontalLayoutWidget_2">
-       <layout class="QVBoxLayout" name="rightlayout" stretch="0,0">
+       <layout class="QVBoxLayout" name="rightlayout" stretch="0,0,0">
         <property name="spacing">
          <number>6</number>
         </property>
@@ -179,7 +179,7 @@
           <item>
            <widget class="QTabWidget" name="browsertabs">
             <property name="currentIndex">
-             <number>1</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="both_tab">
              <attribute name="title">
@@ -277,6 +277,52 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QCheckBox" name="checkBox_17">
+            <property name="text">
+             <string>hidden</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_20">
+            <property name="text">
+             <string>aswitch</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_21">
+            <property name="text">
+             <string>astop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_19">
+            <property name="text">
+             <string>aprev</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_18">
+            <property name="text">
+             <string>recurse</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_16">
+            <property name="text">
+             <string>ext</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="editlayout">
           <item>
            <widget class="QLineEdit" name="sourcedit"/>
@@ -284,7 +330,7 @@
           <item>
            <widget class="QCheckBox" name="regexcheck">
             <property name="text">
-             <string>Regex</string>
+             <string>regex</string>
             </property>
            </widget>
           </item>
