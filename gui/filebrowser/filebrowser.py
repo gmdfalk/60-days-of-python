@@ -4,14 +4,14 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 
 
-class FileBrowser(QtGui.QMainWindow):
+class MassRenamer(QtGui.QMainWindow):
 
     def __init__(self, parent=None):
 
-        super(FileBrowser, self).__init__(parent)
+        super(MassRenamer, self).__init__(parent)
         uic.loadUi("filebrowser.ui", self)
 
-        self.setWindowTitle("FileBrowser")
+        self.setWindowTitle("MassRenamer")
         self.setWindowIcon(QtGui.QIcon("icon.png"))
 
         model = QtGui.QFileSystemModel()
@@ -24,14 +24,13 @@ class FileBrowser(QtGui.QMainWindow):
         self.dirtree.setColumnHidden(2, True)
         self.dirtree.setColumnHidden(3, True)
         self.dirtree.header().hide()
-#         self.setCentralWidget(view)
 
 
 def main():
     "Main entry point."
 
     app = QtGui.QApplication(sys.argv)
-    browser = FileBrowser()
+    browser = MassRenamer()
     browser.show()
     sys.exit(app.exec_())
 

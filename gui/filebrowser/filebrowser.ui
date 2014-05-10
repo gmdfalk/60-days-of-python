@@ -42,93 +42,115 @@
           <widget class="QTreeView" name="dirtree"/>
          </item>
         </layout>
-        <zorder>dirtree</zorder>
-        <zorder>dirtree</zorder>
        </widget>
        <widget class="QWidget" name="options_tab">
         <attribute name="title">
          <string>Options</string>
         </attribute>
-        <widget class="QWidget" name="gridLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>120</x>
-           <y>470</y>
-           <width>160</width>
-           <height>146</height>
-          </rect>
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+         <property name="margin">
+          <number>4</number>
          </property>
-         <layout class="QGridLayout" name="gridLayout" columnminimumwidth="0">
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="checkBox_25">
-            <property name="text">
-             <string>stop on error</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBox_26">
-            <property name="text">
-             <string>automatic preview</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBox_23">
-            <property name="text">
-             <string>preserve extensions</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBox_22">
-            <property name="text">
-             <string>recursive</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBox_24">
-            <property name="text">
-             <string>show hidden</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="horizontalLayoutWidget_4">
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>40</y>
-           <width>251</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <item>
-           <widget class="QRadioButton" name="radioButton">
-            <property name="text">
-             <string>only files</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_3">
-            <property name="text">
-             <string>only dirs</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_2">
-            <property name="text">
-             <string>edit all</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+         <item>
+          <layout class="QVBoxLayout" name="actionlayout" stretch="0,1">
+           <item>
+            <layout class="QHBoxLayout" name="fileradiolayout">
+             <item>
+              <widget class="QRadioButton" name="filesradio">
+               <property name="text">
+                <string>Only files</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="dirsradio">
+               <property name="text">
+                <string>Only dirs</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="allradio">
+               <property name="text">
+                <string>Edit both</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="capitalizecheck">
+               <property name="text">
+                <string>Capitalize</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="checkBox">
+               <property name="text">
+                <string>Spaces</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="comboBox_2"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="optiongrid" rowstretch="0,0,0" columnstretch="0,0">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="recursivecheck">
+             <property name="text">
+              <string>recursive</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="mirrorcheck">
+             <property name="text">
+              <string>mirror manual to all</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="stopcheck">
+             <property name="text">
+              <string>stop on error</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="previewcheck">
+             <property name="text">
+              <string>automatic preview</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="hiddencheck">
+             <property name="text">
+              <string>show hidden</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="extensioncheck">
+             <property name="text">
+              <string>preserve extensions</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="history_tab">
         <attribute name="title">
@@ -199,7 +221,7 @@
           <item>
            <widget class="QCheckBox" name="regexcheck">
             <property name="text">
-             <string>regex</string>
+             <string>Regex</string>
             </property>
            </widget>
           </item>
@@ -213,9 +235,6 @@
      </widget>
     </item>
    </layout>
-   <zorder>verticalLayoutWidget_3</zorder>
-   <zorder>horizontalLayoutWidget_3</zorder>
-   <zorder>verticalLayoutWidget_7</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
