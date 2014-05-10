@@ -6,198 +6,179 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>842</width>
-    <height>595</height>
+    <width>894</width>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>380</y>
-      <width>511</width>
-      <height>31</height>
+      <x>1</x>
+      <y>1</y>
+      <width>721</width>
+      <height>531</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="text">
-        <string>PushButton</string>
+      <layout class="QHBoxLayout" name="toplayout">
+       <property name="spacing">
+        <number>6</number>
        </property>
-      </widget>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTabWidget" name="browsertabs">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="both_tab">
+          <attribute name="title">
+           <string>Both</string>
+          </attribute>
+          <widget class="QWidget" name="horizontalLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>150</x>
+             <y>180</y>
+             <width>360</width>
+             <height>29</height>
+            </rect>
+           </property>
+           <layout class="QHBoxLayout" name="buttonlayout">
+            <item>
+             <widget class="QPushButton" name="previewbutton">
+              <property name="text">
+               <string>Preview</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="startbutton">
+              <property name="text">
+               <string>Start</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="undobutton">
+              <property name="text">
+               <string>Undo</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="refreshbutton">
+              <property name="text">
+               <string>Refresh</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="dirs_tab">
+          <attribute name="title">
+           <string>Dirs</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="files_tab">
+          <attribute name="title">
+           <string>Files</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="error_tab">
+          <attribute name="title">
+           <string>Errors</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="bottomlayout">
+       <item>
+        <layout class="QVBoxLayout" name="optionslayout_4">
+         <item>
+          <widget class="QCheckBox" name="checkBox_16">
+           <property name="text">
+            <string>Show Hidden Files</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_17">
+           <property name="text">
+            <string>Preserve extensions</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_18">
+           <property name="text">
+            <string>Preview automatically</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_19">
+           <property name="text">
+            <string>Apply changes recursively</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_20">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Stop at error</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="actionstabs_4">
+         <property name="currentIndex">
+          <number>2</number>
+         </property>
+         <widget class="QWidget" name="common_tab_4">
+          <attribute name="title">
+           <string>Common</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="replace_tab_4">
+          <attribute name="title">
+           <string>Replace/Remove</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="insert_tab_4">
+          <attribute name="title">
+           <string>Insert/Delete</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="num_tab_4">
+          <attribute name="title">
+           <string>Numerical</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>0</y>
-      <width>511</width>
-      <height>381</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>3</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Both</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Dirs</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_5">
-     <attribute name="title">
-      <string>Files</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_6">
-     <attribute name="title">
-      <string>Errors</string>
-     </attribute>
-    </widget>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>410</y>
-      <width>651</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Common</string>
-     </attribute>
-     <zorder>treeView</zorder>
-    </widget>
-    <widget class="QWidget" name="tab_7">
-     <attribute name="title">
-      <string>Replace/Remove</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_8">
-     <attribute name="title">
-      <string>Insert/Delete</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="tab_4">
-     <attribute name="title">
-      <string>Numerical</string>
-     </attribute>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>650</x>
-      <y>410</y>
-      <width>191</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QCheckBox" name="checkBox_2">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_4">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_5">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_3">
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>CheckBox</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QTreeView" name="treeView">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>331</width>
-      <height>411</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>2</width>
-      <height>2</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2"/>
-   </widget>
-   <zorder>tabWidget</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>tabWidget_2</zorder>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>treeView</zorder>
-   <zorder>verticalLayoutWidget_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
