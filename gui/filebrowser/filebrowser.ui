@@ -16,10 +16,10 @@
   <widget class="QWidget" name="mainwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_6">
     <property name="margin">
-     <number>0</number>
+     <number>4</number>
     </property>
     <item>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="mainsplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -49,109 +49,85 @@
         <attribute name="title">
          <string>Options</string>
         </attribute>
-        <widget class="QRadioButton" name="radioButton">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>170</y>
-           <width>101</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>files</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_24">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>310</y>
-           <width>131</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>show hidden</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="radioButton_3">
-         <property name="geometry">
-          <rect>
-           <x>200</x>
-           <y>170</y>
-           <width>101</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>dirs</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="radioButton_2">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>170</y>
-           <width>101</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>both</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_26">
+        <widget class="QWidget" name="gridLayoutWidget">
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>460</y>
-           <width>151</width>
-           <height>21</height>
+           <y>470</y>
+           <width>160</width>
+           <height>146</height>
           </rect>
          </property>
-         <property name="text">
-          <string>automatic preview</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout" columnminimumwidth="0">
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="checkBox_25">
+            <property name="text">
+             <string>stop on error</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBox_26">
+            <property name="text">
+             <string>automatic preview</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBox_23">
+            <property name="text">
+             <string>preserve extensions</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBox_22">
+            <property name="text">
+             <string>recursive</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkBox_24">
+            <property name="text">
+             <string>show hidden</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-        <widget class="QCheckBox" name="checkBox_23">
+        <widget class="QWidget" name="horizontalLayoutWidget_4">
          <property name="geometry">
           <rect>
-           <x>130</x>
-           <y>240</y>
-           <width>151</width>
-           <height>31</height>
+           <x>50</x>
+           <y>40</y>
+           <width>251</width>
+           <height>41</height>
           </rect>
          </property>
-         <property name="text">
-          <string>preserve extensions</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_25">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>370</y>
-           <width>171</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>stop on error</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_22">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>230</y>
-           <width>87</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>recursive</string>
-         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QRadioButton" name="radioButton">
+            <property name="text">
+             <string>only files</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_3">
+            <property name="text">
+             <string>only dirs</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_2">
+            <property name="text">
+             <string>edit all</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
        <widget class="QWidget" name="history_tab">
@@ -173,11 +149,8 @@
         <property name="spacing">
          <number>6</number>
         </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
+        <property name="margin">
+         <number>4</number>
         </property>
         <item>
          <layout class="QVBoxLayout" name="browserlayout" stretch="0">
