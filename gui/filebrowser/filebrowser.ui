@@ -80,6 +80,9 @@
            </item>
            <item>
             <layout class="QFormLayout" name="formLayout">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <item row="0" column="0">
               <widget class="QCheckBox" name="capitalizecheck">
                <property name="text">
@@ -88,17 +91,63 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox"/>
+              <widget class="QComboBox" name="capitalizebox"/>
              </item>
              <item row="1" column="0">
-              <widget class="QCheckBox" name="checkBox">
+              <widget class="QCheckBox" name="spacecheck">
                <property name="text">
                 <string>Spaces</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_2"/>
+              <widget class="QComboBox" name="spacebox"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="checkBox">
+               <property name="text">
+                <string>Insert</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="lineEdit"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QRadioButton" name="radioButton_3">
+               <property name="text">
+                <string>at position</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="spinBox"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QCheckBox" name="deletecheck">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="spinBox_2"/>
+             </item>
+             <item row="5" column="1">
+              <widget class="QSpinBox" name="spinBox_3"/>
+             </item>
+             <item row="6" column="0">
+              <widget class="QCheckBox" name="checkBox_2">
+               <property name="text">
+                <string>Replace</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLineEdit" name="lineEdit_2"/>
+             </item>
+             <item row="7" column="1">
+              <widget class="QLineEdit" name="lineEdit_3"/>
              </item>
             </layout>
            </item>
