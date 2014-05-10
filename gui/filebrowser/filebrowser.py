@@ -17,6 +17,28 @@ class FileBrowser(QtGui.QMainWindow):
 
         super(FileBrowser, self).__init__(parent)
         uic.loadUi("filebrowser.ui", self)
+
+        # mainlayout
+        #     leftlayout
+        #        dirtree
+        #        actiontabs
+        #            replacer_tab
+        #            delete_tab
+        #            append_tab
+        #            option_tab
+        #            status_tab
+        #     rightlayout
+        #        editlayout
+        #            regexcheck
+        #            sourceedit
+        #            targetedit
+        #        browserlayout
+        #            browsertabs
+        #                both_tab
+        #                dirs_tab
+        #                files_tab
+        #                both_tab
+        #                both_tab
         # Main Window
 #         self.setGeometry(300, 200, 760, 600)
 #         self.setWindowTitle("FileBrowser")

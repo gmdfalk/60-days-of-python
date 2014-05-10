@@ -6,178 +6,266 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>894</width>
-    <height>759</height>
+    <width>892</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>1</y>
-      <width>811</width>
-      <height>641</height>
-     </rect>
+  <widget class="QWidget" name="mainwidget">
+   <layout class="QHBoxLayout" name="mainlayout" stretch="2,3">
+    <property name="margin">
+     <number>0</number>
     </property>
-    <layout class="QVBoxLayout" name="mainlayout" stretch="2,1">
-     <item>
-      <layout class="QHBoxLayout" name="toplayout" stretch="2,3">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QTreeView" name="dirtree"/>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="browserlayout">
-         <item>
-          <widget class="QTabWidget" name="browsertabs">
-           <property name="currentIndex">
-            <number>0</number>
-           </property>
-           <widget class="QWidget" name="both_tab">
-            <attribute name="title">
-             <string>Both</string>
-            </attribute>
-           </widget>
-           <widget class="QWidget" name="dirs_tab">
-            <attribute name="title">
-             <string>Dirs</string>
-            </attribute>
-           </widget>
-           <widget class="QWidget" name="files_tab">
-            <attribute name="title">
-             <string>Files</string>
-            </attribute>
-           </widget>
-           <widget class="QWidget" name="error_tab">
-            <attribute name="title">
-             <string>Errors</string>
-            </attribute>
-           </widget>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="buttonlayout">
-           <item>
-            <widget class="QPushButton" name="previewbutton">
-             <property name="text">
-              <string>Preview</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="startbutton">
-             <property name="text">
-              <string>Start</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="undobutton">
-             <property name="text">
-              <string>Undo</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="refreshbutton">
-             <property name="text">
-              <string>Refresh</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="bottomlayout" stretch="3,1">
-       <item>
-        <widget class="QTabWidget" name="actionstabs_4">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="common_tab_4">
-          <attribute name="title">
-           <string>Common</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="replace_tab_4">
-          <attribute name="title">
-           <string>Replace/Remove</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="insert_tab_4">
-          <attribute name="title">
-           <string>Insert/Delete</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="num_tab_4">
-          <attribute name="title">
-           <string>Numerical</string>
-          </attribute>
-         </widget>
+    <item>
+     <layout class="QVBoxLayout" name="leftlayout" stretch="3,2">
+      <item>
+       <widget class="QTabWidget" name="treewidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="dirtree_tab">
+         <attribute name="title">
+          <string>Dirtree</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="dirtreelayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QTreeView" name="dirtree"/>
+          </item>
+         </layout>
+         <zorder>dirtree</zorder>
+         <zorder>dirtree</zorder>
         </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="optionslayout_4">
-         <item>
-          <widget class="QCheckBox" name="checkBox_16">
-           <property name="text">
-            <string>Show Hidden Files</string>
-           </property>
+        <widget class="QWidget" name="status_tab">
+         <attribute name="title">
+          <string>Status</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="statuslayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QTableView" name="tableView"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="actiontabs">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="replacer_tab">
+         <attribute name="title">
+          <string>Replace</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="replacerlayout">
+          <item>
+           <widget class="QRadioButton" name="radioButton_3">
+            <property name="text">
+             <string>No case changes</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_2">
+            <property name="text">
+             <string>Lowercase</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton">
+            <property name="text">
+             <string>Uppercase</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="delete_tab">
+         <attribute name="title">
+          <string>Delete</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="append_tab">
+         <attribute name="title">
+          <string>Append</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="option_tab">
+         <attribute name="title">
+          <string>Options</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="optionlayout">
+          <item>
+           <widget class="QCheckBox" name="statuscheck">
+            <property name="text">
+             <string>Don't autoswitch to Status</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="hiddencheck">
+            <property name="text">
+             <string>Show Hidden Files</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="extensioncheck">
+            <property name="text">
+             <string>Preserve extensions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="previewcheck">
+            <property name="text">
+             <string>Preview automatically</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="recursecheck">
+            <property name="text">
+             <string>Apply changes recursively</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="stopcheck">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Stop at first error</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+         <zorder>previewcheck</zorder>
+         <zorder>stopcheck</zorder>
+         <zorder>recursecheck</zorder>
+         <zorder>extensioncheck</zorder>
+         <zorder>hiddencheck</zorder>
+         <zorder>previewcheck</zorder>
+         <zorder>statuscheck</zorder>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="rightlayout" stretch="0,0">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="browserlayout" stretch="1,0">
+        <item>
+         <widget class="QTabWidget" name="browsertabs">
+          <property name="currentIndex">
+           <number>4</number>
+          </property>
+          <widget class="QWidget" name="both_tab">
+           <attribute name="title">
+            <string>Both</string>
+           </attribute>
           </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_17">
-           <property name="text">
-            <string>Preserve extensions</string>
-           </property>
+          <widget class="QWidget" name="dirs_tab">
+           <attribute name="title">
+            <string>Dirs</string>
+           </attribute>
           </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_18">
-           <property name="text">
-            <string>Preview automatically</string>
-           </property>
+          <widget class="QWidget" name="files_tab">
+           <attribute name="title">
+            <string>Files</string>
+           </attribute>
           </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_19">
-           <property name="text">
-            <string>Apply changes recursively</string>
-           </property>
+          <widget class="QWidget" name="error_tab">
+           <attribute name="title">
+            <string>Errors</string>
+           </attribute>
           </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_20">
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Stop at error</string>
-           </property>
+          <widget class="QWidget" name="history_tab">
+           <attribute name="title">
+            <string>History</string>
+           </attribute>
           </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="buttonlayout">
+          <item>
+           <widget class="QPushButton" name="previewbutton">
+            <property name="text">
+             <string>Preview</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="startbutton">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="undobutton">
+            <property name="text">
+             <string>Undo</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refreshbutton">
+            <property name="text">
+             <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="editlayout">
+        <item>
+         <widget class="QLineEdit" name="sourcedit"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="regexcheck">
+          <property name="text">
+           <string>Regex</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="targetedit"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+   <zorder>verticalLayoutWidget_3</zorder>
+   <zorder>horizontalLayoutWidget_3</zorder>
+   <zorder>verticalLayoutWidget_7</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
