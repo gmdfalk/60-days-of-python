@@ -19,13 +19,13 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>721</width>
-      <height>531</height>
+      <width>811</width>
+      <height>641</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="mainlayout" stretch="2,1">
      <item>
-      <layout class="QHBoxLayout" name="toplayout">
+      <layout class="QHBoxLayout" name="toplayout" stretch="2,3">
        <property name="spacing">
         <number>6</number>
        </property>
@@ -36,76 +36,102 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QTabWidget" name="browsertabs">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="both_tab">
-          <attribute name="title">
-           <string>Both</string>
-          </attribute>
-          <widget class="QWidget" name="horizontalLayoutWidget">
-           <property name="geometry">
-            <rect>
-             <x>150</x>
-             <y>180</y>
-             <width>360</width>
-             <height>29</height>
-            </rect>
+        <widget class="QTreeView" name="dirtree"/>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="browserlayout">
+         <item>
+          <widget class="QTabWidget" name="browsertabs">
+           <property name="currentIndex">
+            <number>0</number>
            </property>
-           <layout class="QHBoxLayout" name="buttonlayout">
-            <item>
-             <widget class="QPushButton" name="previewbutton">
-              <property name="text">
-               <string>Preview</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="startbutton">
-              <property name="text">
-               <string>Start</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="undobutton">
-              <property name="text">
-               <string>Undo</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="refreshbutton">
-              <property name="text">
-               <string>Refresh</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QWidget" name="both_tab">
+            <attribute name="title">
+             <string>Both</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="dirs_tab">
+            <attribute name="title">
+             <string>Dirs</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="files_tab">
+            <attribute name="title">
+             <string>Files</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="error_tab">
+            <attribute name="title">
+             <string>Errors</string>
+            </attribute>
+           </widget>
           </widget>
-         </widget>
-         <widget class="QWidget" name="dirs_tab">
-          <attribute name="title">
-           <string>Dirs</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="files_tab">
-          <attribute name="title">
-           <string>Files</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="error_tab">
-          <attribute name="title">
-           <string>Errors</string>
-          </attribute>
-         </widget>
-        </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="buttonlayout">
+           <item>
+            <widget class="QPushButton" name="previewbutton">
+             <property name="text">
+              <string>Preview</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="startbutton">
+             <property name="text">
+              <string>Start</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="undobutton">
+             <property name="text">
+              <string>Undo</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="refreshbutton">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="bottomlayout">
+      <layout class="QHBoxLayout" name="bottomlayout" stretch="3,1">
+       <item>
+        <widget class="QTabWidget" name="actionstabs_4">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="common_tab_4">
+          <attribute name="title">
+           <string>Common</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="replace_tab_4">
+          <attribute name="title">
+           <string>Replace/Remove</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="insert_tab_4">
+          <attribute name="title">
+           <string>Insert/Delete</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="num_tab_4">
+          <attribute name="title">
+           <string>Numerical</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
        <item>
         <layout class="QVBoxLayout" name="optionslayout_4">
          <item>
@@ -147,33 +173,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QTabWidget" name="actionstabs_4">
-         <property name="currentIndex">
-          <number>2</number>
-         </property>
-         <widget class="QWidget" name="common_tab_4">
-          <attribute name="title">
-           <string>Common</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="replace_tab_4">
-          <attribute name="title">
-           <string>Replace/Remove</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="insert_tab_4">
-          <attribute name="title">
-           <string>Insert/Delete</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="num_tab_4">
-          <attribute name="title">
-           <string>Numerical</string>
-          </attribute>
-         </widget>
-        </widget>
        </item>
       </layout>
      </item>
