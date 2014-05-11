@@ -1,24 +1,35 @@
 """demimove
 
 Usage:
-    dmv <source> <target> [-a <adm>] [-f] [-d] [-r] [-R] [-t] [-c]
+    dmv <source> <target> [-s] [-f|-d] [-a] [-r] [-i] [-n] [-c <n>] [-R]
         [-q] [-v...] [-h]
 
 Arguments:
-    source        a
-    target        b
+    source        Pattern to match (with globbing enabled by default).
+                  With no other options set, this will match against all
+                  non-hidden file and directory names in the current directory.
+    target        Replacement pattern.
 
 Options:
-    -r, --recursive   Apply changes recursively.
-    -R, --regex       Use regex matching instead of globbing.
-    -c, --confirm     Confirm overwrite actions.
-    -t, --test        Do a test run and dump the results to console.
-    -h, --help        Show this help message and exit.
-    -q, --quiet       Do not print log messages to console.
-    -v                Logging verbosity, up to -vvv.
+    -s, --simulate     Do a test run and dump the results to console.
+    -f, --files        Only search file names. Default is both files and dirs.
+    -d, --dirs         Only search directory names. Leaves files untouched.
+    -a, --all          Include hidden files/directories.
+    -r, --recursive    Apply changes recursively.
+    -i, --interactive  Confirm all rename actions.
+    -n, --no-clobber   Do not overwrite an existing file.
+    -c, --count=<n>    Increment a counter at the given index (0 start, -1 end)
+    -R, --regex        Use regex matching instead of globbing.
+    -q, --quiet        Do not print log messages to console.
+    -v                 Logging verbosity, up to -vvv (debug).
+    --version          Show the current demimove version.
+    -h, --help         Show this help message and exit.
+
+Examples:
+    dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
+    dmv -f * season-* (will prepend "season-" to every file in the cwd)
 """
 import logging
-import shutil
 import sys
 
 import reporting
@@ -26,7 +37,7 @@ import reporting
 
 try:
     from docopt import docopt
-except:
+except ImportError:
     print "Please install docopt first."
     sys.exit()
 
@@ -34,7 +45,8 @@ except:
 def main():
     args = docopt(__doc__, version="0.1")
     reporting.configure_logger(log, args["-v"], args["--quiet"])
-
+    log.error("testmsg")
+    print args
 
 if __name__ == "__main__":
     log = reporting.create_logger()
