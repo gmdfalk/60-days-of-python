@@ -12,8 +12,8 @@ class MassRenamer(QtGui.QMainWindow):
         uic.loadUi("filebrowser.ui", self)
 
 #         print self.mainsplitter.sizes()
-        self.mainsplitter.setStretchFactor(0, 1)
-        self.mainsplitter.setStretchFactor(1, 30)
+        self.mainsplitter.setStretchFactor(0, 0)
+        self.mainsplitter.setStretchFactor(1, 2)
 #         print self.mainsplitter.sizes()
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))

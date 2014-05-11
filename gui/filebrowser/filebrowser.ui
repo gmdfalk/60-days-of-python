@@ -179,19 +179,26 @@
              <item row="5" column="1">
               <layout class="QHBoxLayout" name="replacechecks">
                <item>
+                <widget class="QRadioButton" name="regex">
+                 <property name="text">
+                  <string>regex</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioButton">
+                 <property name="text">
+                  <string>glob</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="casesensitive">
                  <property name="text">
                   <string>case sensitive</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="regex">
-                 <property name="text">
-                  <string>regex</string>
                  </property>
                 </widget>
                </item>
@@ -207,17 +214,18 @@
              <item row="6" column="1">
               <layout class="QHBoxLayout" name="insertlayout">
                <item>
-                <widget class="QLineEdit" name="insertedit"/>
-               </item>
-               <item>
-                <widget class="QLabel" name="insertatlabel">
-                 <property name="text">
-                  <string>at</string>
+                <widget class="QSpinBox" name="insertpos">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to insert to. Choose -1 to append.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="insertpos"/>
+                <widget class="QLineEdit" name="insertedit">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;String to insert at the defined position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -231,17 +239,30 @@
              <item row="7" column="1">
               <layout class="QHBoxLayout" name="deletelayout">
                <item>
-                <widget class="QSpinBox" name="deletestart"/>
+                <widget class="QSpinBox" name="deletestart">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to start deleting from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Startindex&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QSpinBox" name="deleteend">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to stop deletion at.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stopindex&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="minimum">
                   <number>1</number>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_2">
+                <widget class="QLabel" name="deletelabel">
                  <property name="text">
                   <string/>
                  </property>
@@ -250,7 +271,7 @@
               </layout>
              </item>
              <item row="8" column="0">
-              <widget class="QCheckBox" name="checkBox">
+              <widget class="QCheckBox" name="countcheck">
                <property name="text">
                 <string>Index</string>
                </property>
@@ -259,13 +280,27 @@
              <item row="8" column="1">
               <layout class="QHBoxLayout" name="indexlayout" stretch="0,0,0">
                <item>
-                <widget class="QSpinBox" name="startindex"/>
+                <widget class="QSpinBox" name="startindex">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Base. This number will be used as a starting point to count from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Base&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="endindex"/>
+                <widget class="QSpinBox" name="endindex">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Step. Increment the base by this number per target.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Step&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_3">
+                <widget class="QLabel" name="indexlabel">
                  <property name="text">
                   <string/>
                  </property>
@@ -276,17 +311,37 @@
              <item row="9" column="1">
               <layout class="QHBoxLayout" name="countstringlabel">
                <item>
-                <widget class="QLineEdit" name="prefixedit"/>
+                <widget class="QLineEdit" name="prefixedit">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Prefix. A string that will be prepended before the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Index-Prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="suffixedit"/>
+                <widget class="QLineEdit" name="suffixedit">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Suffix. This string will be appended after the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Index-Suffix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="label">
+             <item row="10" column="1">
+              <widget class="QCheckBox" name="autofillcheck">
                <property name="text">
-                <string>   Prefix/Suffix</string>
+                <string>Autofill with zeroes</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -297,7 +352,7 @@
              <item row="0" column="1">
               <widget class="QCheckBox" name="accentbox">
                <property name="text">
-                <string>Remove unusual symbols</string>
+                <string>Remove symbols</string>
                </property>
               </widget>
              </item>
@@ -424,12 +479,12 @@
       <widget class="QWidget" name="horizontalLayoutWidget_2">
        <layout class="QVBoxLayout" name="rightlayout" stretch="1,0,0">
         <property name="margin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QVBoxLayout" name="browserlayout" stretch="0">
           <property name="margin">
-           <number>4</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QTreeView" name="browsertree"/>
