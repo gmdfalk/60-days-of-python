@@ -11,19 +11,42 @@ class MassRenamer(QtGui.QMainWindow):
         super(MassRenamer, self).__init__(parent)
         uic.loadUi("filebrowser.ui", self)
 
-        self.setWindowTitle("MassRenamer")
+#         print self.mainsplitter.sizes()
+        self.mainsplitter.setStretchFactor(0, 0)
+        self.mainsplitter.setStretchFactor(1, 3)
+#         print self.mainsplitter.sizes()
+
         self.setWindowIcon(QtGui.QIcon("icon.png"))
 
-        model = QtGui.QFileSystemModel()
-        model.setRootPath("")
-        model.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.NoDotAndDotDot |
-                        QtCore.QDir.Hidden)
+        self.create_dirtree()
+        self.create_browsertree()
 
-        self.dirtree.setModel(model)
+    def create_dirtree(self):
+        self.dirmodel = QtGui.QFileSystemModel()
+        self.dirmodel.setRootPath("")
+        self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
+                                QtCore.QDir.NoDotAndDotDot)
+        self.dirmodel.fileRenamed.connect(self.on_rootchange)
+        self.dirmodel.rootPathChanged.connect(self.on_rootchange)
+        self.dirmodel.directoryLoaded.connect(self.on_rootchange)
+
+        self.dirtree.setModel(self.dirmodel)
         self.dirtree.setColumnHidden(1, True)
         self.dirtree.setColumnHidden(2, True)
         self.dirtree.setColumnHidden(3, True)
-        self.dirtree.header().hide()
+
+
+    def create_browsertree(self):
+        self.browsermodel = QtGui.QFileSystemModel()
+        self.browsermodel.setRootPath("")
+        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+                                    QtCore.QDir.NoDotAndDotDot |
+                                    QtCore.QDir.Hidden)
+
+        self.browsertree.setModel(self.browsermodel)
+
+    def on_rootchange(self, *args):
+        print self.sender()
 
 
 def main():
