@@ -216,14 +216,14 @@
                <item>
                 <widget class="QSpinBox" name="insertpos">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to insert to. Choose -1 to append.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Insert start position&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Position to insert the following string into. Choose -1 to append.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="insertedit">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;String to insert at the defined position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Insert string&lt;/span&gt;&lt;/p&gt;&lt;p&gt;String to insert at the defined position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
@@ -241,7 +241,7 @@
                <item>
                 <widget class="QSpinBox" name="deletestart">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to start deleting from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Delete Start Position&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Position to start deleting from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Startindex&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -251,7 +251,7 @@
                <item>
                 <widget class="QSpinBox" name="deleteend">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position to stop deletion at.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Delete End Position&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Position to stop deletion at.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stopindex&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -273,7 +273,7 @@
              <item row="8" column="0">
               <widget class="QCheckBox" name="countcheck">
                <property name="text">
-                <string>Index</string>
+                <string>Count</string>
                </property>
               </widget>
              </item>
@@ -282,7 +282,7 @@
                <item>
                 <widget class="QSpinBox" name="startindex">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Base. This number will be used as a starting point to count from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count base&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This number will be used as a starting point to count from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Base&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -292,7 +292,7 @@
                <item>
                 <widget class="QSpinBox" name="endindex">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Step. Increment the base by this number per target.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count step&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Increment the base by this number per target.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Step&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -313,7 +313,7 @@
                <item>
                 <widget class="QLineEdit" name="prefixedit">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Prefix. A string that will be prepended before the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count Prefix&lt;/span&gt;&lt;/p&gt;&lt;p&gt;A string that will be prepended before the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Index-Prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -323,7 +323,7 @@
                <item>
                 <widget class="QLineEdit" name="suffixedit">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Count-Suffix. This string will be appended after the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count Suffix&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This string will be appended after the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="whatsThis">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Index-Suffix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -334,6 +334,9 @@
              </item>
              <item row="10" column="1">
               <widget class="QCheckBox" name="autofillcheck">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Autofill&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If the count gains an order of magnitude, fill the previous numbers with a leading zero.&lt;/p&gt;&lt;p&gt;E.g. 8, 9, 10 will become 08, 09, 10, ...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Autofill with zeroes</string>
                </property>
@@ -351,6 +354,9 @@
             <layout class="QGridLayout" name="removelayout">
              <item row="0" column="1">
               <widget class="QCheckBox" name="accentbox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow ASCII-letters plus common ASCII-symbols like +_-...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Remove symbols</string>
                </property>
@@ -358,6 +364,9 @@
              </item>
              <item row="0" column="0">
               <widget class="QCheckBox" name="symbolbox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Accents&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will replace e.g. &amp;quot;čáñů&amp;quot; with &amp;quot;canu&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Remove accents</string>
                </property>
@@ -369,6 +378,9 @@
             <layout class="QHBoxLayout" name="fileradiolayout">
              <item>
               <widget class="QRadioButton" name="filesradio">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only edit files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Only files</string>
                </property>
@@ -376,6 +388,9 @@
              </item>
              <item>
               <widget class="QRadioButton" name="dirsradio">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only edit dirs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Only dirs</string>
                </property>
@@ -383,6 +398,9 @@
              </item>
              <item>
               <widget class="QRadioButton" name="allradio">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit both files and directories.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Edit both</string>
                </property>
@@ -399,8 +417,11 @@
           <layout class="QGridLayout" name="optiongrid" rowstretch="0,0,0" columnstretch="0,0">
            <item row="1" column="1">
             <widget class="QCheckBox" name="previewcheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Automatic Preview&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Will automatically update the filename previews whenever an option is changed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>automatic preview</string>
+              <string>Automatic preview</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -409,36 +430,48 @@
            </item>
            <item row="2" column="0">
             <widget class="QCheckBox" name="stopcheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Stop On Error&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Halt the renaming process if an error occurs (e.g. a file cannot be renamed due to invalid characters).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>stop on error</string>
+              <string>Stop on error</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QCheckBox" name="hiddencheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Show Hidden&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Show (and therefore edit) hidden files and directories, too.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>show hidden</string>
+              <string>Show hidden</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
             <widget class="QCheckBox" name="mirrorcheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mirror Manual Changes&lt;/span&gt;&lt;/p&gt;&lt;p&gt;When you manually change a file, MassRenamer will try to replace the same pattern in all files and/or directories.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>mirror manual to all</string>
+              <string>Mirror manual to all</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
             <widget class="QCheckBox" name="recursivecheck">
              <property name="text">
-              <string>recursive</string>
+              <string>Recursive</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
             <widget class="QCheckBox" name="extensioncheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Preserve Extensions&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Only the edit the basename of the file. Leave the extension untouched.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>preserve extensions</string>
+              <string>Preserve extensions</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -508,9 +541,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="startbutton">
+           <widget class="QPushButton" name="renamebutton">
             <property name="text">
-             <string>Start</string>
+             <string>Rename</string>
             </property>
            </widget>
           </item>
@@ -530,8 +563,11 @@
           </item>
           <item>
            <widget class="QCheckBox" name="regexcheck">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If checked, use regular expressions, otherwise use globbing.&lt;/p&gt;&lt;p&gt;Globbing Example: *	z*  (will prepend a &amp;quot;z&amp;quot; to all targets).&lt;/p&gt;&lt;p&gt;Same with regex:  .*	z\1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
-             <string>regex</string>
+             <string>rgx</string>
             </property>
            </widget>
           </item>
