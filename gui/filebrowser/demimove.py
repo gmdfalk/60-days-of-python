@@ -24,6 +24,14 @@ except ImportError:
     print "ImportError: Please install docopt to use the CLI."
 
 
+class DirModel(QtGui.QFileSystemModel):
+    "Dummy reimplementation of QFileSystemModel"
+    # This is necessary because otherwise i get:
+    # "QTimer can only be used with threads started with QThread."
+    def __init__(self, parent):
+        super(DirModel, self).__init__(parent)
+
+
 class DemiMove(QtGui.QMainWindow):
 
     def __init__(self, parent=None):
@@ -31,20 +39,17 @@ class DemiMove(QtGui.QMainWindow):
         super(DemiMove, self).__init__(parent)
         uic.loadUi("demimove.ui", self)
 
-#         print self.mainsplitter.sizes()
+        self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.mainsplitter.setStretchFactor(0, 0)
         self.mainsplitter.setStretchFactor(1, 2)
-#         print self.mainsplitter.sizes()
-
-        self.setWindowIcon(QtGui.QIcon("icon.png"))
 
         self.create_dirtree()
         self.create_browsertree()
-        log.error("initialized")
-        sys.exit()
+        log.info("DemiMove initialized.")
+
 
     def create_dirtree(self):
-        self.dirmodel = QtGui.QFileSystemModel()
+        self.dirmodel = DirModel(self)
         self.dirmodel.setRootPath("")
         self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
                                 QtCore.QDir.NoDotAndDotDot)
@@ -59,7 +64,7 @@ class DemiMove(QtGui.QMainWindow):
 
 
     def create_browsertree(self):
-        self.browsermodel = QtGui.QFileSystemModel()
+        self.browsermodel = DirModel(self)
         self.browsermodel.setRootPath("")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
@@ -102,6 +107,8 @@ def configure_logger(loglevel=1, quiet=False):
 def main():
     "Main entry point for DemiMove."
     app = QtGui.QApplication(sys.argv)
+    app.setApplicationName("DMV")
+#     app.setStyle("plastique")
     browser = DemiMove()
     browser.show()
     sys.exit(app.exec_())
