@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="mainwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0">
+   <layout class="QHBoxLayout" name="mainlayout" stretch="0">
     <property name="margin">
      <number>4</number>
     </property>
@@ -47,60 +47,14 @@
         <attribute name="title">
          <string>Options</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
          <property name="margin">
           <number>4</number>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="actionlayout" stretch="0,0,1">
+          <layout class="QVBoxLayout" name="actionlayout" stretch="0,0,0">
            <item>
-            <layout class="QGridLayout" name="removelayout">
-             <item row="0" column="1">
-              <widget class="QCheckBox" name="accentbox">
-               <property name="text">
-                <string>Remove unusual symbols</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="symbolbox">
-               <property name="text">
-                <string>Remove accents</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="fileradiolayout">
-             <item>
-              <widget class="QRadioButton" name="filesradio">
-               <property name="text">
-                <string>Only files</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="dirsradio">
-               <property name="text">
-                <string>Only dirs</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="allradio">
-               <property name="text">
-                <string>Edit both</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QFormLayout" name="stringforms">
+            <layout class="QFormLayout" name="actionforms">
              <property name="fieldGrowthPolicy">
               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
              </property>
@@ -185,7 +139,7 @@
              <item row="2" column="1">
               <widget class="QCheckBox" name="spacetrimcheck">
                <property name="text">
-                <string>Trim duplicate Spaces</string>
+                <string>Remove duplicate Spaces</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -201,6 +155,13 @@
              </item>
              <item row="3" column="1">
               <widget class="QLineEdit" name="replacesource"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="replacelabel">
+               <property name="text">
+                <string>           with</string>
+               </property>
+              </widget>
              </item>
              <item row="4" column="1">
               <widget class="QLineEdit" name="replacetarget"/>
@@ -226,79 +187,105 @@
                </item>
               </layout>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label">
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
+             <item row="6" column="0">
+              <widget class="QCheckBox" name="insertcheck">
                <property name="text">
-                <string>           with</string>
+                <string>Insert</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <layout class="QHBoxLayout" name="insertlayout_2">
+               <item>
+                <widget class="QLineEdit" name="insertedit"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="insertatlabel">
+                 <property name="text">
+                  <string>at</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="insertpos"/>
+               </item>
+              </layout>
+             </item>
+             <item row="7" column="0">
+              <widget class="QCheckBox" name="deletecheck">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <layout class="QHBoxLayout" name="deletelayout">
+               <item>
+                <widget class="QSpinBox" name="deletestart"/>
+               </item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="deletelabel">
+                 <property name="text">
+                  <string>to</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="deleteend">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="removelayout">
+             <item row="0" column="1">
+              <widget class="QCheckBox" name="accentbox">
+               <property name="text">
+                <string>Remove unusual symbols</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="symbolbox">
+               <property name="text">
+                <string>Remove accents</string>
                </property>
               </widget>
              </item>
             </layout>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="insertlayout" stretch="0,0,0,0">
            <item>
-            <widget class="QCheckBox" name="insertcheck">
-             <property name="text">
-              <string>Insert  </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="insertedit"/>
-           </item>
-           <item alignment="Qt::AlignHCenter">
-            <widget class="QLabel" name="insertatlabel">
-             <property name="text">
-              <string>at</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="insertpos"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="deletelayout" stretch="0,0,0,0,1">
-           <item>
-            <widget class="QCheckBox" name="deletecheck_2">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="deletestart"/>
-           </item>
-           <item alignment="Qt::AlignHCenter">
-            <widget class="QLabel" name="deletelabel">
-             <property name="text">
-              <string>to</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="deleteend">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="deletelabelempty">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="fileradiolayout">
+             <item>
+              <widget class="QRadioButton" name="filesradio">
+               <property name="text">
+                <string>Only files</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="dirsradio">
+               <property name="text">
+                <string>Only dirs</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="allradio">
+               <property name="text">
+                <string>Edit both</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
