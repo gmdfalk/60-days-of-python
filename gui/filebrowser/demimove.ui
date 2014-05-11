@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MassRenamer</class>
- <widget class="QMainWindow" name="MassRenamer">
+ <class>DemiMove</class>
+ <widget class="QMainWindow" name="DemiMove">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MassRenamer</string>
+   <string>DemiMove</string>
   </property>
   <widget class="QWidget" name="mainwidget">
    <layout class="QHBoxLayout" name="mainlayout" stretch="0">
@@ -80,6 +80,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QComboBox" name="capitalizebox">
+               <property name="toolTip">
+                <string/>
+               </property>
                <item>
                 <property name="text">
                  <string>All lowercase</string>
@@ -148,6 +151,9 @@
              </item>
              <item row="2" column="1">
               <widget class="QCheckBox" name="spacetrimcheck">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Trim&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Replace instances of two or more successive (selected source) with a single (selected target).&lt;/p&gt;&lt;p&gt;E.g. with Space to Underscore &amp;quot;a&amp;nbsp;&amp;nbsp;b&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;c&amp;quot; would become &amp;quot;a_b_c&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
                <property name="text">
                 <string>Trim</string>
                </property>
@@ -164,7 +170,11 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QLineEdit" name="replacesource"/>
+              <widget class="QLineEdit" name="replacesource">
+               <property name="toolTip">
+                <string/>
+               </property>
+              </widget>
              </item>
              <item row="4" column="0">
               <widget class="QLabel" name="replacelabel">
@@ -174,28 +184,44 @@
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QLineEdit" name="replacetarget"/>
+              <widget class="QLineEdit" name="replacetarget">
+               <property name="toolTip">
+                <string/>
+               </property>
+              </widget>
              </item>
              <item row="5" column="1">
               <layout class="QHBoxLayout" name="replacechecks">
                <item>
                 <widget class="QRadioButton" name="regex">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="text">
-                  <string>regex</string>
+                  <string>Regex</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QRadioButton" name="radioButton">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Globbing&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use globbing instead of regular expressions for pattern matching.&lt;/p&gt;&lt;p&gt;Example: asdf*	* (would remove asdf from all files/dirs that start with &amp;quot;asdf&amp;quot;)&lt;/p&gt;&lt;p&gt;Same with regex:  ^asdf	(empty)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="text">
-                  <string>glob</string>
+                  <string>Glob</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="casesensitive">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Case Sensitivity&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="text">
-                  <string>case sensitive</string>
+                  <string>CS</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -559,7 +585,11 @@
         <item>
          <layout class="QHBoxLayout" name="editlayout">
           <item>
-           <widget class="QLineEdit" name="sourcedit"/>
+           <widget class="QLineEdit" name="sourcedit">
+            <property name="toolTip">
+             <string>Pattern to match</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="regexcheck">
@@ -572,7 +602,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="targetedit"/>
+           <widget class="QLineEdit" name="targetedit">
+            <property name="toolTip">
+             <string>Replacement string</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
