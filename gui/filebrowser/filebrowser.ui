@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>892</width>
-    <height>702</height>
+    <width>835</width>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@
         <attribute name="title">
          <string>Options</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0,0">
          <property name="margin">
           <number>4</number>
          </property>
@@ -55,7 +55,7 @@
           <layout class="QVBoxLayout" name="actionlayout" stretch="0,0,1">
            <item>
             <layout class="QGridLayout" name="removelayout">
-             <item row="1" column="0">
+             <item row="0" column="1">
               <widget class="QCheckBox" name="accentbox">
                <property name="text">
                 <string>remove unusual symbols</string>
@@ -97,7 +97,7 @@
             </layout>
            </item>
            <item>
-            <layout class="QFormLayout" name="formLayout">
+            <layout class="QFormLayout" name="stringforms">
              <property name="fieldGrowthPolicy">
               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
              </property>
@@ -174,69 +174,108 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QCheckBox" name="insertcheck">
-               <property name="text">
-                <string>Insert</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="lineEdit"/>
-             </item>
-             <item row="3" column="0">
-              <widget class="QRadioButton" name="radioButton_3">
-               <property name="text">
-                <string>at position</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox"/>
-             </item>
-             <item row="4" column="0">
               <widget class="QCheckBox" name="deletecheck">
                <property name="text">
                 <string>Delete</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="2" column="1">
               <widget class="QSpinBox" name="spinBox_2"/>
              </item>
-             <item row="5" column="1">
+             <item row="3" column="1">
               <widget class="QSpinBox" name="spinBox_3"/>
              </item>
-             <item row="6" column="0">
+             <item row="4" column="0">
               <widget class="QCheckBox" name="replacecheck">
                <property name="text">
                 <string>Replace</string>
                </property>
               </widget>
              </item>
-             <item row="6" column="1">
+             <item row="4" column="1">
               <widget class="QLineEdit" name="lineEdit_2"/>
              </item>
-             <item row="7" column="1">
+             <item row="5" column="1">
               <widget class="QLineEdit" name="lineEdit_3"/>
              </item>
-             <item row="8" column="1">
+             <item row="6" column="1">
               <widget class="QCheckBox" name="casecheck">
                <property name="text">
                 <string>case sensitive</string>
                </property>
               </widget>
              </item>
-             <item row="9" column="0">
+             <item row="7" column="0">
               <widget class="QCheckBox" name="countcheck">
                <property name="text">
                 <string>Count</string>
                </property>
               </widget>
              </item>
-             <item row="9" column="1">
+             <item row="7" column="1">
               <widget class="QSpinBox" name="countfrombox"/>
              </item>
             </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="insertlayout" stretch="0,0,0,0">
+           <item>
+            <widget class="QCheckBox" name="insertcheck">
+             <property name="text">
+              <string>Insert  </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="insertedit"/>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="insertatlabel">
+             <property name="text">
+              <string>at</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="insertpos"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="deletelayout" stretch="0,0,0,0,1">
+           <item>
+            <widget class="QCheckBox" name="deletecheck_2">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="deletestart"/>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="deletelabel">
+             <property name="text">
+              <string>to</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="deleteend">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="deletelabelempty">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -313,14 +352,14 @@
         <item>
          <layout class="QVBoxLayout" name="browserlayout" stretch="0">
           <item>
-           <widget class="QListView" name="fileslist"/>
+           <widget class="QListView" name="browserlist"/>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="buttonlayout">
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="refreshbutton">
             <property name="text">
              <string>Refresh</string>
             </property>
