@@ -52,7 +52,25 @@
           <number>4</number>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="actionlayout" stretch="0,1">
+          <layout class="QVBoxLayout" name="actionlayout" stretch="0,0,1">
+           <item>
+            <layout class="QGridLayout" name="removelayout">
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="accentbox">
+               <property name="text">
+                <string>remove unusual symbols</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="symbolbox">
+               <property name="text">
+                <string>remove accents</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
            <item>
             <layout class="QHBoxLayout" name="fileradiolayout">
              <item>
@@ -91,7 +109,28 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="capitalizebox"/>
+              <widget class="QComboBox" name="capitalizebox">
+               <item>
+                <property name="text">
+                 <string>All lowercase</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>All uppercase</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>First letter of first word</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>First letter of each word</string>
+                </property>
+               </item>
+              </widget>
              </item>
              <item row="1" column="0">
               <widget class="QCheckBox" name="spacecheck">
@@ -101,10 +140,41 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QComboBox" name="spacebox"/>
+              <widget class="QComboBox" name="spacebox">
+               <item>
+                <property name="text">
+                 <string>Space to Underscore</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Space to Hyphen</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Space to Dot</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Dot to Space</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Hyphen to Space</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Underscore to Space</string>
+                </property>
+               </item>
+              </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QCheckBox" name="checkBox">
+              <widget class="QCheckBox" name="insertcheck">
                <property name="text">
                 <string>Insert</string>
                </property>
@@ -137,7 +207,7 @@
               <widget class="QSpinBox" name="spinBox_3"/>
              </item>
              <item row="6" column="0">
-              <widget class="QCheckBox" name="checkBox_2">
+              <widget class="QCheckBox" name="replacecheck">
                <property name="text">
                 <string>Replace</string>
                </property>
@@ -149,23 +219,33 @@
              <item row="7" column="1">
               <widget class="QLineEdit" name="lineEdit_3"/>
              </item>
+             <item row="8" column="1">
+              <widget class="QCheckBox" name="casecheck">
+               <property name="text">
+                <string>case sensitive</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QCheckBox" name="countcheck">
+               <property name="text">
+                <string>Count</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QSpinBox" name="countfrombox"/>
+             </item>
             </layout>
            </item>
           </layout>
          </item>
          <item>
           <layout class="QGridLayout" name="optiongrid" rowstretch="0,0,0" columnstretch="0,0">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="recursivecheck">
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="previewcheck">
              <property name="text">
-              <string>recursive</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="mirrorcheck">
-             <property name="text">
-              <string>mirror manual to all</string>
+              <string>automatic preview</string>
              </property>
             </widget>
            </item>
@@ -176,17 +256,24 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="previewcheck">
-             <property name="text">
-              <string>automatic preview</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="0">
             <widget class="QCheckBox" name="hiddencheck">
              <property name="text">
               <string>show hidden</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="mirrorcheck">
+             <property name="text">
+              <string>mirror manual to all</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="recursivecheck">
+             <property name="text">
+              <string>recursive</string>
              </property>
             </widget>
            </item>
