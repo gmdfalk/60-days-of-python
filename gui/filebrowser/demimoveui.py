@@ -9,11 +9,9 @@ Options:
     -v                   Logging verbosity level, up to -vvv.
     -q, --quiet          Do not print logging messages to console.
     -h,  --help          Show this help text and exit.
-    --version            Show the current DemiMove version.
+    --version            Show the current demimove-ui version.
 """
 # TODO: ConfigParser
-import logging
-import re
 import sys
 
 from PyQt4 import QtGui, QtCore, uic
@@ -27,19 +25,11 @@ except ImportError:
     print "ImportError: Please install docopt to use the CLI."
 
 
-class DirModel(QtGui.QFileSystemModel):
-    "Dummy reimplementation of QFileSystemModel"
-    # This is necessary because otherwise i get:
-    # "QTimer can only be used with threads started with QThread."
-    def __init__(self, parent):
-        super(DirModel, self).__init__(parent)
-
-
-class DemiMove(QtGui.QMainWindow):
+class DemiMoveGUI(QtGui.QMainWindow):
 
     def __init__(self, parent=None):
 
-        super(DemiMove, self).__init__(parent)
+        super(DemiMoveGUI, self).__init__(parent)
         uic.loadUi("demimove.ui", self)
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
@@ -48,11 +38,12 @@ class DemiMove(QtGui.QMainWindow):
 
         self.create_dirtree()
         self.create_browsertree()
-        log.info("DemiMove initialized.")
+        log.info("demimove initialized.")
 
 
     def create_dirtree(self):
-        self.dirmodel = DirModel(self)
+        # Passing self as arg/parent here to avoid QTimer errors.
+        self.dirmodel = QtGui.QFileSystemModel(self)
         self.dirmodel.setRootPath("")
         self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
                                 QtCore.QDir.NoDotAndDotDot)
@@ -67,7 +58,7 @@ class DemiMove(QtGui.QMainWindow):
 
 
     def create_browsertree(self):
-        self.browsermodel = DirModel(self)
+        self.browsermodel = QtGui.QFileSystemModel(self)
         self.browsermodel.setRootPath("")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
@@ -80,12 +71,12 @@ class DemiMove(QtGui.QMainWindow):
 
 
 def main():
-    "Main entry point for DemiMove."
+    "Main entry point for demimove."
     app = QtGui.QApplication(sys.argv)
-    app.setApplicationName("dmv-ui")
+    app.setApplicationName("demimove")
 #     app.setStyle("plastique")
-    browser = DemiMove()
-    browser.show()
+    gui = DemiMoveGUI()
+    gui.show()
     sys.exit(app.exec_())
 
 

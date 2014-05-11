@@ -1,7 +1,7 @@
 """demimove
 
 Usage:
-    dmv <source> <target> [-s] [-f|-d] [-a] [-r] [-i] [-n] [-c <n>] [-R]
+    dmv <source> <target> [-s] [-f|-d] [-a] [-r] [-i|-p] [-n] [-c <n>] [-R]
         [-q] [-v...] [-h]
 
 Arguments:
@@ -16,7 +16,8 @@ Options:
     -d, --dirs         Only search directory names. Leaves files untouched.
     -a, --all          Include hidden files/directories.
     -r, --recursive    Apply changes recursively.
-    -i, --interactive  Confirm all rename actions.
+    -i, --interactive  Confirm before overwriting.
+    -p, --prompt       Confirm any action.
     -n, --no-clobber   Do not overwrite an existing file.
     -c, --count=<n>    Increment a counter at the given index (0 start, -1 end)
     -R, --regex        Use regex matching instead of globbing.
@@ -29,6 +30,7 @@ Examples:
     dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
     dmv -f * season-* (will prepend "season-" to every file in the cwd)
 """
+# TODO: History file and undo action?
 import logging
 import sys
 
@@ -45,8 +47,7 @@ except ImportError:
 def main():
     args = docopt(__doc__, version="0.1")
     reporting.configure_logger(log, args["-v"], args["--quiet"])
-    log.error("testmsg")
-    print args
+
 
 if __name__ == "__main__":
     log = reporting.create_logger()
