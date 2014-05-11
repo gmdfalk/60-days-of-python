@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>707</height>
+    <width>876</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="mainwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_6">
+   <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0">
     <property name="margin">
      <number>4</number>
     </property>
@@ -58,14 +58,14 @@
              <item row="0" column="1">
               <widget class="QCheckBox" name="accentbox">
                <property name="text">
-                <string>remove unusual symbols</string>
+                <string>Remove unusual symbols</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QCheckBox" name="symbolbox">
                <property name="text">
-                <string>remove accents</string>
+                <string>Remove accents</string>
                </property>
               </widget>
              </item>
@@ -92,6 +92,9 @@
                <property name="text">
                 <string>Edit both</string>
                </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -105,6 +108,9 @@
               <widget class="QCheckBox" name="capitalizecheck">
                <property name="text">
                 <string>Capitalize</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -136,6 +142,9 @@
               <widget class="QCheckBox" name="spacecheck">
                <property name="text">
                 <string>Spaces</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -173,48 +182,62 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QCheckBox" name="deletecheck">
+             <item row="2" column="1">
+              <widget class="QCheckBox" name="spacetrimcheck">
                <property name="text">
-                <string>Delete</string>
+                <string>Trim duplicate Spaces</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QSpinBox" name="spinBox_2"/>
-             </item>
-             <item row="3" column="1">
-              <widget class="QSpinBox" name="spinBox_3"/>
-             </item>
-             <item row="4" column="0">
+             <item row="3" column="0">
               <widget class="QCheckBox" name="replacecheck">
                <property name="text">
                 <string>Replace</string>
                </property>
               </widget>
              </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="replacesource"/>
+             </item>
              <item row="4" column="1">
-              <widget class="QLineEdit" name="lineEdit_2"/>
+              <widget class="QLineEdit" name="replacetarget"/>
              </item>
              <item row="5" column="1">
-              <widget class="QLineEdit" name="lineEdit_3"/>
+              <layout class="QHBoxLayout" name="replacechecks">
+               <item>
+                <widget class="QCheckBox" name="casesensitive">
+                 <property name="text">
+                  <string>case sensitive</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="regex">
+                 <property name="text">
+                  <string>regex</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
-             <item row="6" column="1">
-              <widget class="QCheckBox" name="casecheck">
+             <item row="4" column="0">
+              <widget class="QLabel" name="label">
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
                <property name="text">
-                <string>case sensitive</string>
+                <string>           with</string>
                </property>
               </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QCheckBox" name="countcheck">
-               <property name="text">
-                <string>Count</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QSpinBox" name="countfrombox"/>
              </item>
             </layout>
            </item>
@@ -286,6 +309,9 @@
              <property name="text">
               <string>automatic preview</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
@@ -320,6 +346,9 @@
             <widget class="QCheckBox" name="extensioncheck">
              <property name="text">
               <string>preserve extensions</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -396,7 +425,7 @@
           <item>
            <widget class="QCheckBox" name="regexcheck">
             <property name="text">
-             <string>Regex</string>
+             <string>regex</string>
             </property>
            </widget>
           </item>
