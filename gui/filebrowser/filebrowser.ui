@@ -31,7 +31,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="browsertab">
         <attribute name="title">
@@ -149,7 +149,7 @@
              <item row="2" column="1">
               <widget class="QCheckBox" name="spacetrimcheck">
                <property name="text">
-                <string>Remove duplicate Spaces</string>
+                <string>Trim</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -233,17 +233,17 @@
                <item>
                 <widget class="QSpinBox" name="deletestart"/>
                </item>
-               <item alignment="Qt::AlignHCenter">
-                <widget class="QLabel" name="deletelabel">
-                 <property name="text">
-                  <string>to</string>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QSpinBox" name="deleteend">
                  <property name="minimum">
                   <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -252,57 +252,43 @@
              <item row="8" column="0">
               <widget class="QCheckBox" name="checkBox">
                <property name="text">
-                <string>Add count</string>
+                <string>Index</string>
                </property>
               </widget>
              </item>
              <item row="8" column="1">
-              <layout class="QHBoxLayout" name="countlayout">
+              <layout class="QHBoxLayout" name="indexlayout" stretch="0,0,0">
                <item>
-                <widget class="QLabel" name="startcountlabel">
+                <widget class="QSpinBox" name="startindex"/>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="endindex"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_3">
                  <property name="text">
-                  <string>Start:</string>
+                  <string/>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="startcount"/>
-               </item>
-               <item>
-                <widget class="QLabel" name="endcountlabel">
-                 <property name="text">
-                  <string>Step:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="endcount"/>
                </item>
               </layout>
              </item>
              <item row="9" column="1">
               <layout class="QHBoxLayout" name="countstringlabel">
                <item>
-                <widget class="QLabel" name="prefixlabel">
-                 <property name="text">
-                  <string>Prefix:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QLineEdit" name="prefixedit"/>
-               </item>
-               <item>
-                <widget class="QLabel" name="suffixlabel">
-                 <property name="text">
-                  <string>Suffix:</string>
-                 </property>
-                </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="suffixedit"/>
                </item>
               </layout>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>   Prefix/Suffix</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
