@@ -167,10 +167,16 @@
                <property name="text">
                 <string>Replace</string>
                </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item row="3" column="1">
               <widget class="QLineEdit" name="replacesource">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string/>
                </property>
@@ -178,6 +184,9 @@
              </item>
              <item row="4" column="0">
               <widget class="QLabel" name="replacelabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>           with</string>
                </property>
@@ -185,6 +194,9 @@
              </item>
              <item row="4" column="1">
               <widget class="QLineEdit" name="replacetarget">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string/>
                </property>
@@ -193,7 +205,10 @@
              <item row="5" column="1">
               <layout class="QHBoxLayout" name="replacechecks">
                <item>
-                <widget class="QRadioButton" name="regex">
+                <widget class="QRadioButton" name="replaceregex">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -203,7 +218,10 @@
                 </widget>
                </item>
                <item>
-                <widget class="QRadioButton" name="radioButton">
+                <widget class="QRadioButton" name="replaceglob">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Globbing&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use globbing instead of regular expressions for pattern matching.&lt;/p&gt;&lt;p&gt;Example: asdf*	* (would remove asdf from all files/dirs that start with &amp;quot;asdf&amp;quot;)&lt;/p&gt;&lt;p&gt;Same with regex:  ^asdf	(empty)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -216,7 +234,10 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="casesensitive">
+                <widget class="QCheckBox" name="replacecase">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Case Sensitivity&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -624,7 +645,7 @@
    <sender>insertcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>insertpos</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>42</x>
@@ -640,7 +661,7 @@
    <sender>insertcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>insertedit</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>42</x>
@@ -656,7 +677,7 @@
    <sender>deletecheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>deletestart</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>45</x>
@@ -672,7 +693,7 @@
    <sender>deletecheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>deleteend</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>45</x>
@@ -688,7 +709,7 @@
    <sender>countcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>countstart</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
@@ -704,7 +725,7 @@
    <sender>countcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>countend</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
@@ -720,7 +741,7 @@
    <sender>countcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>countpreedit</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
@@ -736,7 +757,7 @@
    <sender>countcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>countsufedit</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>43</x>
@@ -745,6 +766,166 @@
     <hint type="destinationlabel">
      <x>358</x>
      <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>countcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>autofillcheck</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>392</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>capitalizecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>capitalizebox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spacebox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spacetrimcheck</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replacelabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>45</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replacesource</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replacetarget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replacecase</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>386</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replaceglob</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replaceregex</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>221</y>
     </hint>
    </hints>
   </connection>
