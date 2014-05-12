@@ -17,12 +17,37 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 
 import reporting
+import os
 
 
 try:
     from docopt import docopt
 except ImportError:
     print "ImportError: Please install docopt to use the CLI."
+
+
+class PreviewFileModel(QtGui.QFileSystemModel):
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        return super(PreviewFileModel, self).columnCount() + 1
+
+    def data(self, index, role):
+        if index.column() == self.columnCount() - 1:
+            if role == QtCore.Qt.DisplayRole:
+                return self.get_preview_text()
+            if role == QtCore.Qt.TextAlignmentRole:
+                return QtCore.Qt.AlignHCenter
+
+        return super(PreviewFileModel, self).data(index, role)
+
+    def get_preview_text(self):
+        return "Get Text per item?"
+
+    def get_file_list(self):
+        pass
+
+    def get_dir_list(self):
+        pass
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -62,8 +87,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirtree.setColumnHidden(3, True)
 
     def create_browsertree(self):
-        self.browsermodel = QtGui.QFileSystemModel(self)
-        self.browsermodel.setRootPath("")
+        self.browsermodel = PreviewFileModel(self)
+        self.browsermodel.setRootPath("/home")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
@@ -71,7 +96,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 #         self.browsermodel.rootPathChanged.connect(self.on_rootchange)
 #         self.browsermodel.directoryLoaded.connect(self.on_rootchange)
 
-        self.browsertree.setModel(self.dirmodel)
+        self.browsertree.setModel(self.browsermodel)
 
     def on_rootchange(self, *args):
 #         print self.dirmodel.filePath(self.dirtree.currentIndex())
