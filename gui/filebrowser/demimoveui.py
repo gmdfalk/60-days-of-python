@@ -51,8 +51,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirmodel.directoryLoaded.connect(self.on_rootchange)
 
         self.dirtree.setModel(self.dirmodel)
-        print self.dirmodel.rootPath()
-        print self.dirmodel.rootDirectory()
+#         print self.dirmodel.rootPath()
+#         print self.dirmodel.rootDirectory()
 
 #         index = self.dirmodel.index(path)
 #         self.dirtree.expand(index)
@@ -67,13 +67,25 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
+#         self.browsermodel.fileRenamed.connect(self.on_rootchange)
+#         self.browsermodel.rootPathChanged.connect(self.on_rootchange)
+#         self.browsermodel.directoryLoaded.connect(self.on_rootchange)
 
-        self.browsertree.setModel(self.browsermodel)
+        self.browsertree.setModel(self.dirmodel)
 
     def on_rootchange(self, *args):
-
-        self.browsermodel.setRootPath("")
-
+#         print self.dirmodel.filePath(self.dirtree.currentIndex())
+        path = self.dirmodel.filePath(self.dirtree.currentIndex())
+#         print self.browsertree.selectionModel()
+#         model = self.browsertree.model()
+#         idx = model.index(model.rootPath())
+#         for i in range(0, model.rowCount(idx)):
+#             child = idx.child(i, idx.column())
+#             print model.fileName(child)
+#         print self.dirtree.currentIndex()
+        print path
+#         self.browsermodel.setRootPath(path)
+        self.browsertree.setRootIndex(self.dirtree.currentIndex())
 
 def main():
     "Main entry point for demimove."

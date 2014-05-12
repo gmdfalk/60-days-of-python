@@ -606,15 +606,12 @@
           <item>
            <layout class="QHBoxLayout" name="fileradiolayout">
             <item>
-             <widget class="QRadioButton" name="allradio">
+             <widget class="QRadioButton" name="dirsradio">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit both files and directories.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only edit dirs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>Both</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
+               <string>Dirs</string>
               </property>
              </widget>
             </item>
@@ -629,12 +626,15 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="dirsradio">
+             <widget class="QRadioButton" name="allradio">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only edit dirs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit both files and directories.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>Dirs</string>
+               <string>Both</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
