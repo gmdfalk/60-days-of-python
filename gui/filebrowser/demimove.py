@@ -31,7 +31,6 @@ Examples:
     dmv -f * season-* (will prepend "season-" to every file in the cwd)
 """
 # TODO: History file and undo action?
-import logging
 import sys
 
 import reporting
@@ -45,10 +44,11 @@ except ImportError:
 
 
 def main():
-    args = docopt(__doc__, version="0.1")
-    reporting.configure_logger(log, args["-v"], args["--quiet"])
+    pass
 
 
 if __name__ == "__main__":
     log = reporting.create_logger()
+    args = docopt(__doc__, version="0.1")
+    reporting.configure_logger(log, args["-v"], args["--quiet"])
     main()

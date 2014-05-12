@@ -40,7 +40,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.create_browsertree()
         log.info("demimove initialized.")
 
-
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.
         self.dirmodel = QtGui.QFileSystemModel(self)
@@ -52,10 +51,15 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirmodel.directoryLoaded.connect(self.on_rootchange)
 
         self.dirtree.setModel(self.dirmodel)
+        print self.dirmodel.rootPath()
+        print self.dirmodel.rootDirectory()
+
+#         index = self.dirmodel.index(path)
+#         self.dirtree.expand(index)
+
         self.dirtree.setColumnHidden(1, True)
         self.dirtree.setColumnHidden(2, True)
         self.dirtree.setColumnHidden(3, True)
-
 
     def create_browsertree(self):
         self.browsermodel = QtGui.QFileSystemModel(self)
@@ -67,7 +71,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.setModel(self.browsermodel)
 
     def on_rootchange(self, *args):
-        print self.sender()
+
+        self.browsermodel.setRootPath("")
 
 
 def main():

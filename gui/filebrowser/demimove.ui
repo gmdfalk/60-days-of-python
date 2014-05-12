@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DemiMove</class>
- <widget class="QMainWindow" name="DemiMove">
+ <class>demimoveui</class>
+ <widget class="QMainWindow" name="demimoveui">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,7 +31,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="browsertab">
         <attribute name="title">
@@ -304,9 +304,9 @@
               </widget>
              </item>
              <item row="8" column="1">
-              <layout class="QHBoxLayout" name="indexlayout" stretch="0,0,0">
+              <layout class="QHBoxLayout" name="countlayout" stretch="0,0,0">
                <item>
-                <widget class="QSpinBox" name="startindex">
+                <widget class="QSpinBox" name="countstart">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count base&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This number will be used as a starting point to count from.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -316,7 +316,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="endindex">
+                <widget class="QSpinBox" name="countend">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count step&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Increment the base by this number per target.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -326,7 +326,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="indexlabel">
+                <widget class="QLabel" name="countlabel">
                  <property name="text">
                   <string/>
                  </property>
@@ -337,7 +337,7 @@
              <item row="9" column="1">
               <layout class="QHBoxLayout" name="countstringlabel">
                <item>
-                <widget class="QLineEdit" name="prefixedit">
+                <widget class="QLineEdit" name="countpreedit">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count Prefix&lt;/span&gt;&lt;/p&gt;&lt;p&gt;A string that will be prepended before the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -347,7 +347,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="suffixedit">
+                <widget class="QLineEdit" name="countsufedit">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Count Suffix&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This string will be appended after the number.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -619,5 +619,134 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>insertcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>insertpos</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>129</x>
+     <y>255</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>insertcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>insertedit</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>255</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>deletecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>deletestart</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>deletecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>deleteend</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>countcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>countstart</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>countcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>countend</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>countcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>countpreedit</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>countcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>countsufedit</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>358</x>
+     <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
