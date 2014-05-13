@@ -12,3 +12,7 @@ import time
 import reporting
 
 
+class Renamer(object):
+
+    def __init__(self):
+        self.recursive = False

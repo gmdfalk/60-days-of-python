@@ -12,12 +12,14 @@ Options:
     --version            Show the current demimove-ui version.
 """
 # TODO: ConfigParser
+import os
+import random
 import sys
 
 from PyQt4 import QtGui, QtCore, uic
 
+import fileops
 import reporting
-import os
 
 
 try:
@@ -27,6 +29,8 @@ except ImportError:
 
 
 class PreviewFileModel(QtGui.QFileSystemModel):
+
+    autopreview = False
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -40,11 +44,11 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
         return super(PreviewFileModel, self).data(index, role)
 
-    def get_preview_text(self):
-        return "Get Text per item here"
+    def get_preview_text(self, *args):
+        return self.get_file_list()
 
     def get_file_list(self):
-        pass
+        return QtCore.QString("Preview here")
 
     def get_dir_list(self):
         pass
@@ -104,7 +108,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         print path
 #         self.browsermodel.setRootPath(path)
 #         self.browsertree.setRootIndex(self.dirtree.currentIndex())
-        self.browsertree.setRootIndex(self.dirmodel.index(path))
+#         self.browsertree.setRootIndex(self.dirmodel.index(path))
 
 def main():
     "Main entry point for demimove."
