@@ -30,9 +30,10 @@ Examples:
     dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
     dmv -f * season-* (will prepend "season-" to every file in the cwd)
 """
-# TODO: History file and undo action?
+import os
 import sys
 
+import fileops
 import reporting
 
 
@@ -44,7 +45,7 @@ except ImportError:
 
 
 def main():
-    pass
+    cwd = os.path.dirname(os.path.realpath(__file__))
 
 
 if __name__ == "__main__":
