@@ -15,13 +15,13 @@ import reporting
 
 class FileOps(object):
 
-    def __init__(self, recursive=False, hidden=False, files=False, dirs=False,
-                 simulate=False, interactive=False, prompt=False,
+    def __init__(self, dirsonly=False, filesonly=False, recursive=False,
+                 hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, count=None, regex=False, quiet=False):
         self.recursive = recursive
         self.hidden = hidden
-        self.files = files
-        self.dirs = dirs
+        self.dirsonly = dirsonly
+        self.filesonly = False if dirsonly else filesonly
         self.simulate = simulate
         self.interactive = interactive
         self.prompt = prompt
@@ -40,16 +40,19 @@ class FileOps(object):
     def get_targets(self, path):
         targets = []
         for root, dirs, files in os.walk(path):
-            if self.files:
-                if self.hidden:
-                    targets.extend(files)
-                else:
-                    targets.extend(f for f in files if not f.startswith("."))
-            if self.dirs:
-                if self.hidden:
-                    targets.extend(dirs)
-                else:
-                    targets.extend(d for d in dirs if not d.startswith("."))
+            root += "/"
+            if self.dirsonly:
+                target = [root + d for d in dirs]
+            elif self.filesonly:
+                target = [root + f for f in files]
+            else:
+                target = [root + d for d in dirs] + [root + f for f in files]
+
+            if self.hidden:
+                targets.extend(target)
+            else:
+                targets.extend(i for i in target if not i.startswith("."))
+
             if not self.recursive:
                 break
 
@@ -70,5 +73,5 @@ class FileOps(object):
 if __name__ == "__main__":
     log = reporting.create_logger()
     reporting.configure_logger(log)
-    fileops = FileOps(dirs=True, files=True, hidden=True, recursive=False)
+    fileops = FileOps(filesonly=True, hidden=True, recursive=True)
     fileops.stage("asdf")
