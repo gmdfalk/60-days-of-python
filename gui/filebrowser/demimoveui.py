@@ -41,7 +41,7 @@ class PreviewFileModel(QtGui.QFileSystemModel):
         return super(PreviewFileModel, self).data(index, role)
 
     def get_preview_text(self):
-        return "Get Text per item?"
+        return "Get Text per item here"
 
     def get_file_list(self):
         pass
@@ -76,27 +76,20 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirmodel.directoryLoaded.connect(self.on_rootchange)
 
         self.dirtree.setModel(self.dirmodel)
-#         print self.dirmodel.rootPath()
-#         print self.dirmodel.rootDirectory()
-
-#         index = self.dirmodel.index(path)
-#         self.dirtree.expand(index)
-
         self.dirtree.setColumnHidden(1, True)
         self.dirtree.setColumnHidden(2, True)
         self.dirtree.setColumnHidden(3, True)
 
     def create_browsertree(self):
         self.browsermodel = PreviewFileModel(self)
-        self.browsermodel.setRootPath("/home")
+        self.browsermodel.setRootPath("")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
-#         self.browsermodel.fileRenamed.connect(self.on_rootchange)
-#         self.browsermodel.rootPathChanged.connect(self.on_rootchange)
-#         self.browsermodel.directoryLoaded.connect(self.on_rootchange)
 
         self.browsertree.setModel(self.browsermodel)
+        self.browsertree.header().swapSections(4, 1)
+        self.browsertree.setColumnHidden(2, True)
 
     def on_rootchange(self, *args):
 #         print self.dirmodel.filePath(self.dirtree.currentIndex())
@@ -110,7 +103,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
 #         print self.dirtree.currentIndex()
         print path
 #         self.browsermodel.setRootPath(path)
-        self.browsertree.setRootIndex(self.dirtree.currentIndex())
+#         self.browsertree.setRootIndex(self.dirtree.currentIndex())
+        self.browsertree.setRootIndex(self.dirmodel.index(path))
 
 def main():
     "Main entry point for demimove."
