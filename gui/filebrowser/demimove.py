@@ -1,8 +1,8 @@
 """demimove
 
 Usage:
-    dmv <source> <target> [-s] [-f|-d] [-a] [-r] [-i|-p] [-n] [-c <n>] [-R]
-        [-q] [-v...] [-h]
+    dmv <source> <target> [-s] [-f|-d] [-a] [-e <ex>...] [-r] [-i|-p] [-n] [-R]
+        [-c <n>] [-v...] [-q] [-h]
 
 Arguments:
     source        Pattern to match (with globbing enabled by default).
@@ -15,14 +15,15 @@ Options:
     -f, --files        Only search file names. Default is both files and dirs.
     -d, --dirs         Only search directory names. Leaves files untouched.
     -a, --all          Include hidden files/directories.
+    -e, --exclude=<e>  Exclude files/directories. Space separated.
     -r, --recursive    Apply changes recursively.
     -i, --interactive  Confirm before overwriting.
     -p, --prompt       Confirm any action.
     -n, --no-clobber   Do not overwrite an existing file.
-    -c, --count=<n>    Increment a counter at the given index (0 start, -1 end)
     -R, --regex        Use regex matching instead of globbing.
-    -q, --quiet        Do not print log messages to console.
+    -c, --count=<n>    Increment a counter at the given index (0 start, -1 end)
     -v                 Logging verbosity, up to -vvv (debug).
+    -q, --quiet        Do not print log messages to console.
     --version          Show the current demimove version.
     -h, --help         Show this help message and exit.
 
