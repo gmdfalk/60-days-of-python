@@ -59,6 +59,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def __init__(self, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
+        self.fileops = fileops.FileOps()
         uic.loadUi("demimove.ui", self)
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
@@ -67,7 +68,24 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         self.create_dirtree()
         self.create_browsertree()
+        self.connect_buttons()
         log.info("demimove initialized.")
+
+    def connect_buttons(self):
+        self.previewbutton.connect(self.on_previewbutton)
+        self.refreshbutton.connect(self.on_refreshbutton)
+        self.renamebutton.connect(self.on_renamebutton)
+        self.undobutton.connect(self.on_undobutton)
+
+        self.regexcheck.connect(self.on_regexcheck)
+        # sourcedit, targetedit (main replace)
+
+        # Main options.
+        self.extensioncheck.connect(self.on_extensioncheck)
+        self.hiddencheck.connect(self.on_hiddencheck)
+        self.mirrorcheck.connect(self.on_hiddencheck)
+        self.recursivecheck.connect(self.on_hiddencheck)
+        self.autopreviewcheck.connect(self.on_hiddencheck)
 
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.
