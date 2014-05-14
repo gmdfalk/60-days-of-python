@@ -14,8 +14,9 @@ class FileOps(object):
                  noclobber=False, keepext=True, count=None, regex=False,
                  exclude=None, quiet=False, verbosity=1,
                  ):
-        self.dirsonly = dirsonly
-        self.filesonly = False if dirsonly else filesonly
+        # Universal options:
+        self.dirsonly = dirsonly  # Only edit directory names.
+        self.filesonly = False if dirsonly else filesonly  # Only file names.
         self.recursive = recursive  # Look for files recursively
         self.hidden = hidden  # Look at hidden files and directories, too.
         self.simulate = simulate  # Simulate renaming and dump result to stdout.
@@ -26,6 +27,12 @@ class FileOps(object):
         self.count = count  # Adds numerical index at position count in target.
         self.regex = regex  # Use regular expressions instead of glob/fnmatch.
         self.exclude = exclude  # List of strings to exclude from targets.
+        # GUI options:
+        self.autopreview = False
+        self.autostop = False
+        self.mirror = False
+        self.insertpos = 0
+        self.inserttext = ""
         # Create the logger.
         self.log = reporting.create_logger()
         reporting.configure_logger(self.log, verbosity, quiet)

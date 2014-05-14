@@ -502,7 +502,7 @@
               <string>Keep filetype</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -529,10 +529,10 @@
            <item row="1" column="1">
             <widget class="QCheckBox" name="hiddencheck">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Show Hidden&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Show (and therefore edit) hidden files and directories, too.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Include Hidden&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Include hidden files and/or directories in the potential targets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Show hidden</string>
+              <string>Include hidden</string>
              </property>
             </widget>
            </item>
@@ -547,7 +547,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QCheckBox" name="stopcheck">
+            <widget class="QCheckBox" name="autostopcheck">
              <property name="toolTip">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Stop On Error&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Halt the renaming process if an error occurs (e.g. a file cannot be renamed due to invalid characters).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
