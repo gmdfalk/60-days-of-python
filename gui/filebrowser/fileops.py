@@ -9,7 +9,6 @@ import glob
 import logging
 import os
 import re
-import sys
 
 import reporting
 
@@ -38,18 +37,20 @@ class FileOps(object):
         if path is None:
             path = os.getcwd()
 
-        targets = self.get_targets(path)
+        targets = self.get_targets(path, expression)
         print targets
-        matches = self.match_targets(targets, expression)
-        print matches
+#         matches = self.match_targets(targets, expression)
+#         print matches
+        # [i for i, j in zip(a, b) if i != j]
 
-    def get_targets(self, path):
+
+    def get_targets(self, path, expr):
         "Creates a list of files and/or directories to work with."
         targets = []
         for root, dirs, files in os.walk(path):
             root += "/"
             if self.dirsonly:
-                target = [(root, d) for d in dirs]
+                target = [(root, d) for d in dirs if self.match(d, expr)]
             elif self.filesonly:
                 target = []
                 for f in files:
@@ -72,13 +73,42 @@ class FileOps(object):
 
         return targets
 
-    def match_targets(self, targets, expression):
-        "Finds regex/glob matches in the list of targets."
-        matches = []
-        for i in targets:
-            pass
-        # [i for i, j in zip(a, b) if i != j]
+
+    def match(self, target, expression):
+        "Searches target for expression and returns True/False respectively."
+        name = i[1]  # [1] is the file-/dirname.
+            if not self.keepext:
+                try:
+                    name = i[1] + i[2]
+                except IndexError:
+                    pass
+            if self.regex:
+                if re.search(expression, name):
+                    matches.append(i)
+            else:
+                if fnmatch.fnmatch(name, expression):
+                    matches.append(i)
+
         return matches
+
+#     def match_targets(self, targets, expression):
+#         "Finds regex/glob matches in the list of targets."
+#         matches = []
+#         for i in targets:
+#             name = i[1]  # [1] is the file-/dirname.
+#             if not self.keepext:
+#                 try:
+#                     name = i[1] + i[2]
+#                 except IndexError:
+#                     pass
+#             if self.regex:
+#                 if re.search(expression, name):
+#                     matches.append(i)
+#             else:
+#                 if fnmatch.fnmatch(name, expression):
+#                     matches.append(i)
+#
+#         return matches
 
     def commit(self):
         pass
@@ -90,5 +120,5 @@ class FileOps(object):
 if __name__ == "__main__":
     log = reporting.create_logger()
     reporting.configure_logger(log)
-    fileops = FileOps(hidden=True, recursive=False)
-    fileops.stage("asdf")
+    fileops = FileOps(hidden=True, recursive=False, keepext=False)
+    fileops.stage("reporting*")
