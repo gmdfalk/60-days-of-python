@@ -34,11 +34,9 @@ Examples:
     dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
     dmv -f "*" "season-*" (will prepend "season-" to every file in the cwd)
 """
-import os
 import sys
 
 from fileops import FileOps
-import reporting
 
 
 try:
@@ -49,6 +47,7 @@ except ImportError:
 
 
 def main():
+    args = docopt(__doc__, version="0.1")
     fileops = FileOps(dirsonly=args["--dirsonly"],
                       filesonly=args["--filesonly"],
                       recursive=args["--recursive"],
@@ -61,12 +60,10 @@ def main():
                       count=args["--count"],
                       regex=args["--regex"],
                       quiet=args["--quiet"],
+                      verbosity=args["-v"],
                       exclude=args["--exclude"])
     fileops.stage(args["<source>"], args["<target>"], args["--path"])
 
 
 if __name__ == "__main__":
-    log = reporting.create_logger()
-    args = docopt(__doc__, version="0.1")
-    reporting.configure_logger(log, args["-v"], args["--quiet"])
     main()

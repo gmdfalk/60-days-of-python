@@ -1,7 +1,5 @@
 # TODO: Exclude option
 import fnmatch
-import glob
-import logging
 import os
 import re
 
@@ -13,7 +11,7 @@ class FileOps(object):
     def __init__(self, dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=True, count=None, regex=False,
-                 quiet=False, exclude=None):
+                 exclude=None, quiet=False, verbosity=1):
         self.dirsonly = dirsonly
         self.filesonly = False if dirsonly else filesonly
         self.recursive = recursive  # Look for files recursively
@@ -27,6 +25,10 @@ class FileOps(object):
         self.regex = regex  # Use regular expressions instead of glob/fnmatch.
         self.quiet = quiet  # No logging.
         self.exclude = exclude  # List of strings to exclude from targets.
+
+        # Create the logging instance.
+        self.log = reporting.create_logger()
+        reporting.configure_logger(self.log, verbosity, quiet)
 
     def stage(self, srcpat, destpat, path=None):
         if not path:
@@ -110,8 +112,9 @@ class FileOps(object):
             # TODO: Two functions: one to convert a glob into a pattern
             # and another to convert one into a replacement.
 
-    def commit(self):
-        pass
+    def commit(self, targets):
+        if self.simulate:
+            print "{} to {}".format(targets[1], targets[2])
 
     def rollback(self):
         pass
