@@ -49,7 +49,7 @@ class FileOps(object):
         for f in files:
             fname, ext = os.path.splitext(f)
             if self.match(srcpat, fname, ext):
-                target.append((root, fname, ext))
+                target.append([root, fname, ext])
         return target
 
     def joinext(self, target):
@@ -81,11 +81,11 @@ class FileOps(object):
         for root, dirs, files in os.walk(path):
             root += "/"
             if self.dirsonly:
-                target = [(root, d) for d in dirs if self.match(srcpat, d)]
+                target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
                 self.split_files(files, root, srcpat)
             else:
-                target = [(root, d) for d in dirs if self.match(srcpat, d)]
+                target = [[root, d] for d in dirs if self.match(srcpat, d)]
                 target += self.split_files(files, root, srcpat)
 
             if self.hidden:
@@ -100,15 +100,15 @@ class FileOps(object):
         return targets
 
     def modify_targets(self, targets, srcpat, destpat):
+        print srcpat, destpat
         if not self.regex:
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
-        print srcpat, destpat
-        srcrx = re.compile(srcpat)
-        destrx = re.compile(destpat)
         for target in targets:
             name = self.joinext(target)
-            match = srcrx.search(name)
+            print srcpat, destpat, name
+            match = re.sub(srcpat, destpat, name)
+            print match
 
     def commit(self):
         pass
@@ -120,5 +120,5 @@ class FileOps(object):
 if __name__ == "__main__":
     log = reporting.create_logger()
     reporting.configure_logger(log)
-    fileops = FileOps(hidden=True, recursive=False, keepext=False, regex=False)
-    fileops.stage("demi*", "*")
+    fileops = FileOps(hidden=True, recursive=True, keepext=False, regex=False)
+    fileops.stage("*.txt", "asdf")
