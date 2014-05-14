@@ -1,13 +1,13 @@
 """demimove
 
 Usage:
-    dmv <source> <target> [-f|-d] [-e <name>...] [-v|-vv|-vvv] [options]
+    dmv <source> [<target>] [-f|-d] [-e <name>...] [-v|-vv|-vvv] [options]
 
 Arguments:
     source        Pattern to match (with globbing enabled by default).
                   With no other options set, this will match against all
                   non-hidden file and directory names in the current directory.
-    target        Replacement pattern.
+    target        Optional replacement pattern.
                   For glob patterns, the number of wild cards has to match
                   those in the source pattern.
 
@@ -25,6 +25,10 @@ Options:
     -n, --no-clobber      Do not overwrite an existing file.
     -R, --regex           Use regex matching instead of globbing.
     -c, --count=<N>       Increment a counter at the given index (-1 is end).
+    -l
+    -u
+    -m, --media           Media mode. Clean up NTFS-style files
+                          (Spacer, mixed case, duplicate symbols and others).
     -v                    Logging verbosity, up to -vvv (debug).
     -q, --quiet           Do not print log messages to console.
     --version             Show the current demimove version.

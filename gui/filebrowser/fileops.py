@@ -4,6 +4,7 @@ import os
 import re
 
 import reporting
+import unicodedata
 
 
 class FileOps(object):
@@ -11,7 +12,8 @@ class FileOps(object):
     def __init__(self, dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=True, count=None, regex=False,
-                 exclude=None, quiet=False, verbosity=1):
+                 exclude=None, quiet=False, verbosity=1,
+                 ):
         self.dirsonly = dirsonly
         self.filesonly = False if dirsonly else filesonly
         self.recursive = recursive  # Look for files recursively
@@ -23,14 +25,15 @@ class FileOps(object):
         self.keepext = keepext  # Don't modify extensions.
         self.count = count  # Adds numerical index at position count in target.
         self.regex = regex  # Use regular expressions instead of glob/fnmatch.
-        self.quiet = quiet  # No logging.
         self.exclude = exclude  # List of strings to exclude from targets.
-
-        # Create the logging instance.
+        # Create the logger.
         self.log = reporting.create_logger()
         reporting.configure_logger(self.log, verbosity, quiet)
+        self.history = []  # History of commited operations, useful to undo.
 
     def stage(self, srcpat, destpat, path=None):
+        """Initialize the rename operation. Returns list of targets and their
+        preview."""
         if not path:
             path = os.getcwd()
         print path
@@ -42,7 +45,8 @@ class FileOps(object):
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
 
-    def split_files(self, files, root, srcpat):
+    def splitext(self, files, root, srcpat):
+        """Splits a list of files into filename and extension."""
         target = []
         for f in files:
             fname, ext = os.path.splitext(f)
@@ -51,6 +55,7 @@ class FileOps(object):
         return target
 
     def joinext(self, target):
+        """Joins a target tuple of (name, extension) back together."""
         if len(target) > 2:
             target = (target[1], target[2])
         name = target[0]
@@ -62,7 +67,7 @@ class FileOps(object):
         return name
 
     def match(self, srcpat, *target):
-        "Searches target for pattern and returns True/False respectively."
+        """Searches target for pattern and returns True/False respectively."""
         name = self.joinext(target)
         if self.regex:
             if re.search(srcpat, name):
@@ -74,24 +79,24 @@ class FileOps(object):
         return False
 
     def find_targets(self, srcpat, path):
-        "Creates a list of files and/or directories to work with."
+        """Creates a list of files and/or directories to work with."""
         targets = []
         for root, dirs, files in os.walk(path):
             root += "/"
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
-                self.split_files(files, root, srcpat)
+                self.splitext(files, root, srcpat)
             else:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
-                target += self.split_files(files, root, srcpat)
+                target += self.splitext(files, root, srcpat)
 
             if self.hidden:
                 targets.extend(target)
             else:
                 targets.extend(i for i in target if not i[1].startswith("."))
 
-            # Exit before the second loop for non-recursive searches.
+            # Do not enter the second loop for non-recursive searches.
             if not self.recursive:
                 break
 
@@ -107,8 +112,9 @@ class FileOps(object):
         for target in targets:
             name = self.joinext(target)
             print srcpat, destpat, name
-            match = re.sub(srcpat, destpat, name)
-            print match
+            srcmatch = re.search(target, srcpat).group()
+            destmatch = re.search(target, destpat).group()
+            print srcmatch, destmatch
             # TODO: Two functions: one to convert a glob into a pattern
             # and another to convert one into a replacement.
 
@@ -116,8 +122,69 @@ class FileOps(object):
         if self.simulate:
             print "{} to {}".format(targets[1], targets[2])
 
-    def rollback(self):
+    def undo(self, action):
         pass
+
+    def get_new_path(self, name, path):
+        """ Remove file from path, so we have only the dir"""
+        dirpath = os.path.split(path)[0]
+        if dirpath != '/': dirpath += '/'
+        return dirpath + name
+
+    def replace_spaces(self, name, path, mode):
+        name = unicode(name)
+        path = unicode(path)
+
+        if mode == 0:
+            newname = name.replace(' ', '_')
+        elif mode == 1:
+            newname = name.replace('_', ' ')
+        elif mode == 2:
+            newname = name.replace(' ', '.')
+        elif mode == 3:
+            newname = name.replace('.', ' ')
+        elif mode == 4:
+            newname = name.replace(' ', '-')
+        elif mode == 5:
+            newname = name.replace('-', ' ')
+
+        newpath = self.get_new_path(newname, path)
+        return unicode(newname), unicode(newpath)
+
+    def replace_capitalization(self, name, path, mode):
+        name = unicode(name)
+        path = unicode(path)
+
+        if mode == 0:
+            newname = name.upper()
+        elif mode == 1:
+            newname = name.lower()
+        elif mode == 2:
+            newname = name.capitalize()
+        elif mode == 3:
+            # newname = name.title()
+            newname = " ".join([x.capitalize() for x in name.split()])
+
+        newpath = self.get_new_path(newname, path)
+        return unicode(newname), unicode(newpath)
+
+    def replace_with(self, name, path, orig, new):
+        """ Replace all occurences of orig with new """
+        newname = name.replace(orig, new)
+        newpath = self.get_new_path(newname, path)
+
+        return unicode(newname), unicode(newpath)
+
+
+    def replace_accents(self, name, path):
+        name = unicode(name)
+        path = unicode(path)
+
+        newname = ''.join(c for c in unicodedata.normalize('NFD', name)
+                           if unicodedata.category(c) != 'Mn')
+
+        newpath = self.get_new_path(newname, path)
+        return unicode(newname), unicode(newpath)
 
 
 if __name__ == "__main__":
