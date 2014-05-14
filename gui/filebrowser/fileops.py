@@ -33,39 +33,65 @@ class FileOps(object):
         self.quiet = quiet  # No logging.
         self.exclude = exclude  # List of strings to exclude from targets.
 
-    def stage(self, expression, path=None):
+    def stage(self, srcpat, destpat, path=None):
         if path is None:
             path = os.getcwd()
 
-        targets = self.get_targets(path, expression)
+        targets = self.find_targets(srcpat, path)
         print targets
+        modtargets = self.modify_targets(targets, srcpat, destpat)
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
 
+    def split_files(self, files, root, srcpat):
+        target = []
+        for f in files:
+            fname, ext = os.path.splitext(f)
+            if self.match(srcpat, fname, ext):
+                target.append((root, fname, ext))
+        return target
 
-    def get_targets(self, path, expr):
+    def joinext(self, target):
+        if len(target) > 2:
+            target = (target[1], target[2])
+        name = target[0]
+        if not self.keepext:
+            try:
+                name += target[1]
+            except IndexError:
+                pass
+        return name
+
+    def match(self, srcpat, *target):
+        "Searches target for pattern and returns True/False respectively."
+        name = self.joinext(target)
+        if self.regex:
+            if re.search(srcpat, name):
+                return True
+        else:
+            if fnmatch.fnmatch(name, srcpat):
+                return True
+
+        return False
+
+    def find_targets(self, srcpat, path):
         "Creates a list of files and/or directories to work with."
         targets = []
         for root, dirs, files in os.walk(path):
             root += "/"
             if self.dirsonly:
-                target = [(root, d) for d in dirs if self.match(d, expr)]
+                target = [(root, d) for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
-                target = []
-                for f in files:
-                    fname, ext = os.path.splitext(f)
-                    target.append((root, fname, ext))
+                self.split_files(files, root, srcpat)
             else:
-                target = [(root, d) for d in dirs]
-                for f in files:
-                    fname, ext = os.path.splitext(f)
-                    target.append((root, fname, ext))
+                target = [(root, d) for d in dirs if self.match(srcpat, d)]
+                target += self.split_files(files, root, srcpat)
 
             if self.hidden:
                 targets.extend(target)
             else:
-                targets.extend(i for i in target if not i[2].startswith("."))
+                targets.extend(i for i in target if not i[1].startswith("."))
 
             # Exit before the second loop for non-recursive searches.
             if not self.recursive:
@@ -73,42 +99,16 @@ class FileOps(object):
 
         return targets
 
-
-    def match(self, target, expression):
-        "Searches target for expression and returns True/False respectively."
-        name = i[1]  # [1] is the file-/dirname.
-            if not self.keepext:
-                try:
-                    name = i[1] + i[2]
-                except IndexError:
-                    pass
-            if self.regex:
-                if re.search(expression, name):
-                    matches.append(i)
-            else:
-                if fnmatch.fnmatch(name, expression):
-                    matches.append(i)
-
-        return matches
-
-#     def match_targets(self, targets, expression):
-#         "Finds regex/glob matches in the list of targets."
-#         matches = []
-#         for i in targets:
-#             name = i[1]  # [1] is the file-/dirname.
-#             if not self.keepext:
-#                 try:
-#                     name = i[1] + i[2]
-#                 except IndexError:
-#                     pass
-#             if self.regex:
-#                 if re.search(expression, name):
-#                     matches.append(i)
-#             else:
-#                 if fnmatch.fnmatch(name, expression):
-#                     matches.append(i)
-#
-#         return matches
+    def modify_targets(self, targets, srcpat, destpat):
+        if not self.regex:
+            srcpat = fnmatch.translate(srcpat)
+            destpat = fnmatch.translate(destpat)
+        print srcpat, destpat
+        srcrx = re.compile(srcpat)
+        destrx = re.compile(destpat)
+        for target in targets:
+            name = self.joinext(target)
+            match = srcrx.search(name)
 
     def commit(self):
         pass
@@ -120,5 +120,5 @@ class FileOps(object):
 if __name__ == "__main__":
     log = reporting.create_logger()
     reporting.configure_logger(log)
-    fileops = FileOps(hidden=True, recursive=False, keepext=False)
-    fileops.stage("reporting*")
+    fileops = FileOps(hidden=True, recursive=False, keepext=False, regex=False)
+    fileops.stage("demi*", "*")
