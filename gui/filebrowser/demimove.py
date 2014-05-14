@@ -1,8 +1,8 @@
 """demimove
 
 Usage:
-    dmv <source> <target> [-s] [-f|-d] [-a] [-e <ex>...] [-r] [-i|-p] [-n] [-R]
-        [-c <n>] [-v...] [-q] [-h]
+    dmv <source> <target> [-s] [-f|-d] [-a] [-r] [-i|-p] [-n] [-R]
+        [-c <n>] [-e <e>...] [-v...] [-q] [-h]
 
 Arguments:
     source        Pattern to match (with globbing enabled by default).
@@ -29,12 +29,12 @@ Options:
 
 Examples:
     dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
-    dmv -f * season-* (will prepend "season-" to every file in the cwd)
+    dmv -f "*" "season-*" (will prepend "season-" to every file in the cwd)
 """
 import os
 import sys
 
-import fileops
+from fileops import FileOps
 import reporting
 
 
@@ -46,7 +46,8 @@ except ImportError:
 
 
 def main():
-    cwd = os.path.dirname(os.path.realpath(__file__))
+    fileops = FileOps()
+    print args
 
 
 if __name__ == "__main__":

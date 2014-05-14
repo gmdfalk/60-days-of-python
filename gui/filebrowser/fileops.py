@@ -1,8 +1,3 @@
-# from datetime import datetime
-# import codecs
-# import dircache
-# import shutil
-# import time
 # TODO: Exclude option
 import fnmatch
 import glob
@@ -36,6 +31,7 @@ class FileOps(object):
     def stage(self, srcpat, destpat, path=None):
         if path is None:
             path = os.getcwd()
+            print path
 
         targets = self.find_targets(srcpat, path)
         print targets
@@ -100,15 +96,19 @@ class FileOps(object):
         return targets
 
     def modify_targets(self, targets, srcpat, destpat):
+        # TODO: Handle case sensitivity (re.IGNORECASE)
         print srcpat, destpat
         if not self.regex:
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
+            print srcpat, destpat
         for target in targets:
             name = self.joinext(target)
             print srcpat, destpat, name
             match = re.sub(srcpat, destpat, name)
             print match
+            # TODO: Two functions: one to convert a glob into a pattern
+            # and another to convert one into a replacement.
 
     def commit(self):
         pass
