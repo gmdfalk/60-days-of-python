@@ -58,6 +58,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         super(DemiMoveGUI, self).__init__(parent)
         self.fileops = fileops.FileOps()
+        self.autopreview = True
         uic.loadUi("demimove.ui", self)
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
@@ -71,47 +72,58 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_previewbutton(self):
         print self.sender()
+#         srcpat, destpat, path = None, None, None
+#         self.fileops.stage(srcpat, destpat, path)
 
-    def on_refreshbutton(self):
+    def on_commitbutton(self):
         pass
-
-    def on_renamebutton(self):
-        pass
+        # self.fileops.commit()
 
     def on_undobutton(self):
         pass
+        # self.fileops.undo()
 
     def on_regexcheck(self, checked):
         if checked:
-            pass
+            self.fileops.regex = True
+        else:
+            self.fileops.regex = False
 
     def on_autopreviewcheck(self, checked):
         if checked:
-            pass
+            self.autopreview = True
+        else:
+            self.autopreview = False
 
     def on_extensioncheck(self, checked):
         if checked:
             self.fileops.keepext = True
         else:
             self.fileops.keepext = False
-        print checked, self.fileops.keepext
 
     def on_hiddencheck(self, checked):
         if checked:
-            pass
+            self.fileops.hidden = True
+        else:
+            self.fileops.hidden = False
 
     def on_mirrorcheck(self, checked):
         if checked:
-            pass
+            self.fileops.mirror = True
+        else:
+            self.fileops.mirror = False
 
     def on_recursivecheck(self, checked):
         if checked:
-            pass
+            self.fileops.recursive = True
+        else:
+            self.fileops.recursive = False
 
     def on_autostopcheck(self, checked):
         if checked:
-            pass
-        # autosotp
+            self.fileops.autostop = True
+        else:
+            self.fileops.autostop = False
 
     def insertpos(self, value):
         pass
@@ -168,7 +180,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         pass
 
 
-    def on_removewords(self):
+    def on_removenonwords(self):
         pass
 
 
@@ -179,11 +191,13 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def connect_buttons(self):
         # Main buttons:
         self.previewbutton.clicked.connect(self.on_previewbutton)
-        self.refreshbutton.clicked.connect(self.on_refreshbutton)
-        self.renamebutton.clicked.connect(self.on_renamebutton)
+        self.commitbutton.clicked.connect(self.on_commitbutton)
         self.undobutton.clicked.connect(self.on_undobutton)
         # Main check and lineedits:
         self.regexcheck.clicked.connect(self.on_regexcheck)
+        self.allradio.clicked.connect(self.on_allradio)
+        self.dirsradio.clicked.connect(self.on_dirsradio)
+        self.filesradio.clicked.connect(self.on_filesradio)
 
         # Main options:
         self.autopreviewcheck.clicked.connect(self.on_autopreviewcheck)
@@ -212,7 +226,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # Remove options:
         self.removeduplicatescheck.clicked.connect(self.on_removeduplicates)
         self.removeextensionscheck.clicked.connect(self.on_removeextensions)
-        self.removewordscheck.clicked.connect(self.on_removewords)
+        self.removenonwordscheck.clicked.connect(self.on_removenonwords)
 
         # Various options:
         self.varaccentscheck.clicked.connect(self.on_varaccents)
@@ -275,7 +289,7 @@ if __name__ == "__main__":
         args = docopt(__doc__, version="0.1")
         reporting.configure_logger(log, args["-v"], args["--quiet"])
     except NameError:
-        reporting.configure_logger(log, loglevel=2, quiet=False)
+        reporting.configure_logger(log, loglevel=3, quiet=False)
         log.error("Please install docopt to use the CLI.")
 
     main()

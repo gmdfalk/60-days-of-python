@@ -28,7 +28,6 @@ class FileOps(object):
         self.regex = regex  # Use regular expressions instead of glob/fnmatch.
         self.exclude = exclude  # List of strings to exclude from targets.
         # GUI options:
-        self.autopreview = False
         self.autostop = False
         self.mirror = False
         self.insertpos = 0

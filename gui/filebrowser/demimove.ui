@@ -605,13 +605,6 @@
         <item>
          <layout class="QHBoxLayout" name="buttonlayout">
           <item>
-           <widget class="QPushButton" name="refreshbutton">
-            <property name="text">
-             <string>Refresh</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="previewbutton">
             <property name="text">
              <string>Preview</string>
@@ -619,14 +612,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="renamebutton">
+           <widget class="QPushButton" name="commitbutton">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply the (previewed) changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
-             <string>Rename</string>
+             <string>Commit</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="undobutton">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo last commit&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Undo</string>
             </property>
