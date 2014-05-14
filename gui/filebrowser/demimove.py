@@ -1,21 +1,22 @@
 """demimove
 
 Usage:
-    dmv <source> [<target>] [-f|-d] [-e <name>...] [-v|-vv|-vvv] [options]
+    dmv [<source> [<target>]] [-D|-F] [-e <name>...] [-v|-vv|-vvv] [options]
 
 Arguments:
-    source        Pattern to match (with globbing enabled by default).
+    source        (Optional) Pattern to identify targets by.
+                  Defaults to globbing but can be set to regular expression.
                   With no other options set, this will match against all
                   non-hidden file and directory names in the current directory.
-    target        Optional replacement pattern.
+    target        Optional replacement pattern for the source pattern.
                   For glob patterns, the number of wild cards has to match
                   those in the source pattern.
 
 Options:
-    -P, --path=<path>     Specify a path. Otherwise use the current directory.
+    -d, --dir=<path>      Specify the working directory. Otherwise cwd is used.
     -s, --simulate        Do a test run and dump the results to console.
-    -d, --dirsonly        Only search directory names. Leaves files untouched.
-    -f, --filesonly       Only search file names. Default is files + dirs.
+    -D, --dirsonly        Only search directory names. Leaves files untouched.
+    -F, --filesonly       Only search file names. Default is files + dirs.
     -e, --exclude=<n>...  Exclude files/directories. One or more instances.
     -a, --all             Include hidden files/directories.
     -k, --keep-extension  Preserve file extensions.
@@ -25,10 +26,10 @@ Options:
     -n, --no-clobber      Do not overwrite an existing file.
     -R, --regex           Use regex matching instead of globbing.
     -c, --count=<N>       Increment a counter at the given index (-1 is end).
-    -l
-    -u
-    -m, --media           Media mode. Clean up NTFS-style files
-                          (Spacer, mixed case, duplicate symbols and others).
+    -l, --lower           Change all letters to lowercase.
+    -u, --upper           Change all letters to uppercase.
+    -m, --media           Media mode: All lowercase, remove duplicate symbols,
+                          replace spaces and similar actions.
     -v                    Logging verbosity, up to -vvv (debug).
     -q, --quiet           Do not print log messages to console.
     --version             Show the current demimove version.

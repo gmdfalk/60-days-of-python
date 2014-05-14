@@ -1,19 +1,17 @@
 """demimove-ui
 
 Usage:
-    dmv-ui [-d <dir>] [-c <file>] [-v...] [-q] [-h]
+    dmv-ui [-d <path>] [-c <file>] [-v|-vv|-vvv] [-q] [-h]
 
 Options:
-    -c, --config=<file>  Specify a config file to load.
-    -d, --dir=<dir>      Specify a directory to load.
+    -c, --config=<file>  <NYI> Specify a config file to load.
+    -d, --dir=<path>     Specify the working directory. Otherwise CWD is used.
     -v                   Logging verbosity level, up to -vvv.
     -q, --quiet          Do not print logging messages to console.
     -h,  --help          Show this help text and exit.
     --version            Show the current demimove-ui version.
 """
 # TODO: ConfigParser
-import os
-import random
 import sys
 
 from PyQt4 import QtGui, QtCore, uic
@@ -71,21 +69,80 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.connect_buttons()
         log.info("demimove initialized.")
 
+
+    def on_previewbutton(self):
+        print self.sender()
+
+
+    def on_refreshbutton(self):
+        pass
+
+
+    def on_renamebutton(self):
+        pass
+
+
+    def on_undobutton(self):
+        pass
+
+
+    def on_regexcheck(self):
+        pass
+
+
+    def on_sourceedit(self):
+        pass
+
+
+    def on_targetedit(self):
+        pass
+
+
+    def autopreviewcheck(self):
+        pass
+
+
+    def extensioncheck(self):
+        pass
+
+
+    def hiddencheck(self):
+        pass
+
+
+    def mirrorcheck(self):
+        pass
+
+
+    def on_recursivecheck(self):
+        pass
+
+
+    def on_stopcheck(self):
+        pass
+
+
     def connect_buttons(self):
-        self.previewbutton.connect(self.on_previewbutton)
-        self.refreshbutton.connect(self.on_refreshbutton)
-        self.renamebutton.connect(self.on_renamebutton)
-        self.undobutton.connect(self.on_undobutton)
+        # Main buttons:
+        self.previewbutton.clicked.connect(self.on_previewbutton)
+        self.refreshbutton.clicked.connect(self.on_refreshbutton)
+        self.renamebutton.clicked.connect(self.on_renamebutton)
+        self.undobutton.clicked.connect(self.on_undobutton)
 
-        self.regexcheck.connect(self.on_regexcheck)
-        # sourcedit, targetedit (main replace)
+        # Main check and lineedits:
+#         self.regexcheck.connect(self.on_regexcheck)
+#         self.sourcedit.connect(self.on_sourceedit)
+#         self.targetedit.connect(self.on_targetedit)
+#
+#         # Main options:
+#         self.autopreviewcheck.connect(self.on_autopreviewcheck)
+#         self.extensioncheck.connect(self.on_extensioncheck)
+#         self.hiddencheck.connect(self.on_hiddencheck)
+#         self.mirrorcheck.connect(self.on_mirrorncheck)
+#         self.recursivecheck.connect(self.on_recursivecheck)
+#         self.stopcheck.connect(self.on_stopcheck)
 
-        # Main options.
-        self.extensioncheck.connect(self.on_extensioncheck)
-        self.hiddencheck.connect(self.on_hiddencheck)
-        self.mirrorcheck.connect(self.on_hiddencheck)
-        self.recursivecheck.connect(self.on_hiddencheck)
-        self.autopreviewcheck.connect(self.on_hiddencheck)
+        # Action options:
 
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.

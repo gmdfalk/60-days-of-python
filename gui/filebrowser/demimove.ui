@@ -149,20 +149,7 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QCheckBox" name="spacetrimcheck">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Trim&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Replace instances of two or more successive (selected source) with a single (selected target).&lt;/p&gt;&lt;p&gt;E.g. with Space to Underscore &amp;quot;a&amp;nbsp;&amp;nbsp;b&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;c&amp;quot; would become &amp;quot;a_b_c&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Trim</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
+             <item row="2" column="0">
               <widget class="QCheckBox" name="replacecheck">
                <property name="text">
                 <string>Replace</string>
@@ -172,37 +159,31 @@
                </property>
               </widget>
              </item>
+             <item row="2" column="1">
+              <layout class="QHBoxLayout" name="replaceeditslayout">
+               <item>
+                <widget class="QLineEdit" name="replacesource">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="replacetarget">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
              <item row="3" column="1">
-              <widget class="QLineEdit" name="replacesource">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="replacelabel">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>           with</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QLineEdit" name="replacetarget">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
               <layout class="QHBoxLayout" name="replacechecks">
                <item>
                 <widget class="QRadioButton" name="replaceregex">
@@ -251,24 +232,7 @@
                </item>
               </layout>
              </item>
-             <item row="6" column="1">
-              <layout class="QGridLayout" name="removelayout">
-               <item row="0" column="0">
-                <widget class="QCheckBox" name="replaceaccentcheck">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Accents&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will replace e.g. &amp;quot;čáñů&amp;quot; with &amp;quot;canu&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Replace accents</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="8" column="0">
+             <item row="4" column="0">
               <widget class="QCheckBox" name="insertcheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Insert a string at a fixed position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -278,7 +242,7 @@
                </property>
               </widget>
              </item>
-             <item row="8" column="1">
+             <item row="4" column="1">
               <layout class="QHBoxLayout" name="insertlayout">
                <item>
                 <widget class="QSpinBox" name="insertpos">
@@ -302,7 +266,7 @@
                </item>
               </layout>
              </item>
-             <item row="9" column="0">
+             <item row="5" column="0">
               <widget class="QCheckBox" name="deletecheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete everything between fixed positions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -312,7 +276,7 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="1">
+             <item row="5" column="1">
               <layout class="QHBoxLayout" name="deletelayout">
                <item>
                 <widget class="QSpinBox" name="deletestart">
@@ -352,7 +316,7 @@
                </item>
               </layout>
              </item>
-             <item row="10" column="0">
+             <item row="6" column="0">
               <widget class="QCheckBox" name="countcheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add an incrementing number at a fixed position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -362,7 +326,7 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="1">
+             <item row="6" column="1">
               <layout class="QHBoxLayout" name="countlayout" stretch="0,0,0">
                <item>
                 <widget class="QSpinBox" name="countstart">
@@ -405,7 +369,7 @@
                </item>
               </layout>
              </item>
-             <item row="11" column="1">
+             <item row="7" column="1">
               <layout class="QHBoxLayout" name="countstringlabel">
                <item>
                 <widget class="QLineEdit" name="countpreedit">
@@ -435,7 +399,7 @@
                </item>
               </layout>
              </item>
-             <item row="12" column="1">
+             <item row="8" column="1">
               <widget class="QCheckBox" name="countfillcheck">
                <property name="enabled">
                 <bool>false</bool>
@@ -454,7 +418,7 @@
                </property>
               </widget>
              </item>
-             <item row="13" column="0">
+             <item row="9" column="0">
               <widget class="QCheckBox" name="removecheck">
                <property name="text">
                 <string>Remove</string>
@@ -464,8 +428,24 @@
                </property>
               </widget>
              </item>
-             <item row="14" column="1">
-              <widget class="QCheckBox" name="removenonwordcheck">
+             <item row="9" column="1">
+              <widget class="QCheckBox" name="removeduplicatescheck">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove duplicate symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reduces multiple successive occurrences of space, dot, hyphen and other common symbols to a single occurrence.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Duplicate symbols</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QCheckBox" name="removenonwordscheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove non-word characters&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow [A-Za-z0-9_.-].&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -474,7 +454,7 @@
                </property>
               </widget>
              </item>
-             <item row="15" column="1">
+             <item row="11" column="1">
               <widget class="QCheckBox" name="removeextensionscheck">
                <property name="enabled">
                 <bool>true</bool>
@@ -487,19 +467,23 @@
                </property>
               </widget>
              </item>
-             <item row="13" column="1">
-              <widget class="QCheckBox" name="removeduplicatescheck">
+             <item row="12" column="1">
+              <widget class="QCheckBox" name="varaccentscheck">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove duplicate symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reduces double occurrences of space, dot, hyphen and other common symbols to a single occurrence.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Accents&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will replace e.g. &amp;quot;čáñů&amp;quot; with &amp;quot;canu&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Duplicate symbols</string>
+                <string>Normalize accents</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QCheckBox" name="varcheck">
+               <property name="text">
+                <string>Various</string>
                </property>
               </widget>
              </item>
@@ -902,38 +886,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>spacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spacetrimcheck</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>46</x>
-     <y>89</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>124</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replacelabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>45</x>
-     <y>189</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>replacecheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>replacesource</receiver>
@@ -1014,14 +966,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>varcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>replaceaccentcheck</receiver>
+   <receiver>varaccentscheck</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>49</x>
-     <y>186</y>
+     <x>47</x>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>274</x>
@@ -1064,7 +1016,7 @@
   <connection>
    <sender>removecheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>removenonwordcheck</receiver>
+   <receiver>removenonwordscheck</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1074,6 +1026,22 @@
     <hint type="destinationlabel">
      <x>219</x>
      <y>472</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replaceregex</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>regexcheck</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>141</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>621</x>
+     <y>604</y>
     </hint>
    </hints>
   </connection>
