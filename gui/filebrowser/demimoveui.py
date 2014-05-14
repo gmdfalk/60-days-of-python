@@ -62,7 +62,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         uic.loadUi("demimove.ui", self)
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
-        self.mainsplitter.setStretchFactor(0, 0)
+        self.mainsplitter.setStretchFactor(0, 2)
         self.mainsplitter.setStretchFactor(1, 3)
 
         self.create_dirtree()
@@ -159,25 +159,39 @@ class DemiMoveGUI(QtGui.QMainWindow):
         pass
 
     def on_countfillcheck(self, checked):
-        pass
+        if checked:
+            self.fileops.countfill = True
+        else:
+            self.fileops.countfill = False
 
     def on_removeduplicates(self, checked):
-        pass
+        if checked:
+            self.fileops.duplicates = True
+        else:
+            self.fileops.duplicates = False
 
     def on_removeextensions(self, checked):
-        pass
+        if checked:
+            self.fileops.ext = True
+        else:
+            self.fileops.ext = False
 
     def on_removenonwords(self, checked):
-        pass
+        if checked:
+            self.fileops.nonwords = True
+        else:
+            self.fileops.nonwords = False
 
     def on_varaccents(self, checked):
-        pass
+        if checked:
+            self.fileops.accents = True
+        else:
+            self.fileops.accents = False
 
     def on_allradio(self, checked):
         if checked:
             self.fileops.filesonly = False
             self.fileops.dirsonly = False
-            log.debug("Enabled both dirs and files.")
 
     def on_dirsradio(self, checked):
         if checked:
@@ -185,7 +199,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.fileops.filesonly = False
         else:
             self.fileops.dirsonly = False
-        log.debug("Dirsonly: {}".format(self.fileops.dirsonly))
 
     def on_filesradio(self, checked):
         if checked:
@@ -193,7 +206,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.fileops.dirsonly = False
         else:
             self.fileops.filessonly = False
-        log.debug("Filesonly: {}".format(self.fileops.filesonly))
 
     def connect_buttons(self):
         # Main buttons:

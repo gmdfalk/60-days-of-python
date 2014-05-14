@@ -13,29 +13,187 @@ class FileOps(object):
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=True, count=None, regex=False,
                  exclude=None, quiet=False, verbosity=1,
-                 ):
+                 accents=False):
         # Universal options:
-        self.dirsonly = dirsonly  # Only edit directory names.
-        self.filesonly = False if dirsonly else filesonly  # Only file names.
-        self.recursive = recursive  # Look for files recursively
-        self.hidden = hidden  # Look at hidden files and directories, too.
-        self.simulate = simulate  # Simulate renaming and dump result to stdout.
-        self.interactive = interactive  # Confirm before overwriting.
-        self.prompt = prompt  # Confirm all rename actions.
-        self.noclobber = noclobber  # Don't overwrite anything.
-        self.keepext = keepext  # Don't modify extensions.
-        self.count = count  # Adds numerical index at position count in target.
-        self.regex = regex  # Use regular expressions instead of glob/fnmatch.
-        self.exclude = exclude  # List of strings to exclude from targets.
+        self._dirsonly = dirsonly  # Only edit directory names.
+        self._filesonly = False if dirsonly else filesonly  # Only file names.
+        self._recursive = recursive  # Look for files recursively
+        self._hidden = hidden  # Look at hidden files and directories, too.
+        self._simulate = simulate  # Simulate renaming and dump result to stdout.
+        self._interactive = interactive  # Confirm before overwriting.
+        self._prompt = prompt  # Confirm all rename actions.
+        self._noclobber = noclobber  # Don't overwrite anything.
+        self._keepext = keepext  # Don't modify extensions.
+        self._count = count  # Adds numerical index at position count in target.
+        self._regex = regex  # Use regular expressions instead of glob/fnmatch.
+        self._exclude = exclude  # List of strings to exclude from targets.
+        self._accents = accents
         # GUI options:
-        self.autostop = False
-        self.mirror = False
-        self.insertpos = 0
-        self.inserttext = ""
+        self._autostop = False
+        self._mirror = False
+        self._insertpos = 0
+        self._inserttext = ""
         # Create the logger.
         self.log = reporting.create_logger("fileops")
         reporting.configure_logger(self.log, verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
+
+    @property
+    def dirsonly(self):
+        return self._dirsonly
+
+    @dirsonly.setter
+    def dirsonly(self, boolean):
+        log.debug("Setting dirsonly to {}.".format(boolean))
+        self._dirsonly = boolean
+        if self.dirsonly:
+            self.filesonly = False
+
+    @property
+    def filesonly(self):
+        return self._filesonly
+
+    @filesonly.setter
+    def filesonly(self, boolean):
+        log.debug("Setting dirsonly to {}.".format(boolean))
+        self._dirsonly = boolean
+        if self.filesonly:
+            self.dirsonly = False
+
+    @property
+    def recursive(self):
+        return self._recursive
+
+    @recursive.setter
+    def recursive(self, boolean):
+        log.debug("Setting recursive to {}.".format(boolean))
+        self._recursive = boolean
+
+    @property
+    def hidden(self):
+        return self._hidden
+
+    @hidden.setter
+    def hidden(self, boolean):
+        log.debug("Setting hidden to {}.".format(boolean))
+        self._hidden = boolean
+
+    @property
+    def simulate(self):
+        return self._simulate
+
+    @simulate.setter
+    def simulate(self, boolean):
+        log.debug("Setting simulate to {}.".format(boolean))
+        self._simulate = boolean
+
+    @property
+    def interactive(self):
+        return self._interactive
+
+    @interactive.setter
+    def interactive(self, boolean):
+        log.debug("Setting interactive to {}.".format(boolean))
+        self._interactive = boolean
+
+    @property
+    def prompt(self):
+        return self._prompt
+
+    @prompt.setter
+    def prompt(self, boolean):
+        log.debug("Setting simulate to {}.".format(boolean))
+        self._prompt = boolean
+
+    @property
+    def noclobber(self):
+        return self._noclobber
+
+    @noclobber.setter
+    def noclobber(self, boolean):
+        log.debug("Setting noclobber to {}.".format(boolean))
+        self._noclobber = boolean
+
+    @property
+    def keepext(self):
+        return self._keepext
+
+    @keepext.setter
+    def keepext(self, boolean):
+        log.debug("Setting keepext to {}.".format(boolean))
+        self._keepext = boolean
+
+    @property
+    def regex(self):
+        return self._regex
+
+    @regex.setter
+    def regex(self, boolean):
+        log.debug("Setting regex to {}.".format(boolean))
+        self._regex = boolean
+
+    @property
+    def accents(self):
+        return self._accents
+
+    @accents.setter
+    def accents(self, boolean):
+        log.debug("Setting accents to {}.".format(boolean))
+        self._accents = boolean
+
+    @property
+    def exclude(self):
+        return self._exclude
+
+    @exclude.setter
+    def exclude(self, names):
+        log.debug("Excluding {}.".format(names))
+        self._exclude = names
+
+    @property
+    def autostop(self):
+        return self._autostop
+
+    @autostop.setter
+    def autostop(self, boolean):
+        log.debug("Setting autostop to {}.".format(boolean))
+        self._autostop = boolean
+
+    @property
+    def mirror(self):
+        return self._mirror
+
+    @mirror.setter
+    def mirror(self, boolean):
+        log.debug("Setting mirror to {}.".format(boolean))
+        self._mirror = boolean
+
+    @property
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, index):
+        log.debug("Setting count index to {}.".format(index))
+        self._count = index
+
+    @property
+    def insertpos(self):
+        return self._insertpos
+
+    @count.setter
+    def count(self, index):
+        log.debug("Setting insertpos to {}.".format(index))
+        self._insertpos = index
+
+    @property
+    def inserttext(self):
+        return self._inserttext
+
+    @inserttext.setter
+    def inserttext(self, text):
+        log.debug("Setting inserttext to {}.".format(text))
+        self._inserttext = text
 
     def stage(self, srcpat, destpat, path=None):
         """Initialize the rename operation. Returns list of targets and their
@@ -127,6 +285,7 @@ class FileOps(object):
     def commit(self, targets):
         if self.simulate:
             print "{} to {}".format(targets[1], targets[2])
+        # clean up self.exclude
 
     def undo(self, action):
         pass

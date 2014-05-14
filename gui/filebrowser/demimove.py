@@ -13,23 +13,26 @@ Arguments:
                   those in the source pattern.
 
 Options:
+    -R, --regex           Use regex matching instead of globbing.
     -d, --dir=<path>      Specify the working directory. Otherwise cwd is used.
+    -r, --recursive       Apply changes recursively.
+    -k, --keep-extension  Preserve file extensions.
     -s, --simulate        Do a test run and dump the results to console.
+    -A, --all             Include hidden files/directories.
     -D, --dirsonly        Only search directory names. Leaves files untouched.
     -F, --filesonly       Only search file names. Default is files + dirs.
     -e, --exclude=<n>...  Exclude files/directories. One or more instances.
-    -a, --all             Include hidden files/directories.
-    -k, --keep-extension  Preserve file extensions.
-    -r, --recursive       Apply changes recursively.
     -i, --interactive     Confirm before overwriting.
     -p, --prompt          Confirm all rename actions.
     -n, --no-clobber      Do not overwrite an existing file.
-    -R, --regex           Use regex matching instead of globbing.
     -c, --count=<N>       Increment a counter at the given index (-1 is end).
+    -C, --capitalize      Change the first letter to uppercase, rest to lower.
     -l, --lower           Change all letters to lowercase.
     -u, --upper           Change all letters to uppercase.
+    -a, --accents         Normalize accents.
+    -w, --no-wordchars    Remove wordchars
     -m, --media           Media mode: All lowercase, remove duplicate symbols,
-                          replace spaces and similar actions.
+                          replace spaces, keep extensions.
     -v                    Logging verbosity, up to -vvv (debug).
     -q, --quiet           Do not print log messages to console.
     --version             Show the current demimove version.
