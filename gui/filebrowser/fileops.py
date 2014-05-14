@@ -29,9 +29,9 @@ class FileOps(object):
         self.exclude = exclude  # List of strings to exclude from targets.
 
     def stage(self, srcpat, destpat, path=None):
-        if path is None:
+        if not path:
             path = os.getcwd()
-            print path
+        print path
 
         targets = self.find_targets(srcpat, path)
         print targets
