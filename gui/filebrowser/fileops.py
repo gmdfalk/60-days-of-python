@@ -33,7 +33,7 @@ class FileOps(object):
         self.insertpos = 0
         self.inserttext = ""
         # Create the logger.
-        self.log = reporting.create_logger()
+        self.log = reporting.create_logger("fileops")
         reporting.configure_logger(self.log, verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
 

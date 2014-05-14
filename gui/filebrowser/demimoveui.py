@@ -63,15 +63,15 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.mainsplitter.setStretchFactor(0, 0)
-        self.mainsplitter.setStretchFactor(1, 2)
+        self.mainsplitter.setStretchFactor(1, 3)
 
         self.create_dirtree()
         self.create_browsertree()
         self.connect_buttons()
-        log.info("demimove initialized.")
+        log.info("demimove-ui initialized.")
 
     def on_previewbutton(self):
-        print self.sender()
+        log.debug("{}".format(self.sender()))
 #         srcpat, destpat, path = None, None, None
 #         self.fileops.stage(srcpat, destpat, path)
 
@@ -131,62 +131,69 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def insertedit(self, text):
         pass
 
-
     def on_replacecase(self):
         pass
-
 
     def on_replaceglob(self):
         pass
 
-
     def on_replaceregex(self):
         pass
-
 
     def on_insertpos(self):
         pass
 
-
     def on_insertedit(self):
         pass
-
 
     def on_countstart(self):
         pass
 
-
     def on_countstep(self):
         pass
-
 
     def on_countpreedit(self):
         pass
 
-
     def on_countsufedit(self):
         pass
 
-
-    def on_countfillcheck(self):
+    def on_countfillcheck(self, checked):
         pass
 
-
-    def on_removeduplicates(self):
+    def on_removeduplicates(self, checked):
         pass
 
-
-    def on_removeextensions(self):
+    def on_removeextensions(self, checked):
         pass
 
-
-    def on_removenonwords(self):
+    def on_removenonwords(self, checked):
         pass
 
-
-    def on_varaccents(self):
+    def on_varaccents(self, checked):
         pass
 
+    def on_allradio(self, checked):
+        if checked:
+            self.fileops.filesonly = False
+            self.fileops.dirsonly = False
+            log.debug("Enabled both dirs and files.")
+
+    def on_dirsradio(self, checked):
+        if checked:
+            self.fileops.dirsonly = True
+            self.fileops.filesonly = False
+        else:
+            self.fileops.dirsonly = False
+        log.debug("Dirsonly: {}".format(self.fileops.dirsonly))
+
+    def on_filesradio(self, checked):
+        if checked:
+            self.fileops.filesonly = True
+            self.fileops.dirsonly = False
+        else:
+            self.fileops.filessonly = False
+        log.debug("Filesonly: {}".format(self.fileops.filesonly))
 
     def connect_buttons(self):
         # Main buttons:
@@ -283,10 +290,11 @@ def main():
 
 
 if __name__ == "__main__":
-    log = reporting.create_logger()
+    log = reporting.create_logger("gui")
 
     try:
         args = docopt(__doc__, version="0.1")
+        args["-v"] = 3
         reporting.configure_logger(log, args["-v"], args["--quiet"])
     except NameError:
         reporting.configure_logger(log, loglevel=3, quiet=False)
