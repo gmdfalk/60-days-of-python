@@ -78,7 +78,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     @autopreview.setter
     def autopreview(self, boolean):
-        log.debug("Setting autopreview to {}.".format(boolean))
+        log.debug("autopreview: {}".format(boolean))
         self._autopreview = boolean
 
     def on_previewbutton(self):
@@ -136,19 +136,28 @@ class DemiMoveGUI(QtGui.QMainWindow):
         else:
             self.fileops.autostop = False
 
+    def on_replacecase(self, checked):
+        if checked:
+            self.fileops.ignorecase = False
+        else:
+            self.fileops.ignorecase = True
+
+    def on_replaceglob(self, checked):
+        if checked:
+            self.fileops.regex = False
+        else:
+            self.fileops.regex = True
+
+    def on_replaceregex(self, checked):
+        if checked:
+            self.fileops.regex = True
+        else:
+            self.fileops.regex = False
+
     def on_insertpos(self, value):
         pass
 
     def on_insertedit(self, text):
-        pass
-
-    def on_replacecase(self):
-        pass
-
-    def on_replaceglob(self):
-        pass
-
-    def on_replaceregex(self):
         pass
 
     def on_countstart(self):

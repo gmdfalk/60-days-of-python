@@ -39,9 +39,9 @@ class FileOps(object):
     def __init__(self, quiet=False, verbosity=1,
                  dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
-                 noclobber=False, keepext=True, count=None, regex=False,
+                 noclobber=False, keepext=False, count=None, regex=False,
                  exclude=None, accents=False, upper=False, lower=False,
-                 nowords=False, media=False):
+                 nowords=False, media=False, ignorecase=False):
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -58,6 +58,7 @@ class FileOps(object):
         self._accents = accents
         self._lower = lower
         self._upper = upper
+        self._ignorecase = ignorecase
         # Initialize GUI options.
         self._autostop = False
         self._mirror = False
@@ -73,7 +74,7 @@ class FileOps(object):
 
     @dirsonly.setter
     def dirsonly(self, boolean):
-        log.debug("Dirsonly: {}".format(boolean))
+        log.debug("dirsonly: {}".format(boolean))
         self._dirsonly = boolean
         if self.dirsonly:
             self.filesonly = False
@@ -84,7 +85,7 @@ class FileOps(object):
 
     @filesonly.setter
     def filesonly(self, boolean):
-        log.debug("Filesonly: {}".format(boolean))
+        log.debug("filesonly: {}".format(boolean))
         self._filesonly = boolean
         if self.filesonly:
             self.dirsonly = False
@@ -95,7 +96,7 @@ class FileOps(object):
 
     @recursive.setter
     def recursive(self, boolean):
-        log.debug("Setting recursive to {}.".format(boolean))
+        log.debug("recursive: {}".format(boolean))
         self._recursive = boolean
 
     @property
@@ -104,7 +105,7 @@ class FileOps(object):
 
     @hidden.setter
     def hidden(self, boolean):
-        log.debug("Setting hidden to {}.".format(boolean))
+        log.debug("hidden: {}".format(boolean))
         self._hidden = boolean
 
     @property
@@ -113,7 +114,7 @@ class FileOps(object):
 
     @simulate.setter
     def simulate(self, boolean):
-        log.debug("Setting simulate to {}.".format(boolean))
+        log.debug("simulate: {}".format(boolean))
         self._simulate = boolean
 
     @property
@@ -122,7 +123,7 @@ class FileOps(object):
 
     @interactive.setter
     def interactive(self, boolean):
-        log.debug("Setting interactive to {}.".format(boolean))
+        log.debug("interactive: {}".format(boolean))
         self._interactive = boolean
 
     @property
@@ -131,7 +132,7 @@ class FileOps(object):
 
     @prompt.setter
     def prompt(self, boolean):
-        log.debug("Setting simulate to {}.".format(boolean))
+        log.debug("simulate: {}".format(boolean))
         self._prompt = boolean
 
     @property
@@ -140,7 +141,7 @@ class FileOps(object):
 
     @noclobber.setter
     def noclobber(self, boolean):
-        log.debug("Setting noclobber to {}.".format(boolean))
+        log.debug("noclobber: {}".format(boolean))
         self._noclobber = boolean
 
     @property
@@ -149,7 +150,7 @@ class FileOps(object):
 
     @keepext.setter
     def keepext(self, boolean):
-        log.debug("Setting keepext to {}.".format(boolean))
+        log.debug("keepext: {}.".format(boolean))
         self._keepext = boolean
 
     @property
@@ -158,7 +159,7 @@ class FileOps(object):
 
     @regex.setter
     def regex(self, boolean):
-        log.debug("Setting regex to {}.".format(boolean))
+        log.debug("regex: {}.".format(boolean))
         self._regex = boolean
 
     @property
@@ -167,7 +168,7 @@ class FileOps(object):
 
     @accents.setter
     def accents(self, boolean):
-        log.debug("Setting accents to {}.".format(boolean))
+        log.debug("accents: {}".format(boolean))
         self._accents = boolean
 
     @property
@@ -185,7 +186,7 @@ class FileOps(object):
 
     @autostop.setter
     def autostop(self, boolean):
-        log.debug("Setting autostop to {}.".format(boolean))
+        log.debug("autostop: {}".format(boolean))
         self._autostop = boolean
 
     @property
@@ -194,8 +195,35 @@ class FileOps(object):
 
     @mirror.setter
     def mirror(self, boolean):
-        log.debug("Setting mirror to {}.".format(boolean))
+        log.debug("mirror: {}".format(boolean))
         self._mirror = boolean
+
+    @property
+    def lower(self):
+        return self._lower
+
+    @lower.setter
+    def lower(self, boolean):
+        log.debug("lower: {}".format(boolean))
+        self._lower = boolean
+
+    @property
+    def upper(self):
+        return self._upper
+
+    @upper.setter
+    def upper(self, boolean):
+        log.debug("upper: {}".format(boolean))
+        self._upper = boolean
+
+    @property
+    def ignorecase(self):
+        return self._ignorecase
+
+    @ignorecase.setter
+    def ignorecase(self, boolean):
+        log.debug("ignorecase: {}".format(boolean))
+        self._ignorecase = boolean
 
     @property
     def count(self):

@@ -21,6 +21,7 @@ Options:
     -A, --all             Include hidden files/directories.
     -D, --dirsonly        Only search directory names. Leaves files untouched.
     -F, --filesonly       Only search file names. Default is files + dirs.
+    -I, --ignorecase      Disable case sensitivity.
     -e, --exclude=<n>...  Exclude files/directories. One or more instances.
     -i, --interactive     Confirm before overwriting.
     -p, --prompt          Confirm all rename actions.
