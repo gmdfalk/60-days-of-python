@@ -29,7 +29,6 @@ def configure_logger(loglevel=2, quiet=False):
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
-    logger.info("Added logging console handler.")
 
     if quiet:
         log.info("Quiet mode: logging disabled.")
@@ -487,10 +486,13 @@ class FileOps(object):
         preview."""
         if not path:
             path = os.getcwd()
-        print path
-
+        log.debug(path)
+        if not srcpat:
+            srcpat = "*"
+        if not destpat:
+            destpat = "*"
         targets = self.find_targets(srcpat, path)
-        print targets
+        log.debug("targets found: {}".format(targets))
         modtargets = self.modify_targets(targets, srcpat, destpat)
 #         matches = self.match_targets(targets, expression)
 #         print matches
@@ -498,7 +500,6 @@ class FileOps(object):
 
     def splitext(self, files, root, srcpat):
         """Splits a list of files into filename and extension."""
-        print files
         target = []
         for f in files:
             fname, ext = os.path.splitext(f)
@@ -559,17 +560,18 @@ class FileOps(object):
 
     def modify_targets(self, targets, srcpat, destpat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
-        print srcpat, destpat
         if not self.regex:
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
-            print srcpat, destpat
         for target in targets:
             name = self.joinext(target)
-            print srcpat, destpat, name
-            srcmatch = re.search(target, srcpat).group()
-            destmatch = re.search(target, destpat).group()
-            print srcmatch, destmatch
+            srcmatch = re.search(srcpat, name)
+            print name, srcpat, srcmatch
+            if srcmatch:
+                print "found src:", srcmatch.group()
+            destmatch = re.search(destpat, name)
+            if destmatch:
+                print "found dest:", destmatch.group()
             # TODO: Two functions: one to convert a glob into a pattern
             # and another to convert one into a replacement.
 
