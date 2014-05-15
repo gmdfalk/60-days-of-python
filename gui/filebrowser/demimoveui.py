@@ -97,12 +97,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.fileops.restore_options()
         # self.fileops.undo()
 
-    def on_regexcheck(self, checked):
-        if checked:
-            self.fileops.regex = True
-        else:
-            self.fileops.regex = False
-
     def on_autopreviewcheck(self, checked):
         if checked:
             self.autopreview = True
@@ -139,6 +133,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         else:
             self.fileops.autostop = False
 
+    def on_replacecheck(self, checked):
+        pass
+
     def on_replacecase(self, checked):
         if checked:
             self.fileops.ignorecase = False
@@ -157,10 +154,16 @@ class DemiMoveGUI(QtGui.QMainWindow):
         else:
             self.fileops.regex = False
 
+    def on_insertcheck(self, checked):
+        pass
+
     def on_insertpos(self, value):
         pass
 
     def on_insertedit(self, text):
+        pass
+
+    def on_countcheck(self, checked):
         pass
 
     def on_countbase(self):
@@ -183,6 +186,12 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.fileops.countfill = True
         else:
             self.fileops.countfill = False
+
+    def on_removecheck(self, checked):
+        if checked:
+            self.fileops.remove = True
+        else:
+            self.fileops.remove = False
 
     def on_removeduplicates(self, checked):
         if checked:
@@ -225,13 +234,38 @@ class DemiMoveGUI(QtGui.QMainWindow):
         else:
             self.fileops.filessonly = False
 
+    def on_capitalizecheck(self):
+        pass
+
+    def on_sourceedit(self):
+        pass
+
+    def on_targetedit(self):
+        pass
+
+    def on_deletecheck(self, checked):
+        pass
+
+    def on_deletestart(self):
+        pass
+
+    def on_deleteend(self):
+        pass
+
+    def on_varcheck(self, checked):
+        pass
+
+    def on_capitalbox(self, *args):
+        print args
+
+    def on_spacebox(self, *args):
+        print args
+
     def connect_buttons(self):
         # Main buttons:
         self.previewbutton.clicked.connect(self.on_previewbutton)
         self.commitbutton.clicked.connect(self.on_commitbutton)
         self.undobutton.clicked.connect(self.on_undobutton)
-        # Main check and lineedits:
-        self.regexcheck.clicked.connect(self.on_regexcheck)
         self.allradio.clicked.connect(self.on_allradio)
         self.dirsradio.clicked.connect(self.on_dirsradio)
         self.filesradio.clicked.connect(self.on_filesradio)
@@ -245,15 +279,24 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.recursivecheck.clicked.connect(self.on_recursivecheck)
 
         # Replace options:
+        self.replacecheck.clicked.connect(self.on_replacecheck)
         self.replacecase.clicked.connect(self.on_replacecase)
         self.replaceglob.clicked.connect(self.on_replaceglob)
         self.replaceregex.clicked.connect(self.on_replaceregex)
+        self.sourceedit.textChanged.connect(self.on_sourceedit)
+        self.targetedit.textChanged.connect(self.on_targetedit)
 
         # Insert options:
+        self.insertcheck.clicked.connect(self.on_insertcheck)
         self.insertpos.valueChanged.connect(self.on_insertpos)
         self.insertedit.textChanged.connect(self.on_insertedit)
 
+        self.deletecheck.clicked.connect(self.on_deletecheck)
+        self.deletestart.valueChanged.connect(self.on_deletestart)
+        self.deleteend.valueChanged.connect(self.on_deleteend)
+
         # Count options:
+        self.countcheck.clicked.connect(self.on_countcheck)
         self.countbase.valueChanged.connect(self.on_countbase)
         self.countpos.valueChanged.connect(self.on_countpos)
         self.countstep.valueChanged.connect(self.on_countstep)
@@ -262,12 +305,19 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.countfillcheck.clicked.connect(self.on_countfillcheck)
 
         # Remove options:
+        self.removecheck.clicked.connect(self.on_removecheck)
         self.removeduplicatescheck.clicked.connect(self.on_removeduplicates)
         self.removeextensionscheck.clicked.connect(self.on_removeextensions)
         self.removenonwordscheck.clicked.connect(self.on_removenonwords)
 
         # Various options:
+        self.varcheck.clicked.connect(self.on_varcheck)
         self.varaccentscheck.clicked.connect(self.on_varaccents)
+
+        self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
+        self.capitalizebox.currentIndexChanged[str].connect(self.on_capitalbox)
+        self.spacecheck.clicked.connect(self.on_capitalizecheck)
+        self.spacebox.currentIndexChanged[str].connect(self.on_spacebox)
 
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.

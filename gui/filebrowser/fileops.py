@@ -86,6 +86,9 @@ class FileOps(object):
         self._delete = False
         self._deletestart = 0
         self._deleteend = 1
+        self._replace = True
+        self._sourceedit = ""
+        self._targetedit = ""
 
         # Create the logger.
         configure_logger(verbosity, quiet)
@@ -280,13 +283,76 @@ class FileOps(object):
         self._media = boolean
 
     @property
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, boolean):
+        log.debug("count: {}".format(boolean))
+        self._count = boolean
+
+    @property
+    def countfill(self):
+        return self._countfill
+
+    @countfill.setter
+    def countfill(self, boolean):
+        log.debug("countfill: {}".format(boolean))
+        self._countfill = boolean
+
+    @property
     def countpos(self):
         return self._countpos
 
     @countpos.setter
     def countpos(self, index):
-        log.debug("coutnpos: {}".format(index))
+        log.debug("countpos: {}".format(index))
         self._countpos = index
+
+    @property
+    def countbase(self):
+        return self._countbase
+
+    @countbase.setter
+    def countbase(self, num):
+        log.debug("countbase: {}".format(num))
+        self._countbase = num
+
+    @property
+    def countstep(self):
+        return self._countstep
+
+    @countstep.setter
+    def countstep(self, num):
+        log.debug("countstep: {}".format(num))
+        self._countstep = num
+
+    @property
+    def countpreedit(self):
+        return self._countpreedit
+
+    @countpreedit.setter
+    def countpreedit(self, text):
+        log.debug("countpreedit: {}".format(text))
+        self._countpreedit = text
+
+    @property
+    def countsufedit(self):
+        return self._countsufedit
+
+    @countsufedit.setter
+    def countsufedit(self, text):
+        log.debug("countsufedit: {}".format(text))
+        self._countsufedit = text
+
+    @property
+    def insert(self):
+        return self._insert
+
+    @insert.setter
+    def insert(self, boolean):
+        log.debug("insert: {}".format(boolean))
+        self._insert = boolean
 
     @property
     def insertpos(self):
@@ -298,13 +364,85 @@ class FileOps(object):
         self._insertpos = index
 
     @property
-    def inserttext(self):
-        return self._inserttext
+    def insertedit(self):
+        return self._insertedit
 
-    @inserttext.setter
-    def inserttext(self, text):
-        log.debug("inserttext: {}.".format(text))
-        self._inserttext = text
+    @insertedit.setter
+    def insertedit(self, text):
+        log.debug("insertedit: {}.".format(text))
+        self._insertedit = text
+
+    @property
+    def delete(self):
+        return self._delete
+
+    @delete.setter
+    def delete(self, boolean):
+        log.debug("delete: {}".format(boolean))
+        self._delete = boolean
+
+    @property
+    def deletestart(self):
+        return self._deletestart
+
+    @deletestart.setter
+    def deletestart(self, index):
+        log.debug("deletestart: {}".format(index))
+        self._deletestart = index
+
+    @property
+    def deleteend(self):
+        return self._deleteend
+
+    @deleteend.setter
+    def deleteend(self, index):
+        log.debug("deleteend: {}".format(index))
+        self._deleteend = index
+
+    @property
+    def replace(self):
+        return self._replace
+
+    @replace.setter
+    def replace(self, boolean):
+        log.debug("replace: {}".format(boolean))
+        self._replace = boolean
+
+    @property
+    def sourceedit(self):
+        return self._sourceedit
+
+    @sourceedit.setter
+    def sourceedit(self, text):
+        log.debug("sourceedit: {}.".format(text))
+        self._sourceedit = text
+
+    @property
+    def targetedit(self):
+        return self._targetedit
+
+    @targetedit.setter
+    def targetedit(self, text):
+        log.debug("targetedit: {}.".format(text))
+        self._targetedit = text
+
+    @property
+    def capitalizemode(self):
+        return self._capitalizemode
+
+    @capitalizemode.setter
+    def capitalizemode(self, num):
+        log.debug("capitalizemode: {}".format(num))
+        self._capitalizemode = num
+
+    @property
+    def spacemode(self):
+        return self._spacemode
+
+    @spacemode.setter
+    def spacemode(self, num):
+        log.debug("spacemode: {}".format(num))
+        self._spacemode = num
 
     def stage(self, srcpat, destpat, path=None):
         """Initialize the rename operation. Returns list of targets and their
