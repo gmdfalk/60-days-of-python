@@ -56,21 +56,27 @@ except ImportError:
 
 def main():
     args = docopt(__doc__, version="0.1")
-    fileops = FileOps(dirsonly=args["--dirsonly"],
-                      filesonly=args["--filesonly"],
+    fileops = FileOps(regex=args["--regex"],
                       recursive=args["--recursive"],
-                      hidden=args["--all"],
+                      keepext=args["--keep-extension"],
                       simulate=args["--simulate"],
+                      hidden=args["--all"],
+                      dirsonly=args["--dirsonly"],
+                      filesonly=args["--filesonly"],
+                      exclude=args["--exclude"],
                       interactive=args["--interactive"],
                       prompt=args["--prompt"],
                       noclobber=args["--no-clobber"],
-                      keepext=args["--keep-extension"],
                       count=args["--count"],
-                      regex=args["--regex"],
+                      capitalize=args["--capitalize"],
+                      lower=args["--lower"],
+                      upper=args["--upper"],
+                      accents=args["--accents"],
+                      nowords=args["--no-wordchars"],
+                      media=args["--media"],
                       quiet=args["--quiet"],
-                      verbosity=args["-v"],
-                      exclude=args["--exclude"])
-    fileops.stage(args["<source>"], args["<target>"], args["--path"])
+                      verbosity=args["-v"])
+    fileops.stage(args["<source>"], args["<target>"], args["--dir"])
 
 
 if __name__ == "__main__":

@@ -12,13 +12,15 @@ Options:
     --version            Show the current demimove-ui version.
 """
 # TODO: ConfigParser
+import logging
 import sys
 
 from PyQt4 import QtGui, QtCore, uic
 
-import fileops
-import reporting
+from fileops import FileOps
 
+
+log = logging.getLogger("gui")
 
 try:
     from docopt import docopt
@@ -54,11 +56,11 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
 class DemiMoveGUI(QtGui.QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, fileops, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
-        self.fileops = fileops.FileOps()
-        self.autopreview = True
+        self._autopreview = True
+        self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
@@ -69,6 +71,15 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.create_browsertree()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
+
+    @property
+    def autopreview(self):
+        return self._autopreview
+
+    @autopreview.setter
+    def autopreview(self, boolean):
+        log.debug("Setting autopreview to {}.".format(boolean))
+        self._autopreview = boolean
 
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
@@ -293,23 +304,20 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
 def main():
     "Main entry point for demimove."
+    try:
+        args = docopt(__doc__, version="0.1")
+        args["-v"] = 3
+        fileops = FileOps(verbosity=args["-v"], quiet=args["--quiet"])
+    except NameError:
+        fileops = fileops.FileOps()
+        log.error("Please install docopt to use the CLI.")
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName("demimove")
 #     app.setStyle("plastique")
-    gui = DemiMoveGUI()
+    gui = DemiMoveGUI(fileops)
     gui.show()
     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
-    log = reporting.create_logger("gui")
-
-    try:
-        args = docopt(__doc__, version="0.1")
-        args["-v"] = 3
-        reporting.configure_logger(log, args["-v"], args["--quiet"])
-    except NameError:
-        reporting.configure_logger(log, loglevel=3, quiet=False)
-        log.error("Please install docopt to use the CLI.")
-
     main()

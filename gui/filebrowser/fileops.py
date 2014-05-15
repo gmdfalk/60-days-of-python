@@ -1,19 +1,47 @@
 # TODO: Exclude option
 import fnmatch
+import logging
 import os
 import re
-
-import reporting
+import sys
 import unicodedata
+
+
+log = logging.getLogger("fileops")
+
+
+def configure_logger(loglevel=2, quiet=False):
+    "Creates the logger instance and adds handlers and formatting."
+    logger = logging.getLogger()
+
+    # Set the loglevel.
+    if loglevel > 3:
+        loglevel = 3  # Cap at 3 to avoid index errors.
+    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
+    logger.setLevel(levels[loglevel])
+
+    logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
+
+    formatter = logging.Formatter(logformat, "%Y-%m-%d %H:%M:%S")
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    logger.info("Added logging console handler.")
+
+    if quiet:
+        log.info("Quiet mode: logging disabled.")
+        logging.disable(logging.ERROR)
 
 
 class FileOps(object):
 
-    def __init__(self, dirsonly=False, filesonly=False, recursive=False,
+    def __init__(self, quiet=False, verbosity=1,
+                 dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=True, count=None, regex=False,
-                 exclude=None, quiet=False, verbosity=1,
-                 accents=False):
+                 exclude=None, accents=False, upper=False, lower=False,
+                 nowords=False, media=False):
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -28,14 +56,15 @@ class FileOps(object):
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
         self._accents = accents
-        # GUI options:
+        self._lower = lower
+        self._upper = upper
+        # Initialize GUI options.
         self._autostop = False
         self._mirror = False
         self._insertpos = 0
         self._inserttext = ""
         # Create the logger.
-        self.log = reporting.create_logger("fileops")
-        reporting.configure_logger(self.log, verbosity, quiet)
+        configure_logger(verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
 
     @property
@@ -340,7 +369,6 @@ class FileOps(object):
 
         return unicode(newname), unicode(newpath)
 
-
     def replace_accents(self, name, path):
         name = unicode(name)
         path = unicode(path)
@@ -353,7 +381,5 @@ class FileOps(object):
 
 
 if __name__ == "__main__":
-    log = reporting.create_logger()
-    reporting.configure_logger(log)
     fileops = FileOps(hidden=True, recursive=True, keepext=False, regex=False)
     fileops.stage("*.txt", "asdf")
