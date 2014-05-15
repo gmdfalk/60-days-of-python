@@ -87,11 +87,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
 #         self.fileops.stage(srcpat, destpat, path)
 
     def on_commitbutton(self):
-        pass
+        print self.fileops.get_options()
         # self.fileops.commit()
 
     def on_undobutton(self):
-        pass
+        self.fileops.restore_options()
         # self.fileops.undo()
 
     def on_regexcheck(self, checked):
@@ -160,7 +160,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_insertedit(self, text):
         pass
 
-    def on_countstart(self):
+    def on_countbase(self):
+        pass
+
+    def on_countpos(self):
         pass
 
     def on_countstep(self):
@@ -248,7 +251,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.insertedit.textChanged.connect(self.on_insertedit)
 
         # Count options:
-        self.countstart.valueChanged.connect(self.on_countstart)
+        self.countbase.valueChanged.connect(self.on_countbase)
+        self.countpos.valueChanged.connect(self.on_countpos)
         self.countstep.valueChanged.connect(self.on_countstep)
         self.countpreedit.textChanged.connect(self.on_countpreedit)
         self.countsufedit.textChanged.connect(self.on_countsufedit)

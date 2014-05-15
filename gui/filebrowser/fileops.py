@@ -43,11 +43,11 @@ class FileOps(object):
                  exclude=None, accents=False, upper=False, lower=False,
                  nowords=False, media=False, ignorecase=False):
 
-        self.options = ["dirsonly", "filesonly", "recursive", "hidden",
-                        "simulate", "interactive", "prompt", "noclobber",
-                        "keepext", "countpos", "regex", "exclude", "accents",
-                        "lower", "upper", "nowords", "ignorecase", "autostop",
-                        "mirror", "media", "insertpos", "inserttext"]
+        self.opts = ["dirsonly", "filesonly", "recursive", "hidden",
+                     "simulate", "interactive", "prompt", "noclobber",
+                     "keepext", "countpos", "regex", "exclude", "accents",
+                     "lower", "upper", "nowords", "ignorecase", "autostop",
+                     "mirror", "media", "insertpos", "inserttext"]
 
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
@@ -66,6 +66,8 @@ class FileOps(object):
         self._lower = lower
         self._upper = upper
         self._ignorecase = ignorecase
+        self._nowords = nowords
+        self._media = media
         # Initialize GUI options.
         self._autostop = False
         self._mirror = False
@@ -74,18 +76,17 @@ class FileOps(object):
         # Create the logger.
         configure_logger(verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
-        self.defaultopts = {i:getattr(self, "_" + i) for i in self.options}
+        self.defaultopts = {i:getattr(self, "_" + i, None) for i in self.opts}
 
     def get_options(self):
-        for i in self.options:
-            print i, getattr(self, i)
+        return {i: getattr(self, i, None) for i in self.opts}
 
     def set_options(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
     def restore_options(self):
-        pass
+        self.set_options(**self.defaultopts)
 
     @property
     def dirsonly(self):
@@ -245,21 +246,39 @@ class FileOps(object):
         self._ignorecase = boolean
 
     @property
-    def count(self):
-        return self._count
+    def nowords(self):
+        return self._nowords
 
-    @count.setter
-    def count(self, index):
-        log.debug("Setting count index to {}.".format(index))
-        self._count = index
+    @nowords.setter
+    def nowords(self, boolean):
+        log.debug("nowords: {}".format(boolean))
+        self._nowords = boolean
+
+    @property
+    def media(self):
+        return self._media
+
+    @media.setter
+    def media(self, boolean):
+        log.debug("media: {}".format(boolean))
+        self._media = boolean
+
+    @property
+    def countpos(self):
+        return self._countpos
+
+    @countpos.setter
+    def countpos(self, index):
+        log.debug("coutnpos: {}".format(index))
+        self._countpos = index
 
     @property
     def insertpos(self):
         return self._insertpos
 
-    @count.setter
-    def count(self, index):
-        log.debug("Setting insertpos to {}.".format(index))
+    @insertpos.setter
+    def insertpos(self, index):
+        log.debug("insertpos: {}".format(index))
         self._insertpos = index
 
     @property
@@ -268,7 +287,7 @@ class FileOps(object):
 
     @inserttext.setter
     def inserttext(self, text):
-        log.debug("Setting inserttext to {}.".format(text))
+        log.debug("inserttext: {}.".format(text))
         self._inserttext = text
 
     def stage(self, srcpat, destpat, path=None):
