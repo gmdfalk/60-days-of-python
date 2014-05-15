@@ -39,20 +39,16 @@ class FileOps(object):
     def __init__(self, quiet=False, verbosity=1,
                  dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
-                 noclobber=False, keepext=False, count=None, regex=False,
+                 noclobber=False, keepext=False, countpos=None, regex=False,
                  exclude=None, accents=False, upper=False, lower=False,
                  nowords=False, media=False, ignorecase=False):
-        self.defaultopts = {"dirsonly": False, "filesonly": False,
-                            "recursive": False, "hidden": False,
-                            "simulate": False, "interactive": False,
-                            "prompt": False, "noclobber": False,
-                            "keepext": False, "count": 0,
-                            "regex": False, "exclude": False,
-                            "accents": False, "lower": False,
-                            "upper": False, "nowords": False,
-                            "ignorecase": False, "autostop": False,
-                            "mirror": False, "media": False,
-                            "insertpos": False, "inserttext": False}
+
+        self.options = ["dirsonly", "filesonly", "recursive", "hidden",
+                        "simulate", "interactive", "prompt", "noclobber",
+                        "keepext", "countpos", "regex", "exclude", "accents",
+                        "lower", "upper", "nowords", "ignorecase", "autostop",
+                        "mirror", "media", "insertpos", "inserttext"]
+
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -63,7 +59,7 @@ class FileOps(object):
         self._prompt = prompt  # Confirm all rename actions.
         self._noclobber = noclobber  # Don't overwrite anything.
         self._keepext = keepext  # Don't modify extensions.
-        self._count = count  # Adds numerical index at position count in target.
+        self._countpos = countpos  # Adds numerical index at position.
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
         self._accents = accents
@@ -78,10 +74,18 @@ class FileOps(object):
         # Create the logger.
         configure_logger(verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
+        self.defaultopts = {i:getattr(self, "_" + i) for i in self.options}
 
     def get_options(self):
         for i in self.options:
             print i, getattr(self, i)
+
+    def set_options(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def restore_options(self):
+        pass
 
     @property
     def dirsonly(self):
