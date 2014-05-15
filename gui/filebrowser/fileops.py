@@ -40,17 +40,23 @@ class FileOps(object):
     def __init__(self, quiet=False, verbosity=1,
                  dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
-                 noclobber=False, keepext=False, countpos=None, regex=False,
-                 exclude=None, accents=False, upper=False, lower=False,
-                 nowords=False, media=False, ignorecase=False):
+                 noclobber=False, keepext=False, regex=False, exclude=None,
+                 media=False, accents=False, duplicates=False, lower=False,
+                 upper=False, extensions=False, nowords=False,
+                 ignorecase=False, countpos=None):
         # List of available options.
         self.opts = ("dirsonly", "filesonly", "recursive", "hidden",
                      "simulate", "interactive", "prompt", "noclobber",
-                     "keepext", "countpos", "regex", "exclude", "accents",
-                     "lower", "upper", "nowords", "ignorecase", "media",
-                     "autostop", "mirror", "insertpos", "insertedit",
-                     "countfill", "count", "countpos", "countbase",
-                     "countpreedit", "countsufedit", "spacemode")
+                     "keepext", "regex", "exclude", "media", "accents",
+                     "lower", "upper", "nowords", "ignorecase",
+                     "autostop", "mirror", "spacecheck", "spacemode",
+                     "capitalizecheck", "capitalizemode",
+                     "insertcheck", "insertpos", "insertedit",
+                     "countcheck", "countfill", "countpos", "countbase",
+                     "countpreedit", "countsufedit",
+                     "deletecheck", "deletestart", "deleteend",
+                     "replacecheck", "sourceedit", "targetedit",
+                     "varcheck")
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -64,35 +70,35 @@ class FileOps(object):
         self._countpos = countpos  # Adds numerical index at position.
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
-        self._accents = accents
-        self._lower = lower
-        self._upper = upper
-        self._ignorecase = ignorecase
-        self._nowords = nowords
-        self._media = media
+        self._accents = accents  # Normalize accents (ñé becomes ne).
+        self._lower = lower  # Convert target to lowercase.
+        self._upper = upper  # Convert target to uppercase.
+        self._ignorecase = ignorecase  # Case sensitivity.
+        self._nowords = nowords  # Only match [A-Za-z0-9_-.].
+        self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
         # Initialize GUI options.
-        self._autostop = False
-        self._mirror = False
-        self._capitalizecheck = False
+        self.removedups = removedups  # Remove duplicates.
+        self._autostop = False  # Automatically stop execution on rename error.
+        self._mirror = False  # Mirror manual rename to all targets.
+        self._capitalizecheck = False  # Whether to apply the capitalizemode.
         self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
-        self._spacecheck = False
+        self._spacecheck = False  # Whether to apply the spacemode.
         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
-        self._countcheck = False
-        self._countbase = 1
-        self._countpos = 0
-        self._countfill = True
-        self._countpreedit = ""
-        self._countsufedit = ""
-        self._insertcheck = False
-        self._insertpos = 0
-        self._insertedit = ""
-        self._deletecheck = False
-        self._deletestart = 0
-        self._deleteend = 1
-        self._replacecheck = True
-        self._sourceedit = ""
-        self._targetedit = ""
-        self._varcheck = False
+        self._countcheck = False  # Wehether to add a counter to the targets.
+        self._countbase = 1  # Base to start counting from.
+        self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
+        self._countpreedit = ""  # String that is prepended to the counter.
+        self._countsufedit = ""  # String that is appended to the counter.
+        self._insertcheck = False  # Whether to apply an insertion.
+        self._insertpos = 0  # Position/Index to insert at.
+        self._insertedit = ""  # The inserted text/string.
+        self._deletecheck = False  # Whether to delete a specified range.
+        self._deletestart = 0  # Start index of deletion sequence.
+        self._deleteend = 1  # End index of deletion sequence.
+        self._replacecheck = True  # Whether to apply source/target patterns.
+        self._sourceedit = ""  # Pattern to search for in files/dirs.
+        self._targetedit = ""  # Pattern to replace above found matches with.
+        self._varcheck = False  # Whether to apply various options (accents).
 
         # Create the logger.
         configure_logger(verbosity, quiet)

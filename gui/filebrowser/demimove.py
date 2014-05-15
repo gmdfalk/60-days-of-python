@@ -73,14 +73,16 @@ def main():
                       noclobber=args["--no-clobber"],
                       count=args["--count"],
                       capitalize=args["--capitalize"],
+                      media=args["--media"],
+                      accents=args["--accents"],
                       lower=args["--lower"],
                       upper=args["--upper"],
-                      accents=args["--accents"],
+                      duplicates=args["--duplicates"],
+                      extensions=args["--extensions"],
                       nowords=args["--no-wordchars"],
-                      media=args["--media"],
                       quiet=args["--quiet"],
                       verbosity=args["-v"])
-    fileops.stage(args["<source>"], args["<target>"], args["--dir"])
+    fileops.stage(args["<source>"], args["<target>"], args["--path"])
 
 
 if __name__ == "__main__":
