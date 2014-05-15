@@ -1,3 +1,4 @@
+# encoding: utf-8
 """demimove-ui
 
 Usage:
@@ -98,124 +99,82 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # self.fileops.undo()
 
     def on_autopreviewcheck(self, checked):
-        if checked:
-            self.autopreview = True
-        else:
-            self.autopreview = False
+        self.autopreview = checked
 
     def on_extensioncheck(self, checked):
-        if checked:
-            self.fileops.keepext = True
-        else:
-            self.fileops.keepext = False
+        self.fileops.keepext = checked
 
     def on_hiddencheck(self, checked):
-        if checked:
-            self.fileops.hidden = True
-        else:
-            self.fileops.hidden = False
+        self.fileops.hidden = checked
 
     def on_mirrorcheck(self, checked):
-        if checked:
-            self.fileops.mirror = True
-        else:
-            self.fileops.mirror = False
+        self.fileops.mirror = checked
 
     def on_recursivecheck(self, checked):
-        if checked:
-            self.fileops.recursive = True
-        else:
-            self.fileops.recursive = False
+        self.fileops.recursive = checked
 
     def on_autostopcheck(self, checked):
-        if checked:
-            self.fileops.autostop = True
-        else:
-            self.fileops.autostop = False
+        self.fileops.autostop = checked
 
     def on_replacecheck(self, checked):
-        pass
+        self.fileops.replacecheck = checked
 
     def on_replacecase(self, checked):
-        if checked:
-            self.fileops.ignorecase = False
-        else:
-            self.fileops.ignorecase = True
+        self.fileops.ignorecase = not checked
 
     def on_replaceglob(self, checked):
-        if checked:
-            self.fileops.regex = False
-        else:
-            self.fileops.regex = True
+        self.fileops.regex = not checked
 
     def on_replaceregex(self, checked):
-        if checked:
-            self.fileops.regex = True
-        else:
-            self.fileops.regex = False
+        self.fileops.regex = checked
 
     def on_insertcheck(self, checked):
-        pass
+        self.fileops.insertcheck = checked
 
-    def on_insertpos(self, value):
-        pass
+    def on_insertpos(self, num):
+        self.fileops.insertpos = int(num)
 
     def on_insertedit(self, text):
-        pass
+        text = unicode(text).encode("utf-8")
+        self.fileops.insertedit = text
 
     def on_countcheck(self, checked):
-        pass
+        self.fileops.countcheck = checked
 
-    def on_countbase(self):
-        pass
+    def on_countbase(self, num):
+        self.fileops.countbase = int(num)
 
-    def on_countpos(self):
-        pass
+    def on_countpos(self, num):
+        self.fileops.countpos = int(num)
 
-    def on_countstep(self):
-        pass
+    def on_countstep(self, num):
+        self.fileops.countstep = int(num)
 
-    def on_countpreedit(self):
-        pass
+    def on_countpreedit(self, text):
+        text = unicode(text).encode("utf-8")
+        self.fileops.countpreedit = text
 
-    def on_countsufedit(self):
-        pass
+    def on_countsufedit(self, text):
+        text = unicode(text).encode("utf-8")
+        self.fileops.countsufedit = text
 
     def on_countfillcheck(self, checked):
-        if checked:
-            self.fileops.countfill = True
-        else:
-            self.fileops.countfill = False
+        self.fileops.countfill = checked
 
     def on_removecheck(self, checked):
-        if checked:
-            self.fileops.remove = True
-        else:
-            self.fileops.remove = False
+        self.fileops.remove = checked
 
     def on_removeduplicates(self, checked):
-        if checked:
-            self.fileops.duplicates = True
-        else:
-            self.fileops.duplicates = False
+        self.fileops.duplicates = checked
 
     def on_removeextensions(self, checked):
-        if checked:
-            self.fileops.ext = True
-        else:
-            self.fileops.ext = False
+        self.fileops.ext = checked
 
     def on_removenonwords(self, checked):
-        if checked:
-            self.fileops.nonwords = True
-        else:
-            self.fileops.nonwords = False
+        self.fileops.nonwords = checked
 
     def on_varaccents(self, checked):
-        if checked:
-            self.fileops.accents = True
-        else:
-            self.fileops.accents = False
+        self.fileops.accents = checked
 
     def on_allradio(self, checked):
         if checked:
@@ -223,37 +182,33 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.fileops.dirsonly = False
 
     def on_dirsradio(self, checked):
-        if checked:
-            self.fileops.dirsonly = True
-        else:
-            self.fileops.dirsonly = False
+        self.fileops.dirsonly = checked
 
     def on_filesradio(self, checked):
-        if checked:
-            self.fileops.filesonly = True
-        else:
-            self.fileops.filessonly = False
+        self.fileops.filesonly = checked
 
-    def on_capitalizecheck(self):
-        pass
+    def on_capitalizecheck(self, checked):
+        self.fileops.capitalizecheck = checked
 
-    def on_sourceedit(self):
-        pass
+    def on_sourceedit(self, text):
+        text = unicode(text).encode("utf-8")
+        self.fileops.sourceedit = text
 
-    def on_targetedit(self):
-        pass
+    def on_targetedit(self, text):
+        text = unicode(text).encode("utf-8")
+        self.fileops.targetedit = text
 
     def on_deletecheck(self, checked):
-        pass
+        self.fileops.deletecheck = checked
 
-    def on_deletestart(self):
-        pass
+    def on_deletestart(self, num):
+        self.fileops.deletestart = int(num)
 
-    def on_deleteend(self):
-        pass
+    def on_deleteend(self, num):
+        self.fileops.deleteend = int(num)
 
     def on_varcheck(self, checked):
-        self.fileops.v
+        self.fileops.varcheck = checked
 
     def on_capitalbox(self, index):
         self.fileops.capitalizemode = index

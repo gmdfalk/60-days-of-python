@@ -1,3 +1,4 @@
+# encoding: utf-8
 # TODO: Exclude option
 # TODO: Unicode
 import fnmatch
@@ -73,11 +74,11 @@ class FileOps(object):
         self._accents = accents  # Normalize accents (ñé becomes ne).
         self._lower = lower  # Convert target to lowercase.
         self._upper = upper  # Convert target to uppercase.
+        self._duplicates = duplicates  # Remove duplicates.
         self._ignorecase = ignorecase  # Case sensitivity.
         self._nowords = nowords  # Only match [A-Za-z0-9_-.].
         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
         # Initialize GUI options.
-        self.removedups = removedups  # Remove duplicates.
         self._autostop = False  # Automatically stop execution on rename error.
         self._mirror = False  # Mirror manual rename to all targets.
         self._capitalizecheck = False  # Whether to apply the capitalizemode.
@@ -246,6 +247,15 @@ class FileOps(object):
     def mirror(self, boolean):
         log.debug("mirror: {}".format(boolean))
         self._mirror = boolean
+
+    @property
+    def duplicates(self):
+        return self._duplicates
+
+    @duplicates.setter
+    def duplicates(self, boolean):
+        log.debug("duplicates: {}".format(boolean))
+        self._duplicates = boolean
 
     @property
     def lower(self):
@@ -523,7 +533,10 @@ class FileOps(object):
         """Creates a list of files and/or directories to work with."""
         targets = []
         for root, dirs, files in os.walk(path):
+            root = unicode(root).encode("utf-8")
             root += "/"
+            dirs = [unicode(d).encode("utf-8") for d in dirs]
+            dirs = [unicode(f).encode("utf-8") for f in files]
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
