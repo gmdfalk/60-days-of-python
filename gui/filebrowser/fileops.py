@@ -42,6 +42,17 @@ class FileOps(object):
                  noclobber=False, keepext=False, count=None, regex=False,
                  exclude=None, accents=False, upper=False, lower=False,
                  nowords=False, media=False, ignorecase=False):
+        self.defaultopts = {"dirsonly": False, "filesonly": False,
+                            "recursive": False, "hidden": False,
+                            "simulate": False, "interactive": False,
+                            "prompt": False, "noclobber": False,
+                            "keepext": False, "count": 0,
+                            "regex": False, "exclude": False,
+                            "accents": False, "lower": False,
+                            "upper": False, "nowords": False,
+                            "ignorecase": False, "autostop": False,
+                            "mirror": False, "media": False,
+                            "insertpos": False, "inserttext": False}
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -67,6 +78,10 @@ class FileOps(object):
         # Create the logger.
         configure_logger(verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
+
+    def get_options(self):
+        for i in self.options:
+            print i, getattr(self, i)
 
     @property
     def dirsonly(self):
