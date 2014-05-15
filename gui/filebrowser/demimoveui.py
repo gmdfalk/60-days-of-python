@@ -301,8 +301,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.setColumnHidden(2, True)
 
     def on_rootchange(self, *args):
-#         print self.dirmodel.filePath(self.dirtree.currentIndex())
         path = self.dirmodel.filePath(self.dirtree.currentIndex())
+        print path
 #         print self.browsertree.selectionModel()
 #         model = self.browsertree.model()
 #         idx = model.index(model.rootPath())
@@ -310,7 +310,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
 #             child = idx.child(i, idx.column())
 #             print model.fileName(child)
 #         print self.dirtree.currentIndex()
-        print path
 #         self.browsermodel.setRootPath(path)
 #         self.browsertree.setRootIndex(self.dirtree.currentIndex())
 #         self.browsertree.setRootIndex(self.dirmodel.index(path))

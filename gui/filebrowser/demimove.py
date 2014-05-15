@@ -27,7 +27,6 @@ Options:
     -i, --interactive     Confirm before overwriting.
     -p, --prompt          Confirm all rename actions.
     -n, --no-clobber      Do not overwrite an existing file.
-    -c, --capitalize      Change the first letter to uppercase, rest to lower.
     -l, --lower           Change all letters to lowercase.
     -u, --upper           Change all letters to uppercase.
     -a, --accents         Normalize accents.
@@ -72,7 +71,6 @@ def main():
                       prompt=args["--prompt"],
                       noclobber=args["--no-clobber"],
                       count=args["--count"],
-                      capitalize=args["--capitalize"],
                       media=args["--media"],
                       accents=args["--accents"],
                       lower=args["--lower"],

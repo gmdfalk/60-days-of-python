@@ -44,7 +44,7 @@ class FileOps(object):
                  noclobber=False, keepext=False, regex=False, exclude=None,
                  media=False, accents=False, duplicates=False, lower=False,
                  upper=False, extensions=False, nowords=False,
-                 ignorecase=False, countpos=None):
+                 ignorecase=False, count=None):
         # List of available options.
         self.opts = ("dirsonly", "filesonly", "recursive", "hidden",
                      "simulate", "interactive", "prompt", "noclobber",
@@ -68,7 +68,7 @@ class FileOps(object):
         self._prompt = prompt  # Confirm all rename actions.
         self._noclobber = noclobber  # Don't overwrite anything.
         self._keepext = keepext  # Don't modify extensions.
-        self._countpos = countpos  # Adds numerical index at position.
+        self._countpos = count  # Adds numerical index at position.
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
         self._accents = accents  # Normalize accents (ñé becomes ne).
@@ -498,6 +498,7 @@ class FileOps(object):
 
     def splitext(self, files, root, srcpat):
         """Splits a list of files into filename and extension."""
+        print files
         target = []
         for f in files:
             fname, ext = os.path.splitext(f)
@@ -518,7 +519,7 @@ class FileOps(object):
         return name
 
     def match(self, srcpat, *target):
-        """Searches target for pattern and returns True/False respectively."""
+        """Searches target for pattern and returns a bool."""
         name = self.joinext(target)
         if self.regex:
             if re.search(srcpat, name):
@@ -533,10 +534,10 @@ class FileOps(object):
         """Creates a list of files and/or directories to work with."""
         targets = []
         for root, dirs, files in os.walk(path):
-            root = unicode(root).encode("utf-8")
             root += "/"
-            dirs = [unicode(d).encode("utf-8") for d in dirs]
-            dirs = [unicode(f).encode("utf-8") for f in files]
+            root = unicode(root, "utf-8")
+            dirs = [unicode(d, "utf-8") for d in dirs]
+            files = [unicode(f, "utf-8") for f in files]
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
@@ -587,8 +588,8 @@ class FileOps(object):
         return dirpath + name
 
     def replace_spaces(self, name, path, mode):
-        name = unicode(name)
-        path = unicode(path)
+        name = unicode(name, "utf-8")
+        path = unicode(path, "utf-8")
 
         if mode == 0:
             newname = name.replace(' ', '_')
