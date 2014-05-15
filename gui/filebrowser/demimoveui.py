@@ -162,16 +162,16 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.fileops.countfill = checked
 
     def on_removecheck(self, checked):
-        self.fileops.remove = checked
+        self.fileops.removecheck = checked
 
     def on_removeduplicates(self, checked):
-        self.fileops.duplicates = checked
+        self.fileops.remdups = checked
 
     def on_removeextensions(self, checked):
-        self.fileops.ext = checked
+        self.fileops.remext = checked
 
     def on_removenonwords(self, checked):
-        self.fileops.nonwords = checked
+        self.fileops.remnonwords = checked
 
     def on_varaccents(self, checked):
         self.fileops.accents = checked

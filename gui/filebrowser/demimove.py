@@ -16,7 +16,7 @@ Options:
     -R, --regex           Use regex matching instead of globbing.
     -p, --path=<path>     Specify the path to start in. Otherwise cwd is used.
     -r, --recursive       Apply changes recursively.
-    -k, --keep-extension  Preserve file extensions.
+    -k, --keep-extension  Preserve file remext.
     -s, --simulate        Do a test run and dump the results to console.
     -A, --all             Include hidden files/directories.
     -D, --dirsonly        Only search directory names. Default is files + dirs.
@@ -31,17 +31,17 @@ Options:
     -u, --upper           Change all letters to uppercase.
     -a, --accents         Normalize accents.
     -d, --duplicates      Remove duplicate symbols.
-    -e, --extensions      Remove extensions.
+    -e, --remext      Remove remext.
     -w, --no-wordchars    Remove wordchars
     -m, --media           Media mode: All lowercase, remove duplicate symbols,
-                          replace spaces, keep extensions.
+                          replace spaces, keep remext.
     -v                    Logging verbosity, up to -vvv (debug).
     -q, --quiet           Do not print log messages to console.
     --version             Show the current demimove version.
     -h, --help            Show this help message and exit.
 
 Examples:
-    dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
+    dmv "*.txt" "*.pdf" (will replace all .txt remext with .pdf)
     dmv -f "*" "season-*" (will prepend "season-" to every file in the cwd)
 """
 # TODO: Better examples..
@@ -76,8 +76,8 @@ def main():
                       lower=args["--lower"],
                       upper=args["--upper"],
                       duplicates=args["--duplicates"],
-                      extensions=args["--extensions"],
-                      nowords=args["--no-wordchars"],
+                      remext=args["--remext"],
+                      nonwords=args["--no-wordchars"],
                       quiet=args["--quiet"],
                       verbosity=args["-v"])
     fileops.stage(args["<source>"], args["<target>"], args["--path"])

@@ -41,14 +41,14 @@ class FileOps(object):
                  dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=False, regex=False, exclude=None,
-                 media=False, accents=False, duplicates=False, lower=False,
-                 upper=False, extensions=False, nowords=False,
+                 media=False, accents=False, remdups=False, lower=False,
+                 upper=False, extensions=False, remnonwords=False,
                  ignorecase=False, count=None):
         # List of available options.
         self.opts = ("dirsonly", "filesonly", "recursive", "hidden",
                      "simulate", "interactive", "prompt", "noclobber",
                      "keepext", "regex", "exclude", "media", "accents",
-                     "lower", "upper", "nowords", "ignorecase",
+                     "lower", "upper", "remnonwords", "ignorecase",
                      "autostop", "mirror", "spacecheck", "spacemode",
                      "capitalizecheck", "capitalizemode",
                      "insertcheck", "insertpos", "insertedit",
@@ -66,17 +66,18 @@ class FileOps(object):
         self._interactive = interactive  # Confirm before overwriting.
         self._prompt = prompt  # Confirm all rename actions.
         self._noclobber = noclobber  # Don't overwrite anything.
-        self._keepext = keepext  # Don't modify extensions.
+        self._keepext = keepext  # Don't modify remext.
         self._countpos = count  # Adds numerical index at position.
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
         self._accents = accents  # Normalize accents (ñé becomes ne).
         self._lower = lower  # Convert target to lowercase.
         self._upper = upper  # Convert target to uppercase.
-        self._duplicates = duplicates  # Remove duplicates.
         self._ignorecase = ignorecase  # Case sensitivity.
-        self._nowords = nowords  # Only match [A-Za-z0-9_-.].
         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
+        self._remdups = remdups  # Remove remdups.
+        self._remnonwords = remnonwords  # Remove all chars except [A-Za-z0-9_-.].
+        self._remext = extensions  # Remove all remext.
         # Initialize GUI options.
         self._autostop = False  # Automatically stop execution on rename error.
         self._mirror = False  # Mirror manual rename to all targets.
@@ -98,6 +99,7 @@ class FileOps(object):
         self._replacecheck = True  # Whether to apply source/target patterns.
         self._sourceedit = ""  # Pattern to search for in files/dirs.
         self._targetedit = ""  # Pattern to replace above found matches with.
+        self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
 
         # Create the logger.
@@ -212,6 +214,15 @@ class FileOps(object):
         self._regex = boolean
 
     @property
+    def varcheck(self):
+        return self._varcheck
+
+    @varcheck.setter
+    def varcheck(self, boolean):
+        log.debug("varcheck: {}".format(boolean))
+        self._varcheck = boolean
+
+    @property
     def accents(self):
         return self._accents
 
@@ -248,13 +259,40 @@ class FileOps(object):
         self._mirror = boolean
 
     @property
-    def duplicates(self):
-        return self._duplicates
+    def removecheck(self):
+        return self._removecheck
 
-    @duplicates.setter
-    def duplicates(self, boolean):
-        log.debug("duplicates: {}".format(boolean))
-        self._duplicates = boolean
+    @removecheck.setter
+    def removecheck(self, boolean):
+        log.debug("removecheck: {}".format(boolean))
+        self._removecheck = boolean
+
+    @property
+    def remnonwords(self):
+        return self._remnonwords
+
+    @remnonwords.setter
+    def remnonwords(self, boolean):
+        log.debug("remnonwords: {}".format(boolean))
+        self._remnonwords = boolean
+
+    @property
+    def remext(self):
+        return self._remext
+
+    @remext.setter
+    def remext(self, boolean):
+        log.debug("remext: {}".format(boolean))
+        self._remext = boolean
+
+    @property
+    def remdups(self):
+        return self._remdups
+
+    @remdups.setter
+    def remdups(self, boolean):
+        log.debug("remdups: {}".format(boolean))
+        self._remdups = boolean
 
     @property
     def lower(self):
