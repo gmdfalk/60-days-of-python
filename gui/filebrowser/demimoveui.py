@@ -136,10 +136,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
         else:
             self.fileops.autostop = False
 
-    def insertpos(self, value):
+    def on_insertpos(self, value):
         pass
 
-    def insertedit(self, text):
+    def on_insertedit(self, text):
         pass
 
     def on_replacecase(self):
@@ -149,12 +149,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         pass
 
     def on_replaceregex(self):
-        pass
-
-    def on_insertpos(self):
-        pass
-
-    def on_insertedit(self):
         pass
 
     def on_countstart(self):
@@ -207,14 +201,12 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_dirsradio(self, checked):
         if checked:
             self.fileops.dirsonly = True
-            self.fileops.filesonly = False
         else:
             self.fileops.dirsonly = False
 
     def on_filesradio(self, checked):
         if checked:
             self.fileops.filesonly = True
-            self.fileops.dirsonly = False
         else:
             self.fileops.filessonly = False
 

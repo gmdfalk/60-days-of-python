@@ -42,6 +42,7 @@ Examples:
     dmv "*.txt" "*.pdf" (will replace all .txt extensions with .pdf)
     dmv -f "*" "season-*" (will prepend "season-" to every file in the cwd)
 """
+# TODO: Better examples..
 import sys
 
 from fileops import FileOps

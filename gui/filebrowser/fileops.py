@@ -73,7 +73,7 @@ class FileOps(object):
 
     @dirsonly.setter
     def dirsonly(self, boolean):
-        log.debug("Setting dirsonly to {}.".format(boolean))
+        log.debug("Dirsonly: {}".format(boolean))
         self._dirsonly = boolean
         if self.dirsonly:
             self.filesonly = False
@@ -84,8 +84,8 @@ class FileOps(object):
 
     @filesonly.setter
     def filesonly(self, boolean):
-        log.debug("Setting dirsonly to {}.".format(boolean))
-        self._dirsonly = boolean
+        log.debug("Filesonly: {}".format(boolean))
+        self._filesonly = boolean
         if self.filesonly:
             self.dirsonly = False
 
