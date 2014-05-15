@@ -42,13 +42,14 @@ class FileOps(object):
                  noclobber=False, keepext=False, countpos=None, regex=False,
                  exclude=None, accents=False, upper=False, lower=False,
                  nowords=False, media=False, ignorecase=False):
-
-        self.opts = ["dirsonly", "filesonly", "recursive", "hidden",
+        # List of available options.
+        self.opts = ("dirsonly", "filesonly", "recursive", "hidden",
                      "simulate", "interactive", "prompt", "noclobber",
                      "keepext", "countpos", "regex", "exclude", "accents",
-                     "lower", "upper", "nowords", "ignorecase", "autostop",
-                     "mirror", "media", "insertpos", "inserttext"]
-
+                     "lower", "upper", "nowords", "ignorecase", "media",
+                     "autostop", "mirror", "insertpos", "insertedit",
+                     "countfill", "count", "countpos", "countbase",
+                     "countpreedit", "countsufedit", "spacemode")
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -71,14 +72,29 @@ class FileOps(object):
         # Initialize GUI options.
         self._autostop = False
         self._mirror = False
+        self._capitalizemode = 0  # 1=lc, 2=uc, 3=flfw, 4=flew
+        self._spacemode = 0  # 1=su, 2=sh, 3=sd, 4=ds, 5=hs, 6=us
+        self._count = False
+        self._countbase = 1
+        self._countpos = 0
+        self._countfill = True
+        self._countpreedit = ""
+        self._countsufedit = ""
+        self._insert = False
         self._insertpos = 0
-        self._inserttext = ""
+        self._insertedit = ""
+        self._delete = False
+        self._deletestart = 0
+        self._deleteend = 1
+
         # Create the logger.
         configure_logger(verbosity, quiet)
         self.history = []  # History of commited operations, useful to undo.
         self.defaultopts = {i:getattr(self, "_" + i, None) for i in self.opts}
 
-    def get_options(self):
+    def get_options(self, *args):
+        if args:
+            return {i: getattr(self, i, None) for i in args}
         return {i: getattr(self, i, None) for i in self.opts}
 
     def set_options(self, **kwargs):

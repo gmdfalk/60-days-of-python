@@ -59,9 +59,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def __init__(self, fileops, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
-        self._autopreview = True
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
+        self.apply_options()
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.mainsplitter.setStretchFactor(0, 2)
@@ -71,6 +71,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.create_browsertree()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
+
+    def apply_options(self):
+        self._autopreview = True
 
     @property
     def autopreview(self):

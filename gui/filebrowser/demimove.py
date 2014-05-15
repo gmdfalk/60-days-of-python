@@ -1,7 +1,7 @@
 """demimove
 
 Usage:
-    dmv [<source> [<target>]] [-D|-F] [-e <name>...] [-v|-vv|-vvv] [options]
+    dmv [<source> [<target>]] [-D|-F] [-E <name>...] [-v|-vv|-vvv] [options]
 
 Arguments:
     source        (Optional) Pattern to identify targets by.
@@ -14,23 +14,25 @@ Arguments:
 
 Options:
     -R, --regex           Use regex matching instead of globbing.
-    -d, --dir=<path>      Specify the working directory. Otherwise cwd is used.
+    -p, --path=<path>     Specify the path to start in. Otherwise cwd is used.
     -r, --recursive       Apply changes recursively.
     -k, --keep-extension  Preserve file extensions.
     -s, --simulate        Do a test run and dump the results to console.
     -A, --all             Include hidden files/directories.
-    -D, --dirsonly        Only search directory names. Leaves files untouched.
+    -D, --dirsonly        Only search directory names. Default is files + dirs.
     -F, --filesonly       Only search file names. Default is files + dirs.
+    -C, --count=<N>       Increment a counter at the given index (-1 is end).
+    -E, --exclude=<name>  Exclude files/directories. One or more instances.
     -I, --ignorecase      Disable case sensitivity.
-    -e, --exclude=<n>...  Exclude files/directories. One or more instances.
     -i, --interactive     Confirm before overwriting.
     -p, --prompt          Confirm all rename actions.
     -n, --no-clobber      Do not overwrite an existing file.
-    -c, --count=<N>       Increment a counter at the given index (-1 is end).
-    -C, --capitalize      Change the first letter to uppercase, rest to lower.
+    -c, --capitalize      Change the first letter to uppercase, rest to lower.
     -l, --lower           Change all letters to lowercase.
     -u, --upper           Change all letters to uppercase.
     -a, --accents         Normalize accents.
+    -d, --duplicates      Remove duplicate symbols.
+    -e, --extensions      Remove extensions.
     -w, --no-wordchars    Remove wordchars
     -m, --media           Media mode: All lowercase, remove duplicate symbols,
                           replace spaces, keep extensions.

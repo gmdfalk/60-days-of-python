@@ -69,9 +69,9 @@
               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
              </property>
              <item row="0" column="0">
-              <widget class="QCheckBox" name="capitalizecheck">
+              <widget class="QCheckBox" name="replacecheck">
                <property name="text">
-                <string>Capitalize</string>
+                <string>Replace</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -79,7 +79,57 @@
               </widget>
              </item>
              <item row="0" column="1">
+              <layout class="QHBoxLayout" name="replacechecks">
+               <item>
+                <widget class="QRadioButton" name="replaceregex">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Regex</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="replaceglob">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Globbing&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use globbing instead of regular expressions for pattern matching.&lt;/p&gt;&lt;p&gt;Example: asdf*  * (would remove asdf from all files/dirs that start with &amp;quot;asdf&amp;quot;)&lt;/p&gt;&lt;p&gt;Same with regex:  ^asdf    (empty)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Glob</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="replacecase">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>CS</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="capitalizecheck">
+               <property name="text">
+                <string>Capitalize</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
               <widget class="QComboBox" name="capitalizebox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string/>
                </property>
@@ -105,18 +155,18 @@
                </item>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QCheckBox" name="spacecheck">
                <property name="text">
                 <string>Spaces</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QComboBox" name="spacebox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <item>
                 <property name="text">
                  <string>Space to Underscore</string>
@@ -148,89 +198,6 @@
                 </property>
                </item>
               </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QCheckBox" name="replacecheck">
-               <property name="text">
-                <string>Replace</string>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <layout class="QHBoxLayout" name="replaceeditslayout">
-               <item>
-                <widget class="QLineEdit" name="replacesource">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="replacetarget">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="3" column="1">
-              <layout class="QHBoxLayout" name="replacechecks">
-               <item>
-                <widget class="QRadioButton" name="replaceregex">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Regex</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="replaceglob">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Globbing&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use globbing instead of regular expressions for pattern matching.&lt;/p&gt;&lt;p&gt;Example: asdf*  * (would remove asdf from all files/dirs that start with &amp;quot;asdf&amp;quot;)&lt;/p&gt;&lt;p&gt;Same with regex:  ^asdf    (empty)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Glob</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="replacecase">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ignore case sensitivity&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>CS</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
              </item>
              <item row="4" column="0">
               <widget class="QCheckBox" name="insertcheck">
@@ -426,15 +393,12 @@
                <property name="text">
                 <string>Remove</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
              <item row="9" column="1">
               <widget class="QCheckBox" name="removeduplicatescheck">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove duplicate symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reduces multiple successive occurrences of space, dot, hyphen and other common symbols to a single occurrence.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -442,13 +406,13 @@
                <property name="text">
                 <string>Duplicate symbols</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
              <item row="10" column="1">
               <widget class="QCheckBox" name="removenonwordscheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove non-word characters&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow [A-Za-z0-9_.-].&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -460,13 +424,20 @@
              <item row="11" column="1">
               <widget class="QCheckBox" name="removeextensionscheck">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow ASCII-letters plus common ASCII-symbols like +_-...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Extensions</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QCheckBox" name="varcheck">
+               <property name="text">
+                <string>Various</string>
                </property>
               </widget>
              </item>
@@ -480,13 +451,6 @@
                </property>
                <property name="text">
                 <string>Normalize accents</string>
-               </property>
-              </widget>
-             </item>
-             <item row="12" column="0">
-              <widget class="QCheckBox" name="varcheck">
-               <property name="text">
-                <string>Various</string>
                </property>
               </widget>
              </item>
@@ -679,16 +643,6 @@
            <widget class="QLineEdit" name="sourcedit">
             <property name="toolTip">
              <string>Pattern to match</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="regexcheck">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If checked, use regular expressions, otherwise use globbing.&lt;/p&gt;&lt;p&gt;Globbing Example: *  z*  (will prepend a &amp;quot;z&amp;quot; to all targets).&lt;/p&gt;&lt;p&gt;Same with regex:  .*   z\1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>rgx</string>
             </property>
            </widget>
           </item>
@@ -888,86 +842,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replacesource</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>156</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replacetarget</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>189</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replacecase</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>386</x>
-     <y>221</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replaceglob</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>221</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>replacecheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>replaceregex</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>158</x>
-     <y>221</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>varcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>varaccentscheck</receiver>
@@ -1032,22 +906,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>replaceregex</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>regexcheck</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>141</x>
-     <y>160</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>621</x>
-     <y>604</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>countcheck</sender>
    <signal>toggled(bool)</signal>
    <receiver>countpos</receiver>
@@ -1060,6 +918,86 @@
     <hint type="destinationlabel">
      <x>144</x>
      <y>264</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replacecase</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>386</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replaceglob</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>replaceregex</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sourcedit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>485</x>
+     <y>605</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>replacecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>targetedit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>774</x>
+     <y>605</y>
     </hint>
    </hints>
   </connection>
