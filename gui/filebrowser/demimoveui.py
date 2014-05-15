@@ -253,13 +253,13 @@ class DemiMoveGUI(QtGui.QMainWindow):
         pass
 
     def on_varcheck(self, checked):
-        pass
+        self.fileops.v
 
-    def on_capitalbox(self, *args):
-        print args
+    def on_capitalbox(self, index):
+        self.fileops.capitalizemode = index
 
-    def on_spacebox(self, *args):
-        print args
+    def on_spacebox(self, index):
+        self.fileops.spacemode = index
 
     def connect_buttons(self):
         # Main buttons:
@@ -315,9 +315,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.varaccentscheck.clicked.connect(self.on_varaccents)
 
         self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
-        self.capitalizebox.currentIndexChanged[str].connect(self.on_capitalbox)
+        self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
         self.spacecheck.clicked.connect(self.on_capitalizecheck)
-        self.spacebox.currentIndexChanged[str].connect(self.on_spacebox)
+        self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
 
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.

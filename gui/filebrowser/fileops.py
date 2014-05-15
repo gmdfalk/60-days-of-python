@@ -1,4 +1,5 @@
 # TODO: Exclude option
+# TODO: Unicode
 import fnmatch
 import logging
 import os
@@ -72,23 +73,26 @@ class FileOps(object):
         # Initialize GUI options.
         self._autostop = False
         self._mirror = False
-        self._capitalizemode = 0  # 1=lc, 2=uc, 3=flfw, 4=flew
-        self._spacemode = 0  # 1=su, 2=sh, 3=sd, 4=ds, 5=hs, 6=us
-        self._count = False
+        self._capitalizecheck = False
+        self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
+        self._spacecheck = False
+        self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
+        self._countcheck = False
         self._countbase = 1
         self._countpos = 0
         self._countfill = True
         self._countpreedit = ""
         self._countsufedit = ""
-        self._insert = False
+        self._insertcheck = False
         self._insertpos = 0
         self._insertedit = ""
-        self._delete = False
+        self._deletecheck = False
         self._deletestart = 0
         self._deleteend = 1
-        self._replace = True
+        self._replacecheck = True
         self._sourceedit = ""
         self._targetedit = ""
+        self._varcheck = False
 
         # Create the logger.
         configure_logger(verbosity, quiet)
@@ -283,13 +287,13 @@ class FileOps(object):
         self._media = boolean
 
     @property
-    def count(self):
-        return self._count
+    def countcheck(self):
+        return self._countcheck
 
-    @count.setter
-    def count(self, boolean):
-        log.debug("count: {}".format(boolean))
-        self._count = boolean
+    @countcheck.setter
+    def countcheck(self, boolean):
+        log.debug("countcheck: {}".format(boolean))
+        self._countcheck = boolean
 
     @property
     def countfill(self):
@@ -346,13 +350,13 @@ class FileOps(object):
         self._countsufedit = text
 
     @property
-    def insert(self):
-        return self._insert
+    def insertcheck(self):
+        return self._insertcheck
 
-    @insert.setter
-    def insert(self, boolean):
-        log.debug("insert: {}".format(boolean))
-        self._insert = boolean
+    @insertcheck.setter
+    def insertcheck(self, boolean):
+        log.debug("insertcheck: {}".format(boolean))
+        self._insertcheck = boolean
 
     @property
     def insertpos(self):
@@ -373,13 +377,13 @@ class FileOps(object):
         self._insertedit = text
 
     @property
-    def delete(self):
+    def deletecheck(self):
         return self._delete
 
-    @delete.setter
-    def delete(self, boolean):
-        log.debug("delete: {}".format(boolean))
-        self._delete = boolean
+    @deletecheck.setter
+    def deletecheck(self, boolean):
+        log.debug("deletecheck: {}".format(boolean))
+        self._deletecheck = boolean
 
     @property
     def deletestart(self):
@@ -400,13 +404,13 @@ class FileOps(object):
         self._deleteend = index
 
     @property
-    def replace(self):
-        return self._replace
+    def replacecheck(self):
+        return self._replacecheck
 
-    @replace.setter
-    def replace(self, boolean):
-        log.debug("replace: {}".format(boolean))
-        self._replace = boolean
+    @replacecheck.setter
+    def replacecheck(self, boolean):
+        log.debug("replacecheck: {}".format(boolean))
+        self._replacecheck = boolean
 
     @property
     def sourceedit(self):
@@ -427,6 +431,15 @@ class FileOps(object):
         self._targetedit = text
 
     @property
+    def capitalizecheck(self):
+        return self._capitalizecheck
+
+    @capitalizecheck.setter
+    def capitalizecheck(self, boolean):
+        log.debug("capitalizecheck: {}".format(boolean))
+        self._capitalizecheck = boolean
+
+    @property
     def capitalizemode(self):
         return self._capitalizemode
 
@@ -434,6 +447,15 @@ class FileOps(object):
     def capitalizemode(self, num):
         log.debug("capitalizemode: {}".format(num))
         self._capitalizemode = num
+
+    @property
+    def spacecheck(self):
+        return self._spacecheck
+
+    @spacecheck.setter
+    def spacecheck(self, boolean):
+        log.debug("spacecheck: {}".format(boolean))
+        self._spacecheck = boolean
 
     @property
     def spacemode(self):
