@@ -75,9 +75,9 @@ def main():
                       accents=args["--accents"],
                       lower=args["--lower"],
                       upper=args["--upper"],
-                      duplicates=args["--duplicates"],
+                      remdups=args["--duplicates"],
                       remext=args["--remext"],
-                      nonwords=args["--no-wordchars"],
+                      remnonwords=args["--no-wordchars"],
                       quiet=args["--quiet"],
                       verbosity=args["-v"])
     fileops.stage(args["<source>"], args["<target>"], args["--path"])
