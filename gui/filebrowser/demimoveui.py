@@ -35,7 +35,11 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
     def paint(self, painter, option, index):
         # decide here if item should be bold and set font weight to bold if needed
         option.font.setWeight(QtGui.QFont.Bold)
-        QtGui.QStyledItemDelegate.paint(self, painter, option, index)
+        super(BoldDelegate, self).paint(painter, option, index)
+#         QtGui.QStyledItemDelegate.paint(self, painter, option, index)
+
+    def toggle(self, index):
+        return True
 
 
 class PreviewFileModel(QtGui.QFileSystemModel):
@@ -51,6 +55,10 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 file_index = self.index(index.row(), 0, index.parent())
                 entry = self.data(file_index, role)
                 return self.get_preview(entry)
+#             if role == QtCore.Qt.FontRole:
+#                 font = QtGui.QFont()
+#                 font.setBold(True)
+#                 return font
 
         return super(PreviewFileModel, self).data(index, role)
 
@@ -118,6 +126,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
             path = self.browsermodel.filePath(curindex)
             self.cwd = path
             self.cwdidx = curindex
+#             self.browsertree.setItemDelegate(BoldDelegate(self))
             log.debug(path)
 
     def on_doubleclicked(self):
