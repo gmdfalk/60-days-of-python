@@ -95,39 +95,37 @@ class DemiMoveGUI(QtGui.QMainWindow):
         log.info("demimove-ui initialized.")
 
     def create_browser(self, startdir):
-        self.browsermodel = PreviewFileModel(self)
+        self.dirmodel = PreviewFileModel(self)
         # TODO: With readOnly disabled we can use setData for renaming.
-        self.browsermodel.setReadOnly(False)
-        self.browsermodel.setRootPath("/")
-        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+        self.dirmodel.setReadOnly(False)
+        self.dirmodel.setRootPath("/")
+        self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
-        self.browsermodel.fileRenamed.connect(self.on_filerenamed)
+        self.dirtree.setModel(self.dirmodel)
+        self.dirtree.setColumnHidden(2, True)
+        self.dirtree.header().swapSections(4, 1)
+        self.dirtree.header().resizeSection(0, 300)
+        self.dirtree.header().resizeSection(4, 300)
+        self.dirtree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
+        self.dirtree.setItemDelegate(BoldDelegate(self))
 
-        self.browsertree.setModel(self.browsermodel)
-        self.browsertree.setColumnHidden(2, True)
-        self.browsertree.header().swapSections(4, 1)
-        self.browsertree.header().resizeSection(0, 300)
-        self.browsertree.header().resizeSection(4, 300)
-        self.browsertree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
-        self.browsertree.setItemDelegate(BoldDelegate(self))
-
-        index = self.browsermodel.index(startdir)
-        self.browsertree.setCurrentIndex(index)
+        index = self.dirmodel.index(startdir)
+        self.dirtree.setCurrentIndex(index)
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
-        index = self.browsertree.currentIndex()
-        path = self.browsermodel.filePath(index)
+        index = self.dirtree.currentIndex()
+        path = self.dirmodel.filePath(index)
         if self.cwd and path == self.cwd:
             self.cwd = ""
             self.cwdidx = None
         elif path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
-        m = self.browsertree.model()
-        index = self.browsertree.currentIndex()
+        m = self.dirtree.model()
+        index = self.dirtree.currentIndex()
         m.dataChanged.emit(index, m.index(index.row(), m.columnCount()))
 
     def keyPressEvent(self, e):
@@ -201,7 +199,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def cwd(self, path):
         # Exit out if dir is not a valid target.
         self._cwd = path
-        self.browsermodel._cwd = path
+        self.dirmodel._cwd = path
         log.debug("cwd: {}".format(self._cwd))
         if self._cwd:
             self.statusbar.showMessage("Root is now {}.".format(self._cwd))
@@ -215,7 +213,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     @cwdidx.setter
     def cwdidx(self, index):
         self._cwdidx = index
-        self.browsermodel._cwdidx = index
+        self.dirmodel._cwdidx = index
 
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
@@ -230,8 +228,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # self.fileops.undo()
 
     def on_autopreviewcheck(self, checked):
-        self.browsermodel.autopreview = checked
-        self.browsertree.update()
+        self.dirmodel.autopreview = checked
+        self.dirtree.update()
 
     def on_extensioncheck(self, checked):
         self.fileops.keepext = checked
@@ -311,18 +309,18 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_allradio(self, checked):
         self.fileops.filesonly = False
         self.fileops.dirsonly = False
-        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+        self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
     def on_dirsradio(self, checked):
         self.fileops.dirsonly = checked
-        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
+        self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
                                     QtCore.QDir.NoDotAndDotDot)
 
     def on_filesradio(self, checked):
         self.fileops.filesonly = checked
-        self.browsermodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
+        self.dirmodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
                                     QtCore.QDir.NoDotAndDotDot)
 
     def on_capitalizecheck(self, checked):
