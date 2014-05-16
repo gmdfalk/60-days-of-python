@@ -31,28 +31,8 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="browsertab">
-        <attribute name="title">
-         <string>Browser</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="dirtreelayout">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="margin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QTreeView" name="dirtree">
-           <attribute name="headerVisible">
-            <bool>false</bool>
-           </attribute>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="optionstab">
         <attribute name="title">
          <string>Options</string>
@@ -369,25 +349,6 @@
                </item>
               </layout>
              </item>
-             <item row="7" column="1">
-              <widget class="QCheckBox" name="countfillcheck">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Autofill&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If the count gains an order of magnitude, fill the previous numbers with a leading zero.&lt;/p&gt;&lt;p&gt;E.g. 8, 9, 10 will become 08, 09, 10, ...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Autofill with zeroes</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
              <item row="8" column="0">
               <widget class="QCheckBox" name="removecheck">
                <property name="text">
@@ -451,6 +412,25 @@
                </property>
                <property name="text">
                 <string>Normalize accents</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QCheckBox" name="countfillcheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Autofill&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If the count gains an order of magnitude, fill the previous numbers with a leading zero.&lt;/p&gt;&lt;p&gt;E.g. 8, 9, 10 will become 08, 09, 10, ...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Autofill with zeroes</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

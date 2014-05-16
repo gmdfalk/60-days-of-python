@@ -19,6 +19,7 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 
 from fileops import FileOps
+import os
 
 
 log = logging.getLogger("gui")
@@ -42,8 +43,6 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 file_index = self.index(index.row(), 0, index.parent())
                 entry = self.data(file_index, role)
                 return self.get_preview(entry)
-#             if role == QtCore.Qt.TextAlignmentRole:
-#                 return QtCore.Qt.AlignHCenter
 
         return super(PreviewFileModel, self).data(index, role)
 
@@ -64,9 +63,10 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
 class DemiMoveGUI(QtGui.QMainWindow):
 
-    def __init__(self, fileops, parent=None):
+    def __init__(self, startdir, fileops, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
+        self.startdir = startdir
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -74,27 +74,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.mainsplitter.setStretchFactor(0, 2)
         self.mainsplitter.setStretchFactor(1, 3)
 
-        self.create_dirtree()
-        self.create_browsertree()
+        self.create_browser()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
 
-    def create_dirtree(self):
-        # Passing self as arg/parent here to avoid QTimer errors.
-        self.dirmodel = QtGui.QFileSystemModel(self)
-        self.dirmodel.setRootPath("")
-        self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
-                                QtCore.QDir.NoDotAndDotDot)
-        self.dirmodel.fileRenamed.connect(self.on_rootchange)
-        self.dirmodel.rootPathChanged.connect(self.on_rootchange)
-        self.dirmodel.directoryLoaded.connect(self.on_rootchange)
-
-        self.dirtree.setModel(self.dirmodel)
-        self.dirtree.setColumnHidden(1, True)
-        self.dirtree.setColumnHidden(2, True)
-        self.dirtree.setColumnHidden(3, True)
-
-    def create_browsertree(self):
+    def create_browser(self):
         self.browsermodel = PreviewFileModel(self)
         self.browsermodel.setRootPath("")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
@@ -108,12 +92,17 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.setModel(self.browsermodel)
         self.browsertree.header().swapSections(4, 1)
         self.browsertree.setColumnHidden(2, True)
-        self.browsertree.header().resizeSection(0, 200)
-        self.browsertree.header().resizeSection(4, 200)
+        self.browsertree.header().resizeSection(0, 300)
+        self.browsertree.header().resizeSection(4, 300)
+        self.browsertree
 
     def on_rootchange(self, *args):
         path = self.sender().filePath(self.browsertree.currentIndex())
-        print path
+        index = self.sender().index(os.getcwd())
+        root = self.sender().index("/")
+        self.browsertree.setExpanded(root, True)
+        self.browsertree.setExpanded(root, True)
+        self.browsertree.setCurrentIndex(index)
 #         print self.browsertree.selectionModel()
 #         model = self.browsertree.model()
 #         idx = model.index(model.rootPath())
@@ -198,6 +187,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_autopreviewcheck(self, checked):
         self.browsermodel.autopreview = checked
+        self.browsertree.update()
 
     def on_extensioncheck(self, checked):
         self.fileops.keepext = checked
@@ -317,17 +307,21 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
 def main():
     "Main entry point for demimove-ui."
+    startdir = os.getcwd()
     try:
         args = docopt(__doc__, version="0.1")
         args["-v"] = 3
         fileops = FileOps(verbosity=args["-v"], quiet=args["--quiet"])
+        if args["--dir"]:
+            startdir = args["--dir"]
     except NameError:
         fileops = fileops.FileOps()
         log.error("Please install docopt to use the CLI.")
+
     app = QtGui.QApplication(sys.argv)
-    app.setApplicationName("demimove")
+    app.setApplicationName("demimove-ui")
 #     app.setStyle("plastique")
-    gui = DemiMoveGUI(fileops)
+    gui = DemiMoveGUI(startdir, fileops)
     gui.show()
     sys.exit(app.exec_())
 
