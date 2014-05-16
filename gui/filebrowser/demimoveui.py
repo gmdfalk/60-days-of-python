@@ -82,6 +82,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def __init__(self, startdir, fileops, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
+        # Current working directory.
+        self._cwd = None
+        self._cwdidx = None
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -111,28 +114,60 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.header().resizeSection(4, 300)
         self.browsertree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
 
-        self.browsertree.doubleClicked.connect(self.on_doubleclicked)
-        self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
+#         self.browsertree.doubleClicked.connect(self.on_doubleclicked)
+#         self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
         self.browsertree.setItemDelegate(BoldDelegate(self))
 
-        self.cwd = startdir
-        self.cwdidx = self.browsermodel.index(self.cwd)
-        self.browsermodel._cwd = startdir
-        self.browsermodel._cwdidx = self.cwdidx
-        self.browsertree.setCurrentIndex(self.cwdidx)
+#         self.cwd = startdir
+        index = self.browsermodel.index(startdir)
+#         self.browsermodel._cwd = startdir
+#         self.browsermodel._cwdidx = self.cwdidx
+        self.browsertree.setCurrentIndex(index)
+        self.set_cwd()
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
-        self.cwdidx = self.browsertree.currentIndex()
-        self.cwd = self.browsermodel.filePath(self.cwdidx)
-        self.browsermodel._cwdidx = self.cwdidx
-        self.browsermodel._cwd = self.cwd
+        index = self.browsertree.currentIndex()
+        path = self.browsermodel.filePath(index)
+        if self._cwd:
+            if path == self.cwd:
+                self.cwd = ""
+                self.cwdidx = None
+                self.statusbar.showMessage("No root set.")
+            else:
+                self.cwd = path
+                self.cwdidx = index
+        else:
+            self.cwd = path
+            self.cwdidx = index
 
     def keyPressEvent(self, e):
         "Connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
-            log.debug(self.cwd)
+            self.browsertree.update()
+#             self.browsermodel.dataChanged.connect(self.browsertree.update)
+            log.debug("cwd: {}".format(self.cwd))
+
+    @property
+    def cwd(self):
+        return self._cwd
+
+    @cwd.setter
+    def cwd(self, dir):
+        self._cwd = dir
+        self.browsermodel._cwd = dir
+        if self._cwd:
+            self.statusbar.showMessage("Root is now {}.".format(self._cwd))
+
+    @property
+    def cwdidx(self):
+        return self._cwdidx
+
+    @cwdidx.setter
+    def cwdidx(self, index):
+        self._cwdidx = index
+        self.browsermodel._cwdidx = index
 
     def on_doubleclicked(self):
         log.debug("doubleClicked")
