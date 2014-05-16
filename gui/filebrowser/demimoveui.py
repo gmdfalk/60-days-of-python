@@ -31,7 +31,7 @@ except ImportError:
 
 class PreviewFileModel(QtGui.QFileSystemModel):
 
-    autopreview = True
+    _autopreview = True
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -48,10 +48,18 @@ class PreviewFileModel(QtGui.QFileSystemModel):
         return super(PreviewFileModel, self).data(index, role)
 
     def get_preview(self, entry):
-        if self.autopreview:
-            return entry.toString()
-        else:
+        if not self.autopreview:
             return QtCore.QString("")
+        return entry.toString()
+
+    @property
+    def autopreview(self):
+        return self._autopreview
+
+    @autopreview.setter
+    def autopreview(self, boolean):
+        log.debug("autopreview: {}".format(boolean))
+        self._autopreview = boolean
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -61,7 +69,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         super(DemiMoveGUI, self).__init__(parent)
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
-        self.apply_options()
 
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.mainsplitter.setStretchFactor(0, 2)
@@ -71,9 +78,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.create_browsertree()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
-
-    def apply_options(self):
-        self._autopreview = True
 
     def create_dirtree(self):
         # Passing self as arg/parent here to avoid QTimer errors.
@@ -97,12 +101,18 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
+        self.browsermodel.fileRenamed.connect(self.on_rootchange)
+        self.browsermodel.rootPathChanged.connect(self.on_rootchange)
+        self.browsermodel.directoryLoaded.connect(self.on_rootchange)
+
         self.browsertree.setModel(self.browsermodel)
         self.browsertree.header().swapSections(4, 1)
         self.browsertree.setColumnHidden(2, True)
+        self.browsertree.header().resizeSection(0, 200)
+        self.browsertree.header().resizeSection(4, 200)
 
     def on_rootchange(self, *args):
-        path = self.dirmodel.filePath(self.dirtree.currentIndex())
+        path = self.sender().filePath(self.browsertree.currentIndex())
         print path
 #         print self.browsertree.selectionModel()
 #         model = self.browsertree.model()
@@ -173,15 +183,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.spacecheck.clicked.connect(self.on_capitalizecheck)
         self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
 
-    @property
-    def autopreview(self):
-        return self._autopreview
-
-    @autopreview.setter
-    def autopreview(self, boolean):
-        log.debug("autopreview: {}".format(boolean))
-        self._autopreview = boolean
-
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
 #         srcpat, destpat, path = None, None, None
@@ -196,7 +197,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # self.fileops.undo()
 
     def on_autopreviewcheck(self, checked):
-        self.autopreview = checked
+        self.browsermodel.autopreview = checked
 
     def on_extensioncheck(self, checked):
         self.fileops.keepext = checked

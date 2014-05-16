@@ -1,6 +1,5 @@
 # encoding: utf-8
 # TODO: Exclude option
-# TODO: Unicode
 import fnmatch
 import logging
 import os
