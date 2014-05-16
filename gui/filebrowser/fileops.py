@@ -25,9 +25,9 @@ def configure_logger(loglevel=2, quiet=False):
 
     formatter = logging.Formatter(logformat, "%Y-%m-%d %H:%M:%S")
 
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     if quiet:
         log.info("Quiet mode: logging disabled.")
@@ -42,20 +42,21 @@ class FileOps(object):
                  noclobber=False, keepext=False, regex=False, exclude=None,
                  media=False, accents=False, lower=False, upper=False,
                  remdups=False, remext=False, remnonwords=False,
-                 ignorecase=False, count=None):
+                 ignorecase=False, countpos=None):
         # List of available options.
-        self.opts = ("dirsonly", "filesonly", "recursive", "hidden",
+        self.opts = ("quiet", "verbosity",
+                     "dirsonly", "filesonly", "recursive", "hidden",
                      "simulate", "interactive", "prompt", "noclobber",
                      "keepext", "regex", "exclude", "media", "accents",
-                     "lower", "upper", "remnonwords", "ignorecase",
+                     "lower", "upper", "remdups", "remext", "remnonwords",
+                     "ignorecase", "countpos",
                      "autostop", "mirror", "spacecheck", "spacemode",
                      "capitalizecheck", "capitalizemode",
                      "insertcheck", "insertpos", "insertedit",
-                     "countcheck", "countfill", "countpos", "countbase",
-                     "countpreedit", "countsufedit",
+                     "countcheck", "countfill", "countbase", "countpreedit",
+                     "countsufedit", "varcheck",
                      "deletecheck", "deletestart", "deleteend",
-                     "replacecheck", "sourceedit", "targetedit",
-                     "varcheck")
+                     "replacecheck", "sourceedit", "targetedit",)
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -66,7 +67,7 @@ class FileOps(object):
         self._prompt = prompt  # Confirm all rename actions.
         self._noclobber = noclobber  # Don't overwrite anything.
         self._keepext = keepext  # Don't modify remext.
-        self._countpos = count  # Adds numerical index at position.
+        self._countpos = countpos  # Adds numerical index at position.
         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._exclude = exclude  # List of strings to exclude from targets.
         self._accents = accents  # Normalize accents (ñé becomes ne).
@@ -75,7 +76,7 @@ class FileOps(object):
         self._ignorecase = ignorecase  # Case sensitivity.
         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
         self._remdups = remdups  # Remove remdups.
-        self._remnonwords = remnonwords  # Remove all chars except [A-Za-z0-9_-.].
+        self._remnonwords = remnonwords  # Only allow wordchars (\w)
         self._remext = remext  # Remove all remext.
         # Initialize GUI options.
         self._autostop = False  # Automatically stop execution on rename error.

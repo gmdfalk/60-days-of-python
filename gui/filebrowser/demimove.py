@@ -70,7 +70,7 @@ def main():
                       interactive=args["--interactive"],
                       prompt=args["--prompt"],
                       noclobber=args["--no-clobber"],
-                      count=args["--count"],
+                      countpos=args["--count"],
                       media=args["--media"],
                       accents=args["--accents"],
                       lower=args["--lower"],

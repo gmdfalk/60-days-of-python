@@ -33,7 +33,6 @@ except ImportError:
 class BoldDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
-        # Only set font to bold for the current working directory.
         if self.parent().cwdidx == index:
             option.font.setWeight(QtGui.QFont.Bold)
         super(BoldDelegate, self).paint(painter, option, index)
@@ -41,9 +40,11 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
 
 class PreviewFileModel(QtGui.QFileSystemModel):
 
-    _autopreview = True
-    _cwd = ""
-    _cwdidx = None
+    def __init__(self, parent=None):
+        super(PreviewFileModel, self).__init__(parent)
+        self._autopreview = True
+        self._cwd = ""
+        self._cwdidx = None
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -51,16 +52,17 @@ class PreviewFileModel(QtGui.QFileSystemModel):
     def data(self, index, role):
         if index.column() == self.columnCount() - 1:
             if role == QtCore.Qt.DisplayRole:
-                file_index = self.index(index.row(), 0, index.parent())
-                entry = self.data(file_index, role)
-                return self.get_preview(entry)
+                fileindex = self.index(index.row(), 0, index.parent())
+                item = self.data(fileindex, role)
+                return self.get_preview(item)
 
         return super(PreviewFileModel, self).data(index, role)
 
     def get_preview(self, item):
         if not self.autopreview:
             return QtCore.QString("")
-#         if entry in ["demimove.py", "demimoveui.py", "fileops.pyc"]:
+#         if item.toString() in targetlist:
+#            return self.parent.fileops.matchthisitem
         return item.toString()
 
     @property
@@ -101,7 +103,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
-        self.browsermodel.dataChanged.connect(self.on_datachanged)
+#         self.browsermodel.dataChanged.connect(self.on_datachanged)
         self.browsermodel.fileRenamed.connect(self.on_filerenamed)
 
         self.browsertree.setModel(self.browsermodel)
@@ -127,17 +129,17 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.cwd and path == self.cwd:
             self.cwd = ""
             self.cwdidx = None
-            return
-        if os.path.isdir(path):
+        elif path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
+        m = self.browsertree.model()
+        index = self.browsertree.currentIndex()
+        m.dataChanged.emit(index, m.index(index.row(), m.columnCount()))
 
     def keyPressEvent(self, e):
         "Connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
-            # FIXME: Find a way to update the view after Delegate changes.
-            self.browsertree.update()
 
     def on_datachanged(self):
         log.debug("dataChanged")
