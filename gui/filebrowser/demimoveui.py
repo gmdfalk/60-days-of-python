@@ -33,18 +33,17 @@ except ImportError:
 class BoldDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
-        # decide here if item should be bold and set font weight to bold if needed
-        option.font.setWeight(QtGui.QFont.Bold)
+        # Only set font to bold for the current working directory.
+        if self.parent().cwdidx == index:
+            option.font.setWeight(QtGui.QFont.Bold)
         super(BoldDelegate, self).paint(painter, option, index)
-#         QtGui.QStyledItemDelegate.paint(self, painter, option, index)
-
-    def toggle(self, index):
-        return True
 
 
 class PreviewFileModel(QtGui.QFileSystemModel):
 
     _autopreview = True
+    _cwd = None
+    _cwdidx = None
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -55,18 +54,18 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 file_index = self.index(index.row(), 0, index.parent())
                 entry = self.data(file_index, role)
                 return self.get_preview(entry)
-#             if role == QtCore.Qt.FontRole:
-#                 font = QtGui.QFont()
-#                 font.setBold(True)
-#                 return font
+#         if role == QtCore.Qt.FontRole and index == self._cwdidx:
+#             font = QtGui.QFont()
+#             font.setBold(True)
+#             return font
 
         return super(PreviewFileModel, self).data(index, role)
 
     def get_preview(self, entry):
         if not self.autopreview:
             return QtCore.QString("")
-        if entry in ["demimove.py", "demimoveui.py", "fileops.pyc"]:
-            return entry.toString()
+#         if entry in ["demimove.py", "demimoveui.py", "fileops.pyc"]:
+        return entry.toString()
 
     @property
     def autopreview(self):
@@ -114,20 +113,26 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         self.browsertree.doubleClicked.connect(self.on_doubleclicked)
         self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
+        self.browsertree.setItemDelegate(BoldDelegate(self))
 
         self.cwd = startdir
         self.cwdidx = self.browsermodel.index(self.cwd)
+        self.browsermodel._cwd = startdir
+        self.browsermodel._cwdidx = self.cwdidx
         self.browsertree.setCurrentIndex(self.cwdidx)
 
+    def set_cwd(self):
+        "Set the current working directory for renaming actions."
+        self.cwdidx = self.browsertree.currentIndex()
+        self.cwd = self.browsermodel.filePath(self.cwdidx)
+        self.browsermodel._cwdidx = self.cwdidx
+        self.browsermodel._cwd = self.cwd
+
     def keyPressEvent(self, e):
-        "Overload keypress have return set the dir as working directory. "
+        "Connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
-            curindex = self.browsertree.currentIndex()
-            path = self.browsermodel.filePath(curindex)
-            self.cwd = path
-            self.cwdidx = curindex
-#             self.browsertree.setItemDelegate(BoldDelegate(self))
-            log.debug(path)
+            self.set_cwd()
+            log.debug(self.cwd)
 
     def on_doubleclicked(self):
         log.debug("doubleClicked")
@@ -146,17 +151,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_currentchanged(self):
         log.debug("currentChanged")
-#         curindex = self.sender().currentIndex()
-#         path = self.browsermodel.filePath(curindex)
-#         log.debug(path)
-#         if not self.browsertree.isExpanded(curindex):
-#             log.debug("{} not expanded!".format(path))
-#             return
-#         log.debug("{} is expanded!".format(path))
-#         indexes = self.sender().selectedIndexes()
-#         for i in indexes:
-#             print self.browsermodel.filePath(i)
-
 
     def connect_buttons(self):
         # Main buttons:
@@ -218,8 +212,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
-#         srcpat, destpat, path = None, None, None
-#         self.fileops.stage(srcpat, destpat, path)
+#         self.fileops.stage(path)
 
     def on_commitbutton(self):
         print self.fileops.get_options()
