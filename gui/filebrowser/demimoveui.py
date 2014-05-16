@@ -31,7 +31,7 @@ except ImportError:
 
 class PreviewFileModel(QtGui.QFileSystemModel):
 
-    autopreview = False
+    autopreview = True
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -39,20 +39,19 @@ class PreviewFileModel(QtGui.QFileSystemModel):
     def data(self, index, role):
         if index.column() == self.columnCount() - 1:
             if role == QtCore.Qt.DisplayRole:
-                return self.get_preview_text()
-            if role == QtCore.Qt.TextAlignmentRole:
-                return QtCore.Qt.AlignHCenter
+                file_index = self.index(index.row(), 0, index.parent())
+                entry = self.data(file_index, role)
+                return self.get_preview(entry)
+#             if role == QtCore.Qt.TextAlignmentRole:
+#                 return QtCore.Qt.AlignHCenter
 
         return super(PreviewFileModel, self).data(index, role)
 
-    def get_preview_text(self, *args):
-        return self.get_file_list()
-
-    def get_file_list(self):
-        return QtCore.QString("Preview here")
-
-    def get_dir_list(self):
-        pass
+    def get_preview(self, entry):
+        if self.autopreview:
+            return entry.toString()
+        else:
+            return QtCore.QString("")
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -75,6 +74,104 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def apply_options(self):
         self._autopreview = True
+
+    def create_dirtree(self):
+        # Passing self as arg/parent here to avoid QTimer errors.
+        self.dirmodel = QtGui.QFileSystemModel(self)
+        self.dirmodel.setRootPath("")
+        self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
+                                QtCore.QDir.NoDotAndDotDot)
+        self.dirmodel.fileRenamed.connect(self.on_rootchange)
+        self.dirmodel.rootPathChanged.connect(self.on_rootchange)
+        self.dirmodel.directoryLoaded.connect(self.on_rootchange)
+
+        self.dirtree.setModel(self.dirmodel)
+        self.dirtree.setColumnHidden(1, True)
+        self.dirtree.setColumnHidden(2, True)
+        self.dirtree.setColumnHidden(3, True)
+
+    def create_browsertree(self):
+        self.browsermodel = PreviewFileModel(self)
+        self.browsermodel.setRootPath("")
+        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+                                    QtCore.QDir.NoDotAndDotDot |
+                                    QtCore.QDir.Hidden)
+
+        self.browsertree.setModel(self.browsermodel)
+        self.browsertree.header().swapSections(4, 1)
+        self.browsertree.setColumnHidden(2, True)
+
+    def on_rootchange(self, *args):
+        path = self.dirmodel.filePath(self.dirtree.currentIndex())
+        print path
+#         print self.browsertree.selectionModel()
+#         model = self.browsertree.model()
+#         idx = model.index(model.rootPath())
+#         for i in range(0, model.rowCount(idx)):
+#             child = idx.child(i, idx.column())
+#             print model.fileName(child)
+#         print self.dirtree.currentIndex()
+#         self.browsermodel.setRootPath(path)
+#         self.browsertree.setRootIndex(self.dirtree.currentIndex())
+#         self.browsertree.setRootIndex(self.dirmodel.index(path))
+
+    def connect_buttons(self):
+        # Main buttons:
+        self.previewbutton.clicked.connect(self.on_previewbutton)
+        self.commitbutton.clicked.connect(self.on_commitbutton)
+        self.undobutton.clicked.connect(self.on_undobutton)
+        self.allradio.clicked.connect(self.on_allradio)
+        self.dirsradio.clicked.connect(self.on_dirsradio)
+        self.filesradio.clicked.connect(self.on_filesradio)
+
+        # Main options:
+        self.autopreviewcheck.clicked.connect(self.on_autopreviewcheck)
+        self.autostopcheck.clicked.connect(self.on_autostopcheck)
+        self.extensioncheck.clicked.connect(self.on_extensioncheck)
+        self.hiddencheck.clicked.connect(self.on_hiddencheck)
+        self.mirrorcheck.clicked.connect(self.on_mirrorcheck)
+        self.recursivecheck.clicked.connect(self.on_recursivecheck)
+
+        # Replace options:
+        self.replacecheck.clicked.connect(self.on_replacecheck)
+        self.replacecase.clicked.connect(self.on_replacecase)
+        self.replaceglob.clicked.connect(self.on_replaceglob)
+        self.replaceregex.clicked.connect(self.on_replaceregex)
+        self.sourceedit.textChanged.connect(self.on_sourceedit)
+        self.targetedit.textChanged.connect(self.on_targetedit)
+
+        # Insert options:
+        self.insertcheck.clicked.connect(self.on_insertcheck)
+        self.insertpos.valueChanged.connect(self.on_insertpos)
+        self.insertedit.textChanged.connect(self.on_insertedit)
+
+        self.deletecheck.clicked.connect(self.on_deletecheck)
+        self.deletestart.valueChanged.connect(self.on_deletestart)
+        self.deleteend.valueChanged.connect(self.on_deleteend)
+
+        # Count options:
+        self.countcheck.clicked.connect(self.on_countcheck)
+        self.countbase.valueChanged.connect(self.on_countbase)
+        self.countpos.valueChanged.connect(self.on_countpos)
+        self.countstep.valueChanged.connect(self.on_countstep)
+        self.countpreedit.textChanged.connect(self.on_countpreedit)
+        self.countsufedit.textChanged.connect(self.on_countsufedit)
+        self.countfillcheck.clicked.connect(self.on_countfillcheck)
+
+        # Remove options:
+        self.removecheck.clicked.connect(self.on_removecheck)
+        self.removeduplicatescheck.clicked.connect(self.on_removeduplicates)
+        self.removeextensionscheck.clicked.connect(self.on_removeextensions)
+        self.removenonwordscheck.clicked.connect(self.on_removenonwords)
+
+        # Various options:
+        self.varcheck.clicked.connect(self.on_varcheck)
+        self.varaccentscheck.clicked.connect(self.on_varaccents)
+
+        self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
+        self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
+        self.spacecheck.clicked.connect(self.on_capitalizecheck)
+        self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
 
     @property
     def autopreview(self):
@@ -216,106 +313,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_spacebox(self, index):
         self.fileops.spacemode = index
 
-    def connect_buttons(self):
-        # Main buttons:
-        self.previewbutton.clicked.connect(self.on_previewbutton)
-        self.commitbutton.clicked.connect(self.on_commitbutton)
-        self.undobutton.clicked.connect(self.on_undobutton)
-        self.allradio.clicked.connect(self.on_allradio)
-        self.dirsradio.clicked.connect(self.on_dirsradio)
-        self.filesradio.clicked.connect(self.on_filesradio)
-
-        # Main options:
-        self.autopreviewcheck.clicked.connect(self.on_autopreviewcheck)
-        self.autostopcheck.clicked.connect(self.on_autostopcheck)
-        self.extensioncheck.clicked.connect(self.on_extensioncheck)
-        self.hiddencheck.clicked.connect(self.on_hiddencheck)
-        self.mirrorcheck.clicked.connect(self.on_mirrorcheck)
-        self.recursivecheck.clicked.connect(self.on_recursivecheck)
-
-        # Replace options:
-        self.replacecheck.clicked.connect(self.on_replacecheck)
-        self.replacecase.clicked.connect(self.on_replacecase)
-        self.replaceglob.clicked.connect(self.on_replaceglob)
-        self.replaceregex.clicked.connect(self.on_replaceregex)
-        self.sourceedit.textChanged.connect(self.on_sourceedit)
-        self.targetedit.textChanged.connect(self.on_targetedit)
-
-        # Insert options:
-        self.insertcheck.clicked.connect(self.on_insertcheck)
-        self.insertpos.valueChanged.connect(self.on_insertpos)
-        self.insertedit.textChanged.connect(self.on_insertedit)
-
-        self.deletecheck.clicked.connect(self.on_deletecheck)
-        self.deletestart.valueChanged.connect(self.on_deletestart)
-        self.deleteend.valueChanged.connect(self.on_deleteend)
-
-        # Count options:
-        self.countcheck.clicked.connect(self.on_countcheck)
-        self.countbase.valueChanged.connect(self.on_countbase)
-        self.countpos.valueChanged.connect(self.on_countpos)
-        self.countstep.valueChanged.connect(self.on_countstep)
-        self.countpreedit.textChanged.connect(self.on_countpreedit)
-        self.countsufedit.textChanged.connect(self.on_countsufedit)
-        self.countfillcheck.clicked.connect(self.on_countfillcheck)
-
-        # Remove options:
-        self.removecheck.clicked.connect(self.on_removecheck)
-        self.removeduplicatescheck.clicked.connect(self.on_removeduplicates)
-        self.removeextensionscheck.clicked.connect(self.on_removeextensions)
-        self.removenonwordscheck.clicked.connect(self.on_removenonwords)
-
-        # Various options:
-        self.varcheck.clicked.connect(self.on_varcheck)
-        self.varaccentscheck.clicked.connect(self.on_varaccents)
-
-        self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
-        self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
-        self.spacecheck.clicked.connect(self.on_capitalizecheck)
-        self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
-
-    def create_dirtree(self):
-        # Passing self as arg/parent here to avoid QTimer errors.
-        self.dirmodel = QtGui.QFileSystemModel(self)
-        self.dirmodel.setRootPath("")
-        self.dirmodel.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.Hidden |
-                                QtCore.QDir.NoDotAndDotDot)
-        self.dirmodel.fileRenamed.connect(self.on_rootchange)
-        self.dirmodel.rootPathChanged.connect(self.on_rootchange)
-        self.dirmodel.directoryLoaded.connect(self.on_rootchange)
-
-        self.dirtree.setModel(self.dirmodel)
-        self.dirtree.setColumnHidden(1, True)
-        self.dirtree.setColumnHidden(2, True)
-        self.dirtree.setColumnHidden(3, True)
-
-    def create_browsertree(self):
-        self.browsermodel = PreviewFileModel(self)
-        self.browsermodel.setRootPath("")
-        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
-                                    QtCore.QDir.NoDotAndDotDot |
-                                    QtCore.QDir.Hidden)
-
-        self.browsertree.setModel(self.browsermodel)
-        self.browsertree.header().swapSections(4, 1)
-        self.browsertree.setColumnHidden(2, True)
-
-    def on_rootchange(self, *args):
-        path = self.dirmodel.filePath(self.dirtree.currentIndex())
-        print path
-#         print self.browsertree.selectionModel()
-#         model = self.browsertree.model()
-#         idx = model.index(model.rootPath())
-#         for i in range(0, model.rowCount(idx)):
-#             child = idx.child(i, idx.column())
-#             print model.fileName(child)
-#         print self.dirtree.currentIndex()
-#         self.browsermodel.setRootPath(path)
-#         self.browsertree.setRootIndex(self.dirtree.currentIndex())
-#         self.browsertree.setRootIndex(self.dirmodel.index(path))
 
 def main():
-    "Main entry point for demimove."
+    "Main entry point for demimove-ui."
     try:
         args = docopt(__doc__, version="0.1")
         args["-v"] = 3
