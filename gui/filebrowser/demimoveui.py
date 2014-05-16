@@ -30,6 +30,14 @@ except ImportError:
     print "ImportError: Please install docopt to use the CLI."
 
 
+class BoldDelegate(QtGui.QStyledItemDelegate):
+
+    def paint(self, painter, option, index):
+        # decide here if item should be bold and set font weight to bold if needed
+        option.font.setWeight(QtGui.QFont.Bold)
+        QtGui.QStyledItemDelegate.paint(self, painter, option, index)
+
+
 class PreviewFileModel(QtGui.QFileSystemModel):
 
     _autopreview = True
@@ -67,7 +75,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def __init__(self, startdir, fileops, parent=None):
 
         super(DemiMoveGUI, self).__init__(parent)
-        self.startdir = startdir
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -75,11 +82,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.mainsplitter.setStretchFactor(0, 2)
         self.mainsplitter.setStretchFactor(1, 3)
 
-        self.create_browser()
+        self.create_browser(startdir)
         self.connect_buttons()
         log.info("demimove-ui initialized.")
 
-    def create_browser(self):
+    def create_browser(self, startdir):
         self.browsermodel = PreviewFileModel(self)
         # TODO: With readOnly disabled we can use setData for renaming.
         self.browsermodel.setReadOnly(False)
@@ -89,24 +96,31 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.Hidden)
 
         self.browsermodel.fileRenamed.connect(self.on_filerenamed)
-        self.browsermodel.rootPathChanged.connect(self.on_rootchanged)
-#         self.browsermodel.directoryLoaded.connect(self.on_dirloaded)
-        self.browsermodel.rowsInserted.connect(self.on_rowsinserted)
 
         self.browsertree.setModel(self.browsermodel)
         self.browsertree.setColumnHidden(2, True)
         self.browsertree.header().swapSections(4, 1)
         self.browsertree.header().resizeSection(0, 300)
         self.browsertree.header().resizeSection(4, 300)
-        self.browsertree.doubleClicked.connect(self.on_dirselected)
-        self.browsertree.setExpandsOnDoubleClick(False)
+        self.browsertree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
+
+        self.browsertree.doubleClicked.connect(self.on_doubleclicked)
         self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
-#         self.connect(self, QtCore.SIGNAL('currentChanged(int)'), self.on_currentchanged)
 
-        startindex = self.browsermodel.index(self.startdir)
-        self.browsertree.setCurrentIndex(startindex)
+        self.cwd = startdir
+        self.cwdidx = self.browsermodel.index(self.cwd)
+        self.browsertree.setCurrentIndex(self.cwdidx)
 
-    def on_dirselected(self):
+    def keyPressEvent(self, e):
+        "Overload keypress have return set the dir as working directory. "
+        if e.key() == QtCore.Qt.Key_Return:
+            curindex = self.browsertree.currentIndex()
+            path = self.browsermodel.filePath(curindex)
+            self.cwd = path
+            self.cwdidx = curindex
+            log.debug(path)
+
+    def on_doubleclicked(self):
         log.debug("doubleClicked")
 
     def on_dirloaded(self):
@@ -123,9 +137,17 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_currentchanged(self):
         log.debug("currentChanged")
-        curindex = self.sender().currentIndex()
-        path = self.browsermodel.filePath(curindex)
-        print path
+#         curindex = self.sender().currentIndex()
+#         path = self.browsermodel.filePath(curindex)
+#         log.debug(path)
+#         if not self.browsertree.isExpanded(curindex):
+#             log.debug("{} not expanded!".format(path))
+#             return
+#         log.debug("{} is expanded!".format(path))
+#         indexes = self.sender().selectedIndexes()
+#         for i in indexes:
+#             print self.browsermodel.filePath(i)
+
 
     def connect_buttons(self):
         # Main buttons:
