@@ -34,7 +34,7 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         # Only set font to bold for the current working directory.
-        if self.parent().cwdidx == index:
+        if self.parent().cwdidx == index and self.parent().cwd:
             option.font.setWeight(QtGui.QFont.Bold)
         super(BoldDelegate, self).paint(painter, option, index)
 
@@ -42,7 +42,7 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
 class PreviewFileModel(QtGui.QFileSystemModel):
 
     _autopreview = True
-    _cwd = None
+    _cwd = ""
     _cwdidx = None
 
     def columnCount(self, parent=QtCore.QModelIndex()):
@@ -54,18 +54,14 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 file_index = self.index(index.row(), 0, index.parent())
                 entry = self.data(file_index, role)
                 return self.get_preview(entry)
-#         if role == QtCore.Qt.FontRole and index == self._cwdidx:
-#             font = QtGui.QFont()
-#             font.setBold(True)
-#             return font
 
         return super(PreviewFileModel, self).data(index, role)
 
-    def get_preview(self, entry):
+    def get_preview(self, item):
         if not self.autopreview:
             return QtCore.QString("")
 #         if entry in ["demimove.py", "demimoveui.py", "fileops.pyc"]:
-        return entry.toString()
+        return item.toString()
 
     @property
     def autopreview(self):
@@ -73,8 +69,8 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
     @autopreview.setter
     def autopreview(self, boolean):
-        log.debug("autopreview: {}".format(boolean))
         self._autopreview = boolean
+        log.debug("autopreview: {}".format(boolean))
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -83,7 +79,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         super(DemiMoveGUI, self).__init__(parent)
         # Current working directory.
-        self._cwd = None
+        self._cwd = ""
         self._cwdidx = None
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
@@ -105,6 +101,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
+        self.browsermodel.dataChanged.connect(self.on_datachanged)
         self.browsermodel.fileRenamed.connect(self.on_filerenamed)
 
         self.browsertree.setModel(self.browsermodel)
@@ -113,15 +110,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.header().resizeSection(0, 300)
         self.browsertree.header().resizeSection(4, 300)
         self.browsertree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
-
 #         self.browsertree.doubleClicked.connect(self.on_doubleclicked)
 #         self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
         self.browsertree.setItemDelegate(BoldDelegate(self))
 
-#         self.cwd = startdir
         index = self.browsermodel.index(startdir)
-#         self.browsermodel._cwd = startdir
-#         self.browsermodel._cwdidx = self.cwdidx
         self.browsertree.setCurrentIndex(index)
         self.set_cwd()
 
@@ -129,14 +122,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         "Set the current working directory for renaming actions."
         index = self.browsertree.currentIndex()
         path = self.browsermodel.filePath(index)
-        if self._cwd:
-            if path == self.cwd:
-                self.cwd = ""
-                self.cwdidx = None
-                self.statusbar.showMessage("No root set.")
-            else:
-                self.cwd = path
-                self.cwdidx = index
+        if self.cwd and path == self.cwd:
+            self.cwd = ""
+            self.cwdidx = None
         else:
             self.cwd = path
             self.cwdidx = index
@@ -145,9 +133,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         "Connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
-            self.browsertree.update()
-#             self.browsermodel.dataChanged.connect(self.browsertree.update)
-            log.debug("cwd: {}".format(self.cwd))
+
+    def on_datachanged(self):
+        log.debug("dataChanged")
 
     @property
     def cwd(self):
@@ -157,8 +145,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def cwd(self, dir):
         self._cwd = dir
         self.browsermodel._cwd = dir
+        log.debug("cwd: {}".format(self._cwd))
         if self._cwd:
             self.statusbar.showMessage("Root is now {}.".format(self._cwd))
+        else:
+            self.statusbar.showMessage("No root set.")
 
     @property
     def cwdidx(self):
@@ -340,12 +331,21 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if checked:
             self.fileops.filesonly = False
             self.fileops.dirsonly = False
+            self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+                                        QtCore.QDir.NoDotAndDotDot |
+                                        QtCore.QDir.Hidden)
 
     def on_dirsradio(self, checked):
+        print checked
         self.fileops.dirsonly = checked
+        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
+                                    QtCore.QDir.NoDotAndDotDot)
 
     def on_filesradio(self, checked):
         self.fileops.filesonly = checked
+        print checked
+        self.browsermodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
+                                    QtCore.QDir.NoDotAndDotDot)
 
     def on_capitalizecheck(self, checked):
         self.fileops.capitalizecheck = checked
