@@ -103,7 +103,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
-#         self.browsermodel.dataChanged.connect(self.on_datachanged)
         self.browsermodel.fileRenamed.connect(self.on_filerenamed)
 
         self.browsertree.setModel(self.browsermodel)
@@ -112,15 +111,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.browsertree.header().resizeSection(0, 300)
         self.browsertree.header().resizeSection(4, 300)
         self.browsertree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
-#         self.browsertree.doubleClicked.connect(self.on_doubleclicked)
-#         self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
         self.browsertree.setItemDelegate(BoldDelegate(self))
 
         index = self.browsermodel.index(startdir)
         self.browsertree.setCurrentIndex(index)
-
-    def on_commitdata(self):
-        log.debug("commitData")
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
@@ -137,54 +131,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         m.dataChanged.emit(index, m.index(index.row(), m.columnCount()))
 
     def keyPressEvent(self, e):
-        "Connect return key to self.set_cwd()."
+        "Overloaded to connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
-
-    def on_datachanged(self):
-        log.debug("dataChanged")
-
-    @property
-    def cwd(self):
-        return self._cwd
-
-    @cwd.setter
-    def cwd(self, dir):
-        # Exit out if dir is not a valid target.
-        self._cwd = dir
-        self.browsermodel._cwd = dir
-        log.debug("cwd: {}".format(self._cwd))
-        if self._cwd:
-            self.statusbar.showMessage("Root is now {}.".format(self._cwd))
-        else:
-            self.statusbar.showMessage("No root set.")
-
-    @property
-    def cwdidx(self):
-        return self._cwdidx
-
-    @cwdidx.setter
-    def cwdidx(self, index):
-        self._cwdidx = index
-        self.browsermodel._cwdidx = index
-
-    def on_doubleclicked(self):
-        log.debug("doubleClicked")
-
-    def on_dirloaded(self):
-        log.debug("dirLoaded")
-
-    def on_filerenamed(self):
-        log.debug("fileRenamed")
-
-    def on_rootchanged(self):
-        log.debug("rootPathChanged")
-
-    def on_rowsinserted(self):
-        log.debug("rowsInserted")
-
-    def on_currentchanged(self):
-        log.debug("currentChanged")
 
     def connect_buttons(self):
         # Main buttons:
@@ -243,6 +192,30 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
         self.spacecheck.clicked.connect(self.on_capitalizecheck)
         self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
+
+    @property
+    def cwd(self):
+        return self._cwd
+
+    @cwd.setter
+    def cwd(self, path):
+        # Exit out if dir is not a valid target.
+        self._cwd = path
+        self.browsermodel._cwd = path
+        log.debug("cwd: {}".format(self._cwd))
+        if self._cwd:
+            self.statusbar.showMessage("Root is now {}.".format(self._cwd))
+        else:
+            self.statusbar.showMessage("No root set.")
+
+    @property
+    def cwdidx(self):
+        return self._cwdidx
+
+    @cwdidx.setter
+    def cwdidx(self, index):
+        self._cwdidx = index
+        self.browsermodel._cwdidx = index
 
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
