@@ -49,7 +49,8 @@ class PreviewFileModel(QtGui.QFileSystemModel):
     def get_preview(self, entry):
         if not self.autopreview:
             return QtCore.QString("")
-        return entry.toString()
+        if entry in ["demimove.py", "demimoveui.py", "fileops.pyc"]:
+            return entry.toString()
 
     @property
     def autopreview(self):
@@ -80,39 +81,51 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def create_browser(self):
         self.browsermodel = PreviewFileModel(self)
-        self.browsermodel.setRootPath("")
+        # TODO: With readOnly disabled we can use setData for renaming.
+        self.browsermodel.setReadOnly(False)
+        self.browsermodel.setRootPath("/")
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
-        self.browsermodel.fileRenamed.connect(self.on_rootchange)
-        self.browsermodel.rootPathChanged.connect(self.on_rootchange)
-        self.browsermodel.directoryLoaded.connect(self.on_rootchange)
+        self.browsermodel.fileRenamed.connect(self.on_filerenamed)
+        self.browsermodel.rootPathChanged.connect(self.on_rootchanged)
+#         self.browsermodel.directoryLoaded.connect(self.on_dirloaded)
+        self.browsermodel.rowsInserted.connect(self.on_rowsinserted)
 
         self.browsertree.setModel(self.browsermodel)
-        self.browsertree.header().swapSections(4, 1)
         self.browsertree.setColumnHidden(2, True)
+        self.browsertree.header().swapSections(4, 1)
         self.browsertree.header().resizeSection(0, 300)
         self.browsertree.header().resizeSection(4, 300)
-        self.browsertree
+        self.browsertree.doubleClicked.connect(self.on_dirselected)
+        self.browsertree.setExpandsOnDoubleClick(False)
+        self.browsertree.selectionModel().currentChanged.connect(self.on_currentchanged)
+#         self.connect(self, QtCore.SIGNAL('currentChanged(int)'), self.on_currentchanged)
 
-    def on_rootchange(self, *args):
-        path = self.sender().filePath(self.browsertree.currentIndex())
-        index = self.sender().index(os.getcwd())
-        root = self.sender().index("/")
-        self.browsertree.setExpanded(root, True)
-        self.browsertree.setExpanded(root, True)
-        self.browsertree.setCurrentIndex(index)
-#         print self.browsertree.selectionModel()
-#         model = self.browsertree.model()
-#         idx = model.index(model.rootPath())
-#         for i in range(0, model.rowCount(idx)):
-#             child = idx.child(i, idx.column())
-#             print model.fileName(child)
-#         print self.dirtree.currentIndex()
-#         self.browsermodel.setRootPath(path)
-#         self.browsertree.setRootIndex(self.dirtree.currentIndex())
-#         self.browsertree.setRootIndex(self.dirmodel.index(path))
+        startindex = self.browsermodel.index(self.startdir)
+        self.browsertree.setCurrentIndex(startindex)
+
+    def on_dirselected(self):
+        log.debug("doubleClicked")
+
+    def on_dirloaded(self):
+        log.debug("dirLoaded")
+
+    def on_filerenamed(self):
+        log.debug("fileRenamed")
+
+    def on_rootchanged(self):
+        log.debug("rootPathChanged")
+
+    def on_rowsinserted(self):
+        log.debug("rowsInserted")
+
+    def on_currentchanged(self):
+        log.debug("currentChanged")
+        curindex = self.sender().currentIndex()
+        path = self.browsermodel.filePath(curindex)
+        print path
 
     def connect_buttons(self):
         # Main buttons:
