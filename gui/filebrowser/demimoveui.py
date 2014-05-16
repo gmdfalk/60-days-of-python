@@ -34,7 +34,7 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         # Only set font to bold for the current working directory.
-        if self.parent().cwdidx == index and self.parent().cwd:
+        if self.parent().cwdidx == index:
             option.font.setWeight(QtGui.QFont.Bold)
         super(BoldDelegate, self).paint(painter, option, index)
 
@@ -116,7 +116,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         index = self.browsermodel.index(startdir)
         self.browsertree.setCurrentIndex(index)
-#         self.set_cwd()
+
+    def on_commitdata(self):
+        log.debug("commitData")
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
@@ -126,13 +128,16 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.cwd = ""
             self.cwdidx = None
             return
-        self.cwd = path
-        self.cwdidx = index
+        if os.path.isdir(path):
+            self.cwd = path
+            self.cwdidx = index
 
     def keyPressEvent(self, e):
         "Connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
+            # FIXME: Find a way to update the view after Delegate changes.
+            self.browsertree.update()
 
     def on_datachanged(self):
         log.debug("dataChanged")
@@ -143,8 +148,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     @cwd.setter
     def cwd(self, dir):
-        if not os.path.isdir(dir) and not self._cwd:
-            return
+        # Exit out if dir is not a valid target.
         self._cwd = dir
         self.browsermodel._cwd = dir
         log.debug("cwd: {}".format(self._cwd))
