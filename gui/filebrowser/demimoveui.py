@@ -116,7 +116,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         index = self.browsermodel.index(startdir)
         self.browsertree.setCurrentIndex(index)
-        self.set_cwd()
+#         self.set_cwd()
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
@@ -125,9 +125,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.cwd and path == self.cwd:
             self.cwd = ""
             self.cwdidx = None
-        else:
-            self.cwd = path
-            self.cwdidx = index
+            return
+        self.cwd = path
+        self.cwdidx = index
 
     def keyPressEvent(self, e):
         "Connect return key to self.set_cwd()."
@@ -143,6 +143,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     @cwd.setter
     def cwd(self, dir):
+        if not os.path.isdir(dir) and not self._cwd:
+            return
         self._cwd = dir
         self.browsermodel._cwd = dir
         log.debug("cwd: {}".format(self._cwd))
@@ -328,22 +330,19 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.fileops.accents = checked
 
     def on_allradio(self, checked):
-        if checked:
-            self.fileops.filesonly = False
-            self.fileops.dirsonly = False
-            self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
-                                        QtCore.QDir.NoDotAndDotDot |
-                                        QtCore.QDir.Hidden)
+        self.fileops.filesonly = False
+        self.fileops.dirsonly = False
+        self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+                                    QtCore.QDir.NoDotAndDotDot |
+                                    QtCore.QDir.Hidden)
 
     def on_dirsradio(self, checked):
-        print checked
         self.fileops.dirsonly = checked
         self.browsermodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
                                     QtCore.QDir.NoDotAndDotDot)
 
     def on_filesradio(self, checked):
         self.fileops.filesonly = checked
-        print checked
         self.browsermodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
                                     QtCore.QDir.NoDotAndDotDot)
 
