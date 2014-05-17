@@ -38,6 +38,58 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
         super(BoldDelegate, self).paint(painter, option, index)
 
 
+class StatusTableModel (QtCore.QAbstractTableModel):
+    "Placeholder for status messages."
+    def __init__(self, data, header, parent=None, *args):
+        QtCore.QAbstractTableModel.__init__(self, parent, *args)
+        self.data = data
+        self.header = header
+
+    def flags(self, index):
+        return (QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable |
+                QtCore.Qt.ItemIsSelectable)
+
+    def rowCount(self, parent):
+        return len(self.data)
+
+    def columnCount(self, parent):
+        return 2
+
+    def setData(self, index, value, role):
+        if index.isValid() and role == QtCore.Qt.CheckStateRole:
+            if value == QtCore.Qt.Checked:
+                self.data[index.row()].setChecked(True)
+            else:
+                self.data[index.row()].setChecked(False)
+
+        self.dataChanged.emit(index, index)
+        return True
+
+    def data(self, index, role):
+        if index.isValid():
+            if role == QtCore.Qt.CheckStateRole:
+                if self.data[index.row()].isChecked():
+                    return QtCore.QVariant(QtCore.Qt.Checked)
+                else:
+                    return QtCore.QVariant(QtCore.Qt.Unchecked)
+            elif role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                if self.data[index.row()].isChecked():
+                    font.setBold(True)
+                else:
+                    font.setBold(False)
+                return QtCore.QVariant(font)
+            elif role == QtCore.Qt.DisplayRole:
+                return QtCore.QVariant(self.data[index.row()].text())
+
+        return QtCore.QVariant()
+
+    def headerData(self, col, orientation, role):
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return QtCore.QVariant(self.header)
+        return QtCore.QVariant()
+
+
 class PreviewFileModel(QtGui.QFileSystemModel):
 
     def __init__(self, parent=None):
@@ -95,6 +147,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.mainsplitter.setStretchFactor(1, 3)
 
         self.create_browser(startdir)
+        self.create_statustab()
+        self.create_historytab()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
 
@@ -117,6 +171,21 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         index = self.dirmodel.index(startdir)
         self.dirtree.setCurrentIndex(index)
+
+    def create_statustab(self):
+        header = "Checkboxes"
+        data = [QtGui.QCheckBox("item 1"),
+                QtGui.QCheckBox("item 2"),
+                QtGui.QCheckBox("item 3"),
+                QtGui.QCheckBox("item 4"),
+                QtGui.QCheckBox("item 5")]
+
+        model = StatusTableModel(data, header, self)
+        self.statustable.setModel(model)
+
+
+    def create_historytab(self):
+        pass
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
