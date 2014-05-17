@@ -118,11 +118,20 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
     def update_preview(self, item, index):
         if self.p.autopreview:
-            if not index.parent() == self._cwdidx:
+            if not self._cwdidx:
                 return
-            if item.toString() in self.p.targetlist:
-                idx = self.p.targetlist.index(item.toString())
-                return self.p.previewlist[idx]
+#             idx = self._cwdidx
+#             for i in range(self.rowCount(idx)):
+#                 child = idx.child(i, idx.column())
+#                 if child == index:
+#                     if item.toString() in self.p.targetlist:
+#                         pidx = self.p.targetlist.index(item.toString())
+#                         return self.p.previewlist[pidx]
+            par, cidx = index.parent(), self._cwdidx
+            if par == cidx or par.parent() == cidx or par.parent().parent() == cidx:
+                if item.toString() in self.p.targetlist:
+                        idx = self.p.targetlist.index(item.toString())
+                        return self.p.previewlist[idx]
 
 #     QModelIndexList Items = model->match(
 #                 model->index(0, 0),
@@ -223,6 +232,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         trgts, prvws = self.fileops.stage(str(self.cwd))
         self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
+#         log.debug(self.targetlist)
+#         log.debug(self.previewlist)
         self.update_view()
 
     def update_view(self):
