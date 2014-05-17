@@ -59,17 +59,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <layout class="QHBoxLayout" name="replacechecks">
-               <item>
-                <widget class="QRadioButton" name="replaceregex">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Regex</string>
-                 </property>
-                </widget>
-               </item>
+              <layout class="QHBoxLayout" name="replaceradios" stretch="3,4">
                <item>
                 <widget class="QRadioButton" name="replaceglob">
                  <property name="toolTip">
@@ -84,28 +74,52 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="replacecase">
+                <widget class="QRadioButton" name="replaceregex">
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="text">
-                  <string>CS</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
+                  <string>Regex</string>
                  </property>
                 </widget>
                </item>
               </layout>
              </item>
-             <item row="1" column="0">
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="replacechecks">
+               <item>
+                <widget class="QCheckBox" name="replacecase">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ignore case&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Disables case sensitivity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>IC</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="replacematchonly">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only use the matching pattern, not the replacement pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Match only</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
               <widget class="QCheckBox" name="capitalizecheck">
                <property name="text">
                 <string>Cases</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QComboBox" name="capitalizebox">
                <property name="enabled">
                 <bool>false</bool>
@@ -135,14 +149,14 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QCheckBox" name="spacecheck">
                <property name="text">
                 <string>Spaces</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QComboBox" name="spacebox">
                <property name="enabled">
                 <bool>false</bool>
@@ -179,7 +193,7 @@
                </item>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QCheckBox" name="insertcheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Insert a string at a fixed position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -189,7 +203,7 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <layout class="QHBoxLayout" name="insertlayout">
                <item>
                 <widget class="QSpinBox" name="insertpos">
@@ -216,7 +230,7 @@
                </item>
               </layout>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QCheckBox" name="deletecheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete everything between fixed positions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -226,7 +240,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <layout class="QHBoxLayout" name="deletelayout">
                <item>
                 <widget class="QSpinBox" name="deletestart">
@@ -266,7 +280,7 @@
                </item>
               </layout>
              </item>
-             <item row="5" column="0">
+             <item row="6" column="0">
               <widget class="QCheckBox" name="countcheck">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add an incrementing number at a fixed position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -276,7 +290,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="6" column="1">
               <layout class="QHBoxLayout" name="countlayout" stretch="0,0,0">
                <item>
                 <widget class="QSpinBox" name="countpos">
@@ -322,7 +336,7 @@
                </item>
               </layout>
              </item>
-             <item row="6" column="1">
+             <item row="7" column="1">
               <layout class="QHBoxLayout" name="countstringlabel">
                <item>
                 <widget class="QLineEdit" name="countpreedit">
@@ -352,73 +366,7 @@
                </item>
               </layout>
              </item>
-             <item row="8" column="0">
-              <widget class="QCheckBox" name="removecheck">
-               <property name="text">
-                <string>Remove</string>
-               </property>
-              </widget>
-             </item>
              <item row="8" column="1">
-              <widget class="QCheckBox" name="removeduplicatescheck">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove duplicate symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reduces multiple successive occurrences of space, dot, hyphen and other common symbols to a single occurrence.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Duplicate symbols</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="1">
-              <widget class="QCheckBox" name="removenonwordscheck">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove non-word characters&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow [A-Za-z0-9_.-].&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Non-word characters</string>
-               </property>
-              </widget>
-             </item>
-             <item row="10" column="1">
-              <widget class="QCheckBox" name="removeextensionscheck">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow ASCII-letters plus common ASCII-symbols like +_-...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Extensions</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="0">
-              <widget class="QCheckBox" name="varcheck">
-               <property name="text">
-                <string>Various</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="1">
-              <widget class="QCheckBox" name="varaccentscheck">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Accents&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will replace e.g. &amp;quot;čáñů&amp;quot; with &amp;quot;canu&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Normalize accents</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
               <widget class="QCheckBox" name="countfillcheck">
                <property name="enabled">
                 <bool>false</bool>
@@ -434,6 +382,72 @@
                </property>
                <property name="checked">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QCheckBox" name="removecheck">
+               <property name="text">
+                <string>Remove</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QCheckBox" name="removeduplicatescheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove duplicate symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reduces multiple successive occurrences of space, dot, hyphen and other common symbols to a single occurrence.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Duplicate symbols</string>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QCheckBox" name="removenonwordscheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove non-word characters&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow [A-Za-z0-9_.-].&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Non-word characters</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="1">
+              <widget class="QCheckBox" name="removeextensionscheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Symbols&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will only allow ASCII-letters plus common ASCII-symbols like +_-...&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Extensions</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QCheckBox" name="varcheck">
+               <property name="text">
+                <string>Various</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="1">
+              <widget class="QCheckBox" name="varaccentscheck">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove Accents&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This will replace e.g. &amp;quot;čáñů&amp;quot; with &amp;quot;canu&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Normalize accents</string>
                </property>
               </widget>
              </item>
@@ -622,14 +636,14 @@
           <item>
            <widget class="QLineEdit" name="sourceedit">
             <property name="toolTip">
-             <string>Pattern to match</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Matching pattern&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLineEdit" name="targetedit">
             <property name="toolTip">
-             <string>Replacement string</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Replacement pattern&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>

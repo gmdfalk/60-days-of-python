@@ -325,7 +325,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_lists()
 
     def on_replacecase(self, checked):
-        self.fileops.ignorecase = not checked
+        self.fileops.ignorecase = checked
         if self.autopreview:
             self.update_lists()
 

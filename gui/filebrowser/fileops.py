@@ -141,6 +141,8 @@ class FileOps(object):
 
         targets = self.find_targets(path, srcpat)
         log.debug([i[1] for i in targets])
+        if not self.keepext and self.remext:
+            targets = [self.joinext(i) for i in targets]
         previews = self.modify_targets(deepcopy(targets), srcpat, destpat)
         log.debug(targets == previews)
         return targets, previews
@@ -173,11 +175,11 @@ class FileOps(object):
         target = []
         for f in files:
             if self.match(srcpat, f):
-                if self.keepext:
-                    fname, ext = os.path.splitext(f)
-                    target.append([root, fname, ext])
-                else:
-                    target.append([root, f])
+#                 if self.keepext:
+                fname, ext = os.path.splitext(f)
+                target.append([root, fname, ext])
+#                 else:
+#                     target.append([root, f])
         return target
 
     def match(self, srcpat, target):
@@ -196,8 +198,9 @@ class FileOps(object):
         for root, dirs, files in os.walk(path):
             root += "/"
             root = unicode(root, "utf-8")
-            dirs = [unicode(d, "utf-8") for d in dirs]
-            files = [unicode(f, "utf-8") for f in files]
+            dirs = sorted([unicode(d, "utf-8") for d in dirs])
+            files = sorted([unicode(f, "utf-8") for f in files])
+            # Check the found files and dirs against our regex/glob filter.
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
@@ -206,22 +209,25 @@ class FileOps(object):
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
                 target += self.match_files(srcpat, files, root)
 
+            # Exclude hidden and explicitly excluded files+dirs.
             if self.hidden:
                 targets.extend(target)
             else:
                 targets.extend(i for i in target if not i[1].startswith("."))
+            # TODO: Implement this correctly (regex/glob?).
+            if self.exclude:
+                targets = [i for i in targets if i not in self.exclude]
 
             # Do not enter the second loop for non-recursive searches.
             if not self.recursive:
                 break
-
         return targets
 
     def modify_targets(self, previews, srcpat, destpat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             countlen = len(str(len(previews)))
-            countrange = range(self.countbase, len(previews), self.countstep)
+            countrange = range(self.countbase, len(previews) + 1, self.countstep)
             if self.countfill:
                 count = (str(i).rjust(countlen, "0") for i in countrange)
             else:
@@ -229,21 +235,22 @@ class FileOps(object):
 
         for preview in previews:
             name = preview[1]
+            print name
+            if self.replacecheck:
+                name = self.apply_replace(name, srcpat, destpat)
             if self.capitalizecheck:
                 name = self.apply_capitalize(name)
             if self.spacecheck:
                 name = self.apply_space(name)
-            if self.replacecheck:
-                name = self.apply_replace(name, srcpat, destpat)
-            if self.deletecheck:
-                name = self.apply_delete(name)
-            if self.removecheck:
-                name = self.apply_remove(name)
             if self.countcheck:
                 try:
                     name = self.apply_count(name, count.next())
                 except StopIteration:
                     pass
+            if self.deletecheck:
+                name = self.apply_delete(name)
+            if self.removecheck:
+                name = self.apply_remove(name)
             if self.insertcheck:
                 name = self.apply_insert(name)
 
