@@ -127,22 +127,13 @@ class FileOps(object):
         if destpat is None:
             destpat = "*"
         log.debug(path)
-        targets = self.find_targets(srcpat, path)
+        targets = self.find_targets(path, srcpat)
         return targets
         log.debug("targets found: {}".format(targets))
         modtargets = self.modify_targets(targets, srcpat, destpat)
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
-
-    def splitext(self, files, root, srcpat):
-        """Splits a list of files into filename and extension."""
-        target = []
-        for f in files:
-            fname, ext = os.path.splitext(f)
-            if self.match(srcpat, fname, ext):
-                target.append([root, fname, ext])
-        return target
 
     def joinext(self, target):
         """Joins a target tuple of (name, extension) back together."""
@@ -156,19 +147,29 @@ class FileOps(object):
                 pass
         return name
 
-    def match(self, srcpat, *target):
+    def match_files(self, srcpat, files, root):
+        """Splits a list of files into filename and extension."""
+        target = []
+        for f in files:
+            if self.match(srcpat, f):
+                if self.keepext:
+                    fname, ext = os.path.splitext(f)
+                    target.append([root, fname, ext])
+                else:
+                    target.append([root, f])
+        return target
+
+    def match(self, srcpat, target):
         """Searches target for pattern and returns a bool."""
-        name = self.joinext(target)
         if self.regex:
-            if re.search(srcpat, name):
+            if re.search(srcpat, target):
                 return True
         else:
-            if fnmatch.fnmatch(name, srcpat):
+            if fnmatch.fnmatch(target, srcpat):
                 return True
-
         return False
 
-    def find_targets(self, srcpat, path):
+    def find_targets(self, path, srcpat):
         """Creates a list of files and/or directories to work with."""
         targets = []
         for root, dirs, files in os.walk(path):
@@ -176,13 +177,14 @@ class FileOps(object):
             root = unicode(root, "utf-8")
             dirs = [unicode(d, "utf-8") for d in dirs]
             files = [unicode(f, "utf-8") for f in files]
+
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
-                self.splitext(files, root, srcpat)
+                target = self.match_files(srcpat, files, root)
             else:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
-                target += self.splitext(files, root, srcpat)
+                target += self.match_files(srcpat, files, root)
 
             if self.hidden:
                 targets.extend(target)
@@ -235,26 +237,72 @@ class FileOps(object):
     def undo(self, action):
         pass
 
-    def apply_space(self):
-        pass
+    def apply_space(self, target):
+        if not self.spacecheck:
+            return
+#         self._dirsonly = dirsonly  # Only edit directory names.
+#         self._filesonly = False if dirsonly else filesonly  # Only file names.
+#         self._recursive = recursive  # Look for files recursively
+#         self._hidden = hidden  # Look at hidden files and directories, too.
+#         self._simulate = simulate  # Simulate renaming and dump result to stdout.
+#         self._interactive = interactive  # Confirm before overwriting.
+#         self._prompt = prompt  # Confirm all rename actions.
+#         self._noclobber = noclobber  # Don't overwrite anything.
+#         self._keepext = keepext  # Don't modify remext.
+#         self._countpos = countpos  # Adds numerical index at position.
+#         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
+#         self._exclude = exclude  # List of strings to exclude from targets.
+#         self._accents = accents  # Normalize accents (ñé becomes ne).
+#         self._lower = lower  # Convert target to lowercase.
+#         self._upper = upper  # Convert target to uppercase.
+#         self._ignorecase = ignorecase  # Case sensitivity.
+#         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
+#         self._remdups = remdups  # Remove remdups.
+#         self._remnonwords = remnonwords  # Only allow wordchars (\w)
+#         self._remext = remext  # Remove all remext.
+#         # Initialize GUI options.
+#         self._autostop = False  # Automatically stop execution on rename error.
+#         self._mirror = False  # Mirror manual rename to all targets.
+#         self._capitalizecheck = False  # Whether to apply the capitalizemode.
+#         self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
+#         self._spacecheck = False  # Whether to apply the spacemode.
+#         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
+#         self._countcheck = False  # Wehether to add a counter to the targets.
+#         self._countbase = 1  # Base to start counting from.
+#         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
+#         self._countpreedit = ""  # String that is prepended to the counter.
+#         self._countsufedit = ""  # String that is appended to the counter.
+#         self._insertcheck = False  # Whether to apply an insertion.
+#         self._insertpos = 0  # Position/Index to insert at.
+#         self._insertedit = ""  # The inserted text/string.
+#         self._deletecheck = False  # Whether to delete a specified range.
+#         self._deletestart = 0  # Start index of deletion sequence.
+#         self._deleteend = 1  # End index of deletion sequence.
+#         self._replacecheck = True  # Whether to apply source/target patterns.
+#         self._removecheck = False
+#         self._varcheck = False  # Whether to apply various options (accents).
 
-    def apply_capitalize(self):
-        pass
+    def apply_capitalize(self, taget):
+        if not self.capitalizecheck:
+            return
 
-    def apply_replace(self):
-        pass
+    def apply_replace(self, target):
+        if not self.replacecheck:
+            return
 
-    def apply_insert(self):
-        pass
+    def apply_insert(self, target):
+        if not self.insertcheck:
+            return
 
-    def apply_count(self):
-        pass
+    def apply_count(self, target):
+        if not self.countcheck:
+            return
 
-    def apply_delete(self):
-        pass
+    def apply_delete(self, target):
+        if not self.deletecheck:
+            return
 
     def replace_spaces(self, s):
-        s = s[1]
 
         if self.spacemode == 0:
             s = s.replace(" ", "_")
@@ -272,7 +320,7 @@ class FileOps(object):
         return s
 
     def replace_capitalization(self, s):
-        s = s[1]
+
         if self.capitalizemode == 0:
             s = s.upper()
         elif self.capitalizemode == 1:
@@ -286,7 +334,7 @@ class FileOps(object):
         return s
 
     def replace_accents(self, s):
-        s = s[1]
+
         s = "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
 
         return s
