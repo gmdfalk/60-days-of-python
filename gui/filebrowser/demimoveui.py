@@ -199,6 +199,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.cwd = path
             self.cwdidx = index
             self.dirtree.setExpanded(self.cwdidx, True)
+        self.update_single_index(index)
 
     def keyPressEvent(self, e):
         "Overloaded to connect return key to self.set_cwd()."
@@ -217,6 +218,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
         m, v = self.dirmodel, self.dirtree
         r = v.rect()
         m.dataChanged.emit(v.indexAt(r.topLeft()), v.indexAt(r.bottomRight()))
+
+    def update_single_index(self, index):
+        m = self.dirmodel
+        m.dataChanged.emit(index, m.index(index.row(), m.columnCount()))
 
     def connect_buttons(self):
         # Main buttons:
