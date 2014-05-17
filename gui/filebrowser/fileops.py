@@ -85,7 +85,7 @@ class FileOps(object):
         self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
         self._spacecheck = False  # Whether to apply the spacemode.
         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
-        self._countcheck = False  # Wehether to add a counter to the targets.
+        self._countcheck = False  # Whether to add a counter to the targets.
         self._countbase = 1  # Base to start counting from.
         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
         self._countpreedit = ""  # String that is prepended to the counter.
@@ -128,12 +128,21 @@ class FileOps(object):
             destpat = "*"
         log.debug(path)
         targets = self.find_targets(path, srcpat)
-        return targets
         log.debug("targets found: {}".format(targets))
         modtargets = self.modify_targets(targets, srcpat, destpat)
+        print targets, modtargets
+        return [i[1] for i in targets], [i[1] for i in modtargets]
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
+
+    def commit(self, targets):
+        if self.simulate:
+            print "{} to {}".format(targets[1], targets[2])
+        # clean up self.exclude
+
+    def undo(self, action):
+        pass
 
     def joinext(self, target):
         """Joins a target tuple of (name, extension) back together."""
@@ -199,110 +208,34 @@ class FileOps(object):
 
     def modify_targets(self, targets, srcpat, destpat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
-        if not self.regex:
-            srcpat = fnmatch.translate(srcpat)
-            destpat = fnmatch.translate(destpat)
-
+        if self.countcheck:
+            countlen = len(str(len(targets)))
+            countrange = range(self.countbase, len(targets), self.countstep)
+            count = (str(i).rjust(countlen, "0") for i in countrange)
         for target in targets:
-            name = self.joinext(target)
-            srcmatch = re.search(srcpat, name)
-#             print name, srcpat, srcmatch
-            if srcmatch:
-                print "found src:", srcmatch.group()
-            destmatch = re.search(destpat, name)
-            if destmatch:
-                print "found dest:", destmatch.group()
-            # TODO: Two functions: one to convert a glob into a pattern
-            # and another to convert one into a replacement.
-            if self.deletecheck:
-                self.apply_delete()
-            if self.removecheck:
-                self.apply_remove()
-            if self.countcheck:
-                self.apply_count()
-            if self.insertcheck:
-                self.apply_insert()
+            name = target[1]
             if self.replacecheck:
-                self.apply_replace()
+                name = self.apply_replace(name, srcpat, destpat)
+            if self.deletecheck:
+                name = self.apply_delete(name)
+            if self.removecheck:
+                name = self.apply_remove(name)
+            if self.countcheck:
+                name = self.apply_count(name, count.next())
+            if self.insertcheck:
+                name = self.apply_insert(name)
             if self.capitalizecheck:
-                self.apply_capitalize()
+                name = self.apply_capitalize(name)
             if self.spacecheck:
-                self.apply_space()
+                name = self.apply_space(name)
 
-    def commit(self, targets):
-        if self.simulate:
-            print "{} to {}".format(targets[1], targets[2])
-        # clean up self.exclude
+            target[1] = name
 
-    def undo(self, action):
-        pass
+        return targets
 
-    def apply_space(self, target):
+    def apply_space(self, s):
         if not self.spacecheck:
-            return
-#         self._dirsonly = dirsonly  # Only edit directory names.
-#         self._filesonly = False if dirsonly else filesonly  # Only file names.
-#         self._recursive = recursive  # Look for files recursively
-#         self._hidden = hidden  # Look at hidden files and directories, too.
-#         self._simulate = simulate  # Simulate renaming and dump result to stdout.
-#         self._interactive = interactive  # Confirm before overwriting.
-#         self._prompt = prompt  # Confirm all rename actions.
-#         self._noclobber = noclobber  # Don't overwrite anything.
-#         self._keepext = keepext  # Don't modify remext.
-#         self._countpos = countpos  # Adds numerical index at position.
-#         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
-#         self._exclude = exclude  # List of strings to exclude from targets.
-#         self._accents = accents  # Normalize accents (ñé becomes ne).
-#         self._lower = lower  # Convert target to lowercase.
-#         self._upper = upper  # Convert target to uppercase.
-#         self._ignorecase = ignorecase  # Case sensitivity.
-#         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
-#         self._remdups = remdups  # Remove remdups.
-#         self._remnonwords = remnonwords  # Only allow wordchars (\w)
-#         self._remext = remext  # Remove all remext.
-#         # Initialize GUI options.
-#         self._autostop = False  # Automatically stop execution on rename error.
-#         self._mirror = False  # Mirror manual rename to all targets.
-#         self._capitalizecheck = False  # Whether to apply the capitalizemode.
-#         self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
-#         self._spacecheck = False  # Whether to apply the spacemode.
-#         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
-#         self._countcheck = False  # Wehether to add a counter to the targets.
-#         self._countbase = 1  # Base to start counting from.
-#         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
-#         self._countpreedit = ""  # String that is prepended to the counter.
-#         self._countsufedit = ""  # String that is appended to the counter.
-#         self._insertcheck = False  # Whether to apply an insertion.
-#         self._insertpos = 0  # Position/Index to insert at.
-#         self._insertedit = ""  # The inserted text/string.
-#         self._deletecheck = False  # Whether to delete a specified range.
-#         self._deletestart = 0  # Start index of deletion sequence.
-#         self._deleteend = 1  # End index of deletion sequence.
-#         self._replacecheck = True  # Whether to apply source/target patterns.
-#         self._removecheck = False
-#         self._varcheck = False  # Whether to apply various options (accents).
-
-    def apply_capitalize(self, taget):
-        if not self.capitalizecheck:
-            return
-
-    def apply_replace(self, target):
-        if not self.replacecheck:
-            return
-
-    def apply_insert(self, target):
-        if not self.insertcheck:
-            return
-
-    def apply_count(self, target):
-        if not self.countcheck:
-            return
-
-    def apply_delete(self, target):
-        if not self.deletecheck:
-            return
-
-    def replace_spaces(self, s):
+            return s
 
         if self.spacemode == 0:
             s = s.replace(" ", "_")
@@ -318,8 +251,33 @@ class FileOps(object):
             s = s.replace("-", " ")
 
         return s
+#         self._dirsonly = dirsonly  # Only edit directory names.
+#         self._filesonly = False if dirsonly else filesonly  # Only file names.
+#         self._recursive = recursive  # Look for files recursively
+#         self._hidden = hidden  # Look at hidden files and directories, too.
+#         self._simulate = simulate  # Simulate renaming and dump result to stdout.
+#         self._interactive = interactive  # Confirm before overwriting.
+#         self._countpos = countpos  # Adds numerical index at position.
+#         self._exclude = exclude  # List of strings to exclude from targets.
+#         self._accents = accents  # Normalize accents (ñé becomes ne).
+#         self._lower = lower  # Convert target to lowercase.
+#         self._upper = upper  # Convert target to uppercase.
+#         self._ignorecase = ignorecase  # Case sensitivity.
+#         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
+#         self._remdups = remdups  # Remove remdups.
+#         self._remnonwords = remnonwords  # Only allow wordchars (\w)
+#         self._remext = remext  # Remove all remext.
+#         # Initialize GUI options.
+#         self._deletecheck = False  # Whether to delete a specified range.
+#         self._deletestart = 0  # Start index of deletion sequence.
+#         self._deleteend = 1  # End index of deletion sequence.
+#         self._replacecheck = True  # Whether to apply source/target patterns.
+#         self._removecheck = False
+#         self._varcheck = False  # Whether to apply various options (accents).
 
-    def replace_capitalization(self, s):
+    def apply_capitalize(self, s):
+        if not self.capitalizecheck:
+            return s
 
         if self.capitalizemode == 0:
             s = s.upper()
@@ -333,11 +291,50 @@ class FileOps(object):
 
         return s
 
-    def replace_accents(self, s):
+    def apply_insert(self, s):
+        if not self.insertcheck or not self.insertedit:
+            return s
+        s = list(s)
+        s.insert(self.insertpos, self.insertedit)
+        return "".join(s)
 
-        s = "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
+    def apply_count(self, s, count):
+        if not self.countcheck:
+            return s
+        s = list(s)
+        # TODO: countfill
+        if self.countpreedit:
+            count = self.countpreedit + count
+        if self.countsufedit:
+            count += self.countsufedit
+        s.insert(self.countpos, count)
 
+        return "".join(s)
+
+    def apply_delete(self, s):
+        if not self.deletecheck:
+            return s
+
+    def apply_replace(self, s, srcpat, destpat):
+        if not self.replacecheck:
+            return s
+        # Translate glob to regular expression.
+        if not self.regex:
+            srcpat = fnmatch.translate(srcpat)
+            destpat = fnmatch.translate(destpat)
+        srcmatch = re.search(srcpat, s)
+        print s, srcpat, srcmatch
+        if srcmatch:
+            print "found src:", srcmatch.group()
+        destmatch = re.search(destpat, s)
+        if destmatch:
+            print "found dest:", destmatch.group()
+        # TODO: Two functions: one to convert a glob into a pattern
+        # and another to convert one into a replacement.
         return s
+
+    def replace_accents(self, s):
+        return "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
 
     @property
     def dirsonly(self):
