@@ -42,9 +42,12 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
     def __init__(self, parent=None):
         super(PreviewFileModel, self).__init__(parent)
+        self.p = parent
         self._autopreview = True
         self._cwd = ""
         self._cwdidx = None
+        self._sourceedit = None
+        self._targetedit = None
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -54,16 +57,15 @@ class PreviewFileModel(QtGui.QFileSystemModel):
             if role == QtCore.Qt.DisplayRole:
                 fileindex = self.index(index.row(), 0, index.parent())
                 item = self.data(fileindex, role)
-                return self.get_preview(item)
+                return self.update_preview(item)
 
         return super(PreviewFileModel, self).data(index, role)
 
-    def get_preview(self, item):
-        if not self.autopreview:
-            return QtCore.QString("")
-#         if item.toString() in targetlist:
-#            return self.parent.fileops.matchthisitem
-        return item.toString()
+    def update_preview(self, item):
+        if self.autopreview:
+            if item.toString() in self.p.targetlist:
+#            return self.p.fileops.stage()
+                return item.toString()
 
     @property
     def autopreview(self):
@@ -83,6 +85,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # Current working directory.
         self._cwd = ""
         self._cwdidx = None
+        self._sourceedit = ""  # Pattern to search for in files/dirs.
+        self._targetedit = ""  # Pattern to replace above found matches with.
+        self.targetlist = []
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -132,6 +137,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
         "Overloaded to connect return key to self.set_cwd()."
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
+            if self.cwd:
+                targets = self.fileops.stage(str(self.cwd))
+                self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in targets]
+                print self.targetlist
 
     def connect_buttons(self):
         # Main buttons:
@@ -214,6 +223,24 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def cwdidx(self, index):
         self._cwdidx = index
         self.dirmodel._cwdidx = index
+
+    @property
+    def sourceedit(self):
+        return self._sourceedit
+
+    @sourceedit.setter
+    def sourceedit(self, text):
+        log.debug("sourceedit: {}.".format(text))
+        self._sourceedit = text
+
+    @property
+    def targetedit(self):
+        return self._targetedit
+
+    @targetedit.setter
+    def targetedit(self, text):
+        log.debug("targetedit: {}.".format(text))
+        self._targetedit = text
 
     def on_previewbutton(self):
         log.debug("{}".format(self.sender()))
@@ -328,11 +355,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_sourceedit(self, text):
         text = unicode(text).encode("utf-8")
-        self.fileops.sourceedit = text
+        self.sourceedit = text
 
     def on_targetedit(self, text):
         text = unicode(text).encode("utf-8")
-        self.fileops.targetedit = text
+        self.targetedit = text
 
     def on_deletecheck(self, checked):
         self.fileops.deletecheck = checked

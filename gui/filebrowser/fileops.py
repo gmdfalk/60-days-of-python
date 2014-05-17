@@ -56,7 +56,7 @@ class FileOps(object):
                      "countcheck", "countfill", "countbase", "countpreedit",
                      "countsufedit", "varcheck",
                      "deletecheck", "deletestart", "deleteend",
-                     "replacecheck", "sourceedit", "targetedit",)
+                     "replacecheck")
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -97,8 +97,6 @@ class FileOps(object):
         self._deletestart = 0  # Start index of deletion sequence.
         self._deleteend = 1  # End index of deletion sequence.
         self._replacecheck = True  # Whether to apply source/target patterns.
-        self._sourceedit = ""  # Pattern to search for in files/dirs.
-        self._targetedit = ""  # Pattern to replace above found matches with.
         self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
 
@@ -119,17 +117,18 @@ class FileOps(object):
     def restore_options(self):
         self.set_options(**self.defaultopts)
 
-    def stage(self, srcpat, destpat, path=None):
+    def stage(self, path=None, srcpat=None, destpat=None):
         """Initialize the rename operation. Returns list of targets and their
         preview."""
         if not path:
             path = os.getcwd()
-        log.debug(path)
-        if not srcpat:
+        if srcpat is None:
             srcpat = "*"
-        if not destpat:
+        if destpat is None:
             destpat = "*"
+        log.debug(path)
         targets = self.find_targets(srcpat, path)
+        return targets
         log.debug("targets found: {}".format(targets))
         modtargets = self.modify_targets(targets, srcpat, destpat)
 #         matches = self.match_targets(targets, expression)
@@ -201,10 +200,11 @@ class FileOps(object):
         if not self.regex:
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
+
         for target in targets:
             name = self.joinext(target)
             srcmatch = re.search(srcpat, name)
-            print name, srcpat, srcmatch
+#             print name, srcpat, srcmatch
             if srcmatch:
                 print "found src:", srcmatch.group()
             destmatch = re.search(destpat, name)
@@ -212,50 +212,20 @@ class FileOps(object):
                 print "found dest:", destmatch.group()
             # TODO: Two functions: one to convert a glob into a pattern
             # and another to convert one into a replacement.
-
-#         self._dirsonly = dirsonly  # Only edit directory names.
-#         self._filesonly = False if dirsonly else filesonly  # Only file names.
-#         self._recursive = recursive  # Look for files recursively
-#         self._hidden = hidden  # Look at hidden files and directories, too.
-#         self._simulate = simulate  # Simulate renaming and dump result to stdout.
-#         self._interactive = interactive  # Confirm before overwriting.
-#         self._prompt = prompt  # Confirm all rename actions.
-#         self._noclobber = noclobber  # Don't overwrite anything.
-#         self._keepext = keepext  # Don't modify remext.
-#         self._countpos = count  # Adds numerical index at position.
-#         self._regex = regex  # Use regular expressions instead of glob/fnmatch.
-#         self._exclude = exclude  # List of strings to exclude from targets.
-#         self._accents = accents  # Normalize accents (ñé becomes ne).
-#         self._lower = lower  # Convert target to lowercase.
-#         self._upper = upper  # Convert target to uppercase.
-#         self._ignorecase = ignorecase  # Case sensitivity.
-#         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
-#         self._remdups = remdups  # Remove remdups.
-#         self._remnonwords = remnonwords  # Remove all chars except [A-Za-z0-9_-.].
-#         self._remext = remext  # Remove all remext.
-#         # Initialize GUI options.
-#         self._autostop = False  # Automatically stop execution on rename error.
-#         self._mirror = False  # Mirror manual rename to all targets.
-#         self._capitalizecheck = False  # Whether to apply the capitalizemode.
-#         self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
-#         self._spacecheck = False  # Whether to apply the spacemode.
-#         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
-#         self._countcheck = False  # Wehether to add a counter to the targets.
-#         self._countbase = 1  # Base to start counting from.
-#         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
-#         self._countpreedit = ""  # String that is prepended to the counter.
-#         self._countsufedit = ""  # String that is appended to the counter.
-#         self._insertcheck = False  # Whether to apply an insertion.
-#         self._insertpos = 0  # Position/Index to insert at.
-#         self._insertedit = ""  # The inserted text/string.
-#         self._deletecheck = False  # Whether to delete a specified range.
-#         self._deletestart = 0  # Start index of deletion sequence.
-#         self._deleteend = 1  # End index of deletion sequence.
-#         self._replacecheck = True  # Whether to apply source/target patterns.
-#         self._sourceedit = ""  # Pattern to search for in files/dirs.
-#         self._targetedit = ""  # Pattern to replace above found matches with.
-#         self._removecheck = False
-#         self._varcheck = False
+            if self.deletecheck:
+                pass
+            if self.removecheck:
+                pass
+            if self.countcheck:
+                pass
+            if self.insertcheck:
+                pass
+            if self.replacecheck:
+                pass
+            if self.capitalizecheck:
+                pass
+            if self.spacecheck:
+                pass
 
     def commit(self, targets):
         if self.simulate:
@@ -670,24 +640,6 @@ class FileOps(object):
     def replacecheck(self, boolean):
         log.debug("replacecheck: {}".format(boolean))
         self._replacecheck = boolean
-
-    @property
-    def sourceedit(self):
-        return self._sourceedit
-
-    @sourceedit.setter
-    def sourceedit(self, text):
-        log.debug("sourceedit: {}.".format(text))
-        self._sourceedit = text
-
-    @property
-    def targetedit(self):
-        return self._targetedit
-
-    @targetedit.setter
-    def targetedit(self, text):
-        log.debug("targetedit: {}.".format(text))
-        self._targetedit = text
 
     @property
     def capitalizecheck(self):
