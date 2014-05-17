@@ -71,7 +71,7 @@ def main():
                       prompt=args["--prompt"],
                       noclobber=args["--no-clobber"],
                       countpos=args["--count"],
-                      mediamode=args["--mediamode"],
+                      mediamode=args["--media"],
                       accents=args["--accents"],
                       lower=args["--lower"],
                       upper=args["--upper"],

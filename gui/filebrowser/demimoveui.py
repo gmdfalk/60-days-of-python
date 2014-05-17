@@ -155,14 +155,13 @@ class DemiMoveGUI(QtGui.QMainWindow):
                        self.autopreviewcheck, self.extensioncheck,
                        self.removenonwordscheck, self.removeextensionscheck, ]
         self.boxes = [self.capitalizebox, self.spacebox]
-        self.checksaves = {}
-        self.combosaves = {}
 
         self.create_browser(startdir)
         self.create_statustab()
         self.create_historytab()
         self.connect_buttons()
         log.info("demimove-ui initialized.")
+        self.statusbar.showMessage("Select a directory and press Enter.")
 
     def create_browser(self, startdir):
         self.dirmodel = PreviewFileModel(self)
@@ -239,59 +238,59 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # Main buttons:
         self.commitbutton.clicked.connect(self.on_commitbutton)
         self.undobutton.clicked.connect(self.on_undobutton)
-        self.allradio.clicked.connect(self.on_allradio)
-        self.dirsradio.clicked.connect(self.on_dirsradio)
-        self.filesradio.clicked.connect(self.on_filesradio)
+        self.allradio.toggled.connect(self.on_allradio)
+        self.dirsradio.toggled.connect(self.on_dirsradio)
+        self.filesradio.toggled.connect(self.on_filesradio)
 
         # Main options:
-        self.autopreviewcheck.clicked.connect(self.on_autopreviewcheck)
-        self.autostopcheck.clicked.connect(self.on_autostopcheck)
-        self.extensioncheck.clicked.connect(self.on_extensioncheck)
-        self.hiddencheck.clicked.connect(self.on_hiddencheck)
-        self.mirrorcheck.clicked.connect(self.on_mirrorcheck)
-        self.recursivecheck.clicked.connect(self.on_recursivecheck)
+        self.autopreviewcheck.toggled.connect(self.on_autopreviewcheck)
+        self.autostopcheck.toggled.connect(self.on_autostopcheck)
+        self.extensioncheck.toggled.connect(self.on_extensioncheck)
+        self.hiddencheck.toggled.connect(self.on_hiddencheck)
+        self.mirrorcheck.toggled.connect(self.on_mirrorcheck)
+        self.recursivecheck.toggled.connect(self.on_recursivecheck)
 
         # Replace options:
-        self.replacecheck.clicked.connect(self.on_replacecheck)
-        self.replacecase.clicked.connect(self.on_replacecase)
-        self.replaceglob.clicked.connect(self.on_replaceglob)
-        self.replacematchonly.clicked.connect(self.on_replacematchonly)
-        self.replaceregex.clicked.connect(self.on_replaceregex)
+        self.replacecheck.toggled.connect(self.on_replacecheck)
+        self.replacecase.toggled.connect(self.on_replacecase)
+        self.replaceglob.toggled.connect(self.on_replaceglob)
+        self.replacematchonly.toggled.connect(self.on_replacematchonly)
+        self.replaceregex.toggled.connect(self.on_replaceregex)
         self.sourceedit.textChanged.connect(self.on_sourceedit)
         self.targetedit.textChanged.connect(self.on_targetedit)
 
         # Insert options:
-        self.insertcheck.clicked.connect(self.on_insertcheck)
+        self.insertcheck.toggled.connect(self.on_insertcheck)
         self.insertpos.valueChanged.connect(self.on_insertpos)
         self.insertedit.textChanged.connect(self.on_insertedit)
 
-        self.deletecheck.clicked.connect(self.on_deletecheck)
+        self.deletecheck.toggled.connect(self.on_deletecheck)
         self.deletestart.valueChanged.connect(self.on_deletestart)
         self.deleteend.valueChanged.connect(self.on_deleteend)
 
         # Count options:
-        self.countcheck.clicked.connect(self.on_countcheck)
+        self.countcheck.toggled.connect(self.on_countcheck)
         self.countbase.valueChanged.connect(self.on_countbase)
         self.countpos.valueChanged.connect(self.on_countpos)
         self.countstep.valueChanged.connect(self.on_countstep)
         self.countpreedit.textChanged.connect(self.on_countpreedit)
         self.countsufedit.textChanged.connect(self.on_countsufedit)
-        self.countfillcheck.clicked.connect(self.on_countfillcheck)
+        self.countfillcheck.toggled.connect(self.on_countfillcheck)
 
         # Remove options:
-        self.removecheck.clicked.connect(self.on_removecheck)
-        self.removeduplicatescheck.clicked.connect(self.on_removeduplicates)
-        self.removeextensionscheck.clicked.connect(self.on_removeextensions)
-        self.removenonwordscheck.clicked.connect(self.on_removenonwords)
+        self.removecheck.toggled.connect(self.on_removecheck)
+        self.removeduplicatescheck.toggled.connect(self.on_removeduplicates)
+        self.removeextensionscheck.toggled.connect(self.on_removeextensions)
+        self.removenonwordscheck.toggled.connect(self.on_removenonwords)
 
         # Various options:
-        self.varcheck.clicked.connect(self.on_varcheck)
-        self.varaccentscheck.clicked.connect(self.on_varaccents)
-        self.varmediacheck.clicked.connect(self.on_varmediacheck)
+        self.varcheck.toggled.connect(self.on_varcheck)
+        self.varaccentscheck.toggled.connect(self.on_varaccents)
+        self.varmediacheck.toggled.connect(self.on_varmediacheck)
 
-        self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
+        self.capitalizecheck.toggled.connect(self.on_capitalizecheck)
         self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
-        self.spacecheck.clicked.connect(self.on_spacecheck)
+        self.spacecheck.toggled.connect(self.on_spacecheck)
         self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
 
     def on_commitbutton(self):
@@ -434,27 +433,30 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_lists()
 
     def save_options(self):
-        self.checksaves = {i: i.checkState() for i in self.checks}
+        self.checksaves = {i: i.isChecked() for i in self.checks}
         self.combosaves = {i: i.currentIndex() for i in self.boxes}
 
-    def toggle_options(self):
-        if self.mediamode:
+    def restore_options(self):
+        for k, v in self.checksaves.items():
+            k.setChecked(v)
+        for k, v in self.combosaves.items():
+            k.setCurrentIndex(v)
+
+    def apply_mediaoptions(self):
+        for i in self.checks[:-2]:
+            i.setChecked(True)
+        self.spacebox.setCurrentIndex(6)
+        self.capitalizebox.setCurrentIndex(0)
+
+    def toggle_options(self, boolean):
+        if boolean:
             self.save_options()
-            for i in self.checks[:-2]:
-                i.setCheckState(True)
-            self.spacebox.setCurrentIndex(6)
-            self.capitalizebox.setCurrentIndex(0)
-            self.mediamode = False
+            self.apply_mediaoptions()
         else:
-            for k, v in self.checksaves.items():
-                k.setCheckState(v)
-            for k, v in self.combosaves.items():
-                k.setCurrentIndex(v)
-            self.mediamode = True
+            self.restore_options()
 
     def on_varmediacheck(self, checked):
-        self.mediamode = checked
-        self.toggle_options()
+        self.toggle_options(checked)
         if self.autopreview:
             self.update_lists()
 
@@ -599,7 +601,7 @@ def main():
     startdir = os.getcwd()
     try:
         args = docopt(__doc__, version="0.1")
-        args["-v"] = 3
+        args["-v"] = 3  # Force debug mode, for now.
         fileops = FileOps(verbosity=args["-v"], quiet=args["--quiet"])
         if args["--dir"]:
             startdir = args["--dir"]

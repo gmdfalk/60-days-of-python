@@ -124,21 +124,20 @@ class FileOps(object):
     def stage(self, path=None, srcpat=None, destpat=None):
         """Initialize the rename operation. Returns list of targets and their
         preview."""
-        self.replacecheck = False
         if not path:
             path = os.getcwd()
         if srcpat is None:
-            srcpat = "*"
+            if self.regex:
+                srcpat = ".*"
+            else:
+                srcpat = "*"
         if destpat is None:
-            destpat = "*"
-#         if self.mediamode:
-#             self.spacecheck = True
-#             self.spacemode = 0
-#             self.capitalizecheck = True
-#             self.capitalizemode = 0
-#             self.removecheck = True
-#             self.remdups = True
-#             self.keepext = True
+            if self.regex:
+                destpat = ".*"
+            else:
+                destpat = "*"
+        if self.mediamode:
+            self.set_mediamode()
 
         targets = self.find_targets(path, srcpat)
         joinedtargets = self.joinext(targets)
@@ -147,6 +146,17 @@ class FileOps(object):
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
+
+    def set_mediamode(self):
+        self.capitalizecheck = True
+        self.spacecheck = True
+        self.removecheck = True
+        self.varcheck = True
+        self.capitalizemode = 0
+        self.spacemode = 6
+        self.remdups = True
+        self.keepext = True
+        self.accents = True
 
     def commit(self, targets):
         if self.simulate:
@@ -343,12 +353,14 @@ class FileOps(object):
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
         srcmatch = re.search(srcpat, s)
-        if srcmatch:
-            log.debug("found src: {}.".format(srcmatch.group()))
+#         if srcmatch:
+#             log.debug("found src: {}.".format(srcmatch.group()))
+        if self.matchonly:
+            return s
         destmatch = re.search(destpat, s)
-        if destmatch:
-            log.debug("found dest: {}.".format(destmatch.group()))
-        log.debug("{}, {}, {}, {}".format(srcpat, destpat, srcmatch, destmatch))
+#         if destmatch:
+#             log.debug("found dest: {}.".format(destmatch.group()))
+#         log.debug("{}, {}, {}, {}".format(srcpat, destpat, srcmatch, destmatch))
 
         # TODO: Two functions: one to convert a glob into a pattern
         # and another to convert one into a replacement.
