@@ -102,6 +102,7 @@ class PreviewFileModel(QtGui.QFileSystemModel):
         self._cwdidx = None
         self._sourceedit = None
         self._targetedit = None
+        self._mediamode = None
 
     def columnCount(self, parent=QtCore.QModelIndex()):
         return super(PreviewFileModel, self).columnCount() + 1
@@ -148,6 +149,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.mainsplitter.setStretchFactor(0, 2)
         self.mainsplitter.setStretchFactor(1, 3)
+
+        self.checks = [self.capitalizecheck, self.spacecheck, self.removecheck,
+                       self.varaccentscheck, self.removeduplicatescheck,
+                       self.autopreviewcheck, self.extensioncheck,
+                       self.removenonwordscheck, self.removeextensionscheck, ]
+        self.boxes = [self.capitalizebox, self.spacebox]
+        self.checksaves = {}
+        self.combosaves = {}
 
         self.create_browser(startdir)
         self.create_statustab()
@@ -278,7 +287,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # Various options:
         self.varcheck.clicked.connect(self.on_varcheck)
         self.varaccentscheck.clicked.connect(self.on_varaccents)
-        self.varmediamode.clicked.connect(self.on_varmediamode)
+        self.varmediacheck.clicked.connect(self.on_varmediacheck)
 
         self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
         self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
@@ -425,13 +434,29 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_lists()
 
     def save_options(self):
-        pass
+        self.checksaves = {i: i.checkState() for i in self.checks}
+        self.combosaves = {i: i.currentIndex() for i in self.boxes}
 
-    def restore_options(self):
-        pass
+    def toggle_options(self):
+        if self.mediamode:
+            print "enabling media"
+            self.save_options()
+            for i in self.checks[:-2]:
+                i.setCheckState(True)
+            self.spacebox.setCurrentIndex(6)
+            self.capitalizebox.setCurrentIndex(0)
+            self.mediamode = False
+        else:
+            print "disabling media"
+            for k, v in self.checksaves.items():
+                k.setCheckState(v)
+            for k, v in self.combosaves.items():
+                k.setCurrentIndex(v)
+            self.mediamode = True
 
-    def on_varmediamode(self, checked):
-        self.fileops.mediamode = checked
+    def on_varmediacheck(self, checked):
+        self.mediamode = checked
+        self.toggle_options()
         if self.autopreview:
             self.update_lists()
 
@@ -524,6 +549,15 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.statusbar.showMessage("Root is now {}.".format(self._cwd))
         else:
             self.statusbar.showMessage("No root set.")
+
+    @property
+    def mediamode(self):
+        return self._mediamode
+
+    @mediamode.setter
+    def mediamode(self, boolean):
+        self._mediamode = boolean
+        log.debug("mediamode: {}".format(boolean))
 
     @property
     def autopreview(self):

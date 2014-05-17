@@ -131,14 +131,14 @@ class FileOps(object):
             srcpat = "*"
         if destpat is None:
             destpat = "*"
-        if self.media:
-            self.spacecheck = True
-            self.spacemode = 0
-            self.capitalizecheck = True
-            self.capitalizemode = 0
-            self.removecheck = True
-            self.remdups = True
-            self.keepext = True
+#         if self.mediamode:
+#             self.spacecheck = True
+#             self.spacemode = 0
+#             self.capitalizecheck = True
+#             self.capitalizemode = 0
+#             self.removecheck = True
+#             self.remdups = True
+#             self.keepext = True
 
         targets = self.find_targets(path, srcpat)
         joinedtargets = self.joinext(targets)
@@ -237,7 +237,7 @@ class FileOps(object):
 
         for preview in previews:
             name = preview[1]
-            print name
+#             print name
             if self.replacecheck:
                 name = self.apply_replace(name, srcpat, destpat)
             if self.capitalizecheck:
@@ -276,6 +276,8 @@ class FileOps(object):
             s = s.replace("-", " ")
         elif self.spacemode == 5:
             s = s.replace("_", " ")
+        elif self.spacemode == 6:
+            s = s.replace(" .", "_")
 
         return s
 #         self._interactive = interactive  # Confirm before overwriting.
@@ -580,13 +582,13 @@ class FileOps(object):
         self._nowords = boolean
 
     @property
-    def media(self):
-        return self._media
+    def mediamode(self):
+        return self._mediamode
 
-    @media.setter
-    def media(self, boolean):
-        log.debug("media: {}".format(boolean))
-        self._media = boolean
+    @mediamode.setter
+    def mediamode(self, boolean):
+        log.debug("mediamode: {}".format(boolean))
+        self._mediamode = boolean
 
     @property
     def countcheck(self):
