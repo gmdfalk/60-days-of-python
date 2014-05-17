@@ -6,6 +6,7 @@ import os
 import re
 import sys
 from unicodedata import normalize, category
+from copy import deepcopy
 
 
 log = logging.getLogger("fileops")
@@ -138,10 +139,9 @@ class FileOps(object):
             self.keepext = True
 
         targets = self.find_targets(path, srcpat)
-        print "fileops safe:", targets
-#         log.debug("targets found: {}".format(targets))
-        previews = self.modify_targets(targets[:], srcpat, destpat)
-        print targets == previews
+        log.debug([i[1] for i in targets])
+        previews = self.modify_targets(deepcopy(targets), srcpat, destpat)
+        log.debug(targets == previews)
         return targets, previews
 #         matches = self.match_targets(targets, expression)
 #         print matches

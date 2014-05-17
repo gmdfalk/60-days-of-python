@@ -140,8 +140,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         trgts, prvws = self.fileops.stage(str(self.cwd))
         self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
-        print "gui targets:", self.targetlist
-        print "gui previews:", self.previewlist
+        log.debug(self.targetlist)
+        log.debug(self.previewlist)
         self.update_view()
 
     def update_view(self):
