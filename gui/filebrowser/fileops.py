@@ -253,7 +253,7 @@ class FileOps(object):
     def apply_space(self, s):
         if not self.spacecheck:
             return s
-
+        print "here", self.spacemode
         if self.spacemode == 0:
             s = s.replace(" ", "_")
         elif self.spacemode == 1:

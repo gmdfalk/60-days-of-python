@@ -199,6 +199,9 @@
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Insert index&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Position to insert the following string into. Choose -1 to append.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
+                 <property name="minimum">
+                  <number>-1</number>
+                 </property>
                 </widget>
                </item>
                <item>

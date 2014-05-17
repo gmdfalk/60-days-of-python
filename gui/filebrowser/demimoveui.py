@@ -123,11 +123,13 @@ class DemiMoveGUI(QtGui.QMainWindow):
         index = self.dirtree.currentIndex()
         path = self.dirmodel.filePath(index)
         if self.cwd and path == self.cwd:
+            self.dirtree.setExpanded(self.cwdidx, False)
             self.cwd = ""
             self.cwdidx = None
         elif path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
+            self.dirtree.setExpanded(self.cwdidx, True)
 
     def keyPressEvent(self, e):
         "Overloaded to connect return key to self.set_cwd()."
@@ -140,8 +142,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
         trgts, prvws = self.fileops.stage(str(self.cwd))
         self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
-        log.debug(self.targetlist)
-        log.debug(self.previewlist)
         self.update_view()
 
     def update_view(self):
@@ -208,7 +208,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_commitbutton(self):
         self.update_targetlist()
-        print self.fileops.get_options()
+        log.debug(self.fileops.get_options())
 #         self.fileops.commit()
 
     def on_undobutton(self):
