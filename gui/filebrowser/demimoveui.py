@@ -62,9 +62,11 @@ class PreviewFileModel(QtGui.QFileSystemModel):
 
     def update_preview(self, item, index):
         if self.p.autopreview:
-            if index.parent() == self._cwdidx:
-                if item.toString() in self.p.targetlist:
-                    return item.toString()
+            if not index.parent() == self._cwdidx:
+                return
+            if item.toString() in self.p.targetlist:
+                idx = self.p.targetlist.index(item.toString())
+                return self.p.previewlist[idx]
 
 #     QModelIndexList Items = model->match(
 #                 model->index(0, 0),
@@ -138,13 +140,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
         trgts, prvws = self.fileops.stage(str(self.cwd))
         self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
+        print "gui targets:", self.targetlist
+        print "gui previews:", self.previewlist
         self.update_view()
 
     def update_view(self):
         m, v = self.dirmodel, self.dirtree
         r = v.rect()
         m.dataChanged.emit(v.indexAt(r.topLeft()), v.indexAt(r.bottomRight()))
-        log.debug(self.targetlist)
 
     def connect_buttons(self):
         # Main buttons:
@@ -205,7 +208,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_commitbutton(self):
         self.update_targetlist()
-        self.fileops.commit()
+        print self.fileops.get_options()
+#         self.fileops.commit()
 
     def on_undobutton(self):
         self.fileops.undo()

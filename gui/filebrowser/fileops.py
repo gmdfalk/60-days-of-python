@@ -42,7 +42,7 @@ class FileOps(object):
                  noclobber=False, keepext=False, regex=False, exclude=None,
                  media=False, accents=False, lower=False, upper=False,
                  remdups=False, remext=False, remnonwords=False,
-                 ignorecase=False, countpos=None):
+                 ignorecase=False, countpos=0):
         # List of available options.
         self.opts = ("quiet", "verbosity",
                      "dirsonly", "filesonly", "recursive", "hidden",
@@ -87,6 +87,7 @@ class FileOps(object):
         self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
         self._countcheck = False  # Whether to add a counter to the targets.
         self._countbase = 1  # Base to start counting from.
+        self._countstep = 1
         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
         self._countpreedit = ""  # String that is prepended to the counter.
         self._countsufedit = ""  # String that is appended to the counter.
@@ -120,6 +121,7 @@ class FileOps(object):
     def stage(self, path=None, srcpat=None, destpat=None):
         """Initialize the rename operation. Returns list of targets and their
         preview."""
+        self.replacecheck = False
         if not path:
             path = os.getcwd()
         if srcpat is None:
@@ -136,9 +138,10 @@ class FileOps(object):
             self.keepext = True
 
         targets = self.find_targets(path, srcpat)
-        log.debug("targets found: {}".format(targets))
-        previews = self.modify_targets(targets, srcpat, destpat)
-        print targets, previews
+        print "fileops safe:", targets
+#         log.debug("targets found: {}".format(targets))
+        previews = self.modify_targets(targets[:], srcpat, destpat)
+        print targets == previews
         return targets, previews
 #         matches = self.match_targets(targets, expression)
 #         print matches
@@ -194,7 +197,6 @@ class FileOps(object):
             root = unicode(root, "utf-8")
             dirs = [unicode(d, "utf-8") for d in dirs]
             files = [unicode(f, "utf-8") for f in files]
-
             if self.dirsonly:
                 target = [[root, d] for d in dirs if self.match(srcpat, d)]
             elif self.filesonly:
@@ -214,17 +216,18 @@ class FileOps(object):
 
         return targets
 
-    def modify_targets(self, targets, srcpat, destpat):
+    def modify_targets(self, previews, srcpat, destpat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
-            countlen = len(str(len(targets)))
-            countrange = range(self.countbase, len(targets), self.countstep)
+            countlen = len(str(len(previews)))
+            countrange = range(self.countbase, len(previews))
             if self.countfill:
-                count = (str(i).rjust(countlen, "0") for i in countrange)
+                count = [str(i).rjust(countlen, "0") for i in countrange]
             else:
-                count = (str(i) for i in countrange)
-        for target in targets:
-            name = target[1]
+                count = [str(i) for i in countrange]
+
+        for preview in previews:
+            name = preview[1]
             if self.replacecheck:
                 name = self.apply_replace(name, srcpat, destpat)
             if self.deletecheck:
@@ -232,7 +235,8 @@ class FileOps(object):
             if self.removecheck:
                 name = self.apply_remove(name)
             if self.countcheck:
-                name = self.apply_count(name, count.next())
+                name = self.apply_count(name, count)
+                count += self.countstep
             if self.insertcheck:
                 name = self.apply_insert(name)
             if self.capitalizecheck:
@@ -240,9 +244,9 @@ class FileOps(object):
             if self.spacecheck:
                 name = self.apply_space(name)
 
-            target[1] = name
+            preview[1] = name
 
-        return targets
+        return previews
 
     def apply_space(self, s):
         if not self.spacecheck:
@@ -272,14 +276,14 @@ class FileOps(object):
             return s
 
         if self.capitalizemode == 0:
-            s = s.upper()
-        elif self.capitalizemode == 1:
             s = s.lower()
+        elif self.capitalizemode == 1:
+            s = s.upper()
         elif self.capitalizemode == 2:
             s = s.capitalize()
         elif self.capitalizemode == 3:
             # news = s.title()
-            s = " ".join([x.capitalize() for x in s.split()])
+            s = " ".join([c.capitalize() for c in s.split()])
 
         return s
 
@@ -299,6 +303,7 @@ class FileOps(object):
             count = self.countpreedit + count
         if self.countsufedit:
             count += self.countsufedit
+        print type(self.countpos), self.countpos
         s.insert(self.countpos, count)
 
         return "".join(s)
