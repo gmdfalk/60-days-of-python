@@ -262,26 +262,10 @@ class FileOps(object):
             s = s.replace("-", " ")
 
         return s
-#         self._dirsonly = dirsonly  # Only edit directory names.
-#         self._filesonly = False if dirsonly else filesonly  # Only file names.
-#         self._recursive = recursive  # Look for files recursively
-#         self._hidden = hidden  # Look at hidden files and directories, too.
 #         self._interactive = interactive  # Confirm before overwriting.
-#         self._countpos = countpos  # Adds numerical index at position.
 #         self._exclude = exclude  # List of strings to exclude from targets.
-#         self._accents = accents  # Normalize accents (ñé becomes ne).
 #         self._ignorecase = ignorecase  # Case sensitivity.
-#         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
-#         self._remdups = remdups  # Remove remdups.
-#         self._remnonwords = remnonwords  # Only allow wordchars (\w)
 #         self._remext = remext  # Remove all remext.
-#         # Initialize GUI options.
-#         self._deletecheck = False  # Whether to delete a specified range.
-#         self._deletestart = 0  # Start index of deletion sequence.
-#         self._deleteend = 1  # End index of deletion sequence.
-#         self._replacecheck = True  # Whether to apply source/target patterns.
-#         self._removecheck = False
-#         self._varcheck = False  # Whether to apply various options (accents).
 
     def apply_capitalize(self, s):
         if not self.capitalizecheck:
@@ -328,7 +312,10 @@ class FileOps(object):
         if not self.removecheck:
             return s
         if self.remdups:
-            pass
+            s = re.sub(r"([-_ .])\1+", r"\1", s)
+        if self.remnonwords:
+            s = re.sub("\W", "", s)
+        return s
 
     def apply_replace(self, s, srcpat, destpat):
         if not self.replacecheck:
