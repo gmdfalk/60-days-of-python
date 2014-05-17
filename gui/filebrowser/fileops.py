@@ -143,9 +143,6 @@ class FileOps(object):
         targets = self.find_targets(path, srcpat)
         joinedtargets = self.joinext(targets)
         previews = self.modify_targets(deepcopy(joinedtargets), srcpat, destpat)
-        print "t:", targets
-        print "p:", previews
-        log.debug(targets == previews)
         return targets, previews
 #         matches = self.match_targets(targets, expression)
 #         print matches
@@ -156,8 +153,9 @@ class FileOps(object):
             print "{} to {}".format(targets[1], targets[2])
         # clean up self.exclude
 
-    def undo(self, action):
-        pass
+    def undo(self, action=None):
+        if action is None:
+            action = self.history.pop()
 
     def joinext(self, targets):
         """Joins a list of targets into [root, name+ ext] per item."""
