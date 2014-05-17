@@ -220,11 +220,11 @@ class FileOps(object):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             countlen = len(str(len(previews)))
-            countrange = range(self.countbase, len(previews))
+            countrange = range(self.countbase, len(previews), self.countstep)
             if self.countfill:
-                count = [str(i).rjust(countlen, "0") for i in countrange]
+                count = (str(i).rjust(countlen, "0") for i in countrange)
             else:
-                count = [str(i) for i in countrange]
+                count = (str(i) for i in countrange)
 
         for preview in previews:
             name = preview[1]
@@ -235,8 +235,10 @@ class FileOps(object):
             if self.removecheck:
                 name = self.apply_remove(name)
             if self.countcheck:
-                name = self.apply_count(name, count)
-                count += self.countstep
+                try:
+                    name = self.apply_count(name, count.next())
+                except StopIteration:
+                    pass
             if self.insertcheck:
                 name = self.apply_insert(name)
             if self.capitalizecheck:
@@ -303,7 +305,6 @@ class FileOps(object):
             count = self.countpreedit + count
         if self.countsufedit:
             count += self.countsufedit
-        print type(self.countpos), self.countpos
         s.insert(self.countpos, count)
 
         return "".join(s)
