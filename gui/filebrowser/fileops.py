@@ -5,7 +5,7 @@ import logging
 import os
 import re
 import sys
-import unicodedata
+from unicodedata import normalize, category
 
 
 log = logging.getLogger("fileops")
@@ -213,19 +213,19 @@ class FileOps(object):
             # TODO: Two functions: one to convert a glob into a pattern
             # and another to convert one into a replacement.
             if self.deletecheck:
-                pass
+                self.apply_delete()
             if self.removecheck:
-                pass
+                self.apply_remove()
             if self.countcheck:
-                pass
+                self.apply_count()
             if self.insertcheck:
-                pass
+                self.apply_insert()
             if self.replacecheck:
-                pass
+                self.apply_replace()
             if self.capitalizecheck:
-                pass
+                self.apply_capitalize()
             if self.spacecheck:
-                pass
+                self.apply_space()
 
     def commit(self, targets):
         if self.simulate:
@@ -235,65 +235,61 @@ class FileOps(object):
     def undo(self, action):
         pass
 
-    def get_new_path(self, name, path):
-        """ Remove file from path, so we have only the dir"""
-        dirpath = os.path.split(path)[0]
-        if dirpath != '/': dirpath += '/'
-        return dirpath + name
+    def apply_space(self):
+        pass
 
-    def replace_spaces(self, name, path, mode):
-        name = unicode(name, "utf-8")
-        path = unicode(path, "utf-8")
+    def apply_capitalize(self):
+        pass
 
-        if mode == 0:
-            newname = name.replace(' ', '_')
-        elif mode == 1:
-            newname = name.replace('_', ' ')
-        elif mode == 2:
-            newname = name.replace(' ', '.')
-        elif mode == 3:
-            newname = name.replace('.', ' ')
-        elif mode == 4:
-            newname = name.replace(' ', '-')
-        elif mode == 5:
-            newname = name.replace('-', ' ')
+    def apply_replace(self):
+        pass
 
-        newpath = self.get_new_path(newname, path)
-        return unicode(newname), unicode(newpath)
+    def apply_insert(self):
+        pass
 
-    def replace_capitalization(self, name, path, mode):
-        name = unicode(name)
-        path = unicode(path)
+    def apply_count(self):
+        pass
 
-        if mode == 0:
-            newname = name.upper()
-        elif mode == 1:
-            newname = name.lower()
-        elif mode == 2:
-            newname = name.capitalize()
-        elif mode == 3:
-            # newname = name.title()
-            newname = " ".join([x.capitalize() for x in name.split()])
+    def apply_delete(self):
+        pass
 
-        newpath = self.get_new_path(newname, path)
-        return unicode(newname), unicode(newpath)
+    def replace_spaces(self, s):
+        s = s[1]
 
-    def replace_with(self, name, path, orig, new):
-        """ Replace all occurences of orig with new """
-        newname = name.replace(orig, new)
-        newpath = self.get_new_path(newname, path)
+        if self.spacemode == 0:
+            s = s.replace(" ", "_")
+        elif self.spacemode == 1:
+            s = s.replace("_", " ")
+        elif self.spacemode == 2:
+            s = s.replace(" ", ".")
+        elif self.spacemode == 3:
+            s = s.replace(".", " ")
+        elif self.spacemode == 4:
+            s = s.replace(" ", "-")
+        elif self.spacemode == 5:
+            s = s.replace("-", " ")
 
-        return unicode(newname), unicode(newpath)
+        return s
 
-    def replace_accents(self, name, path):
-        name = unicode(name)
-        path = unicode(path)
+    def replace_capitalization(self, s):
+        s = s[1]
+        if self.capitalizemode == 0:
+            s = s.upper()
+        elif self.capitalizemode == 1:
+            s = s.lower()
+        elif self.capitalizemode == 2:
+            s = s.capitalize()
+        elif self.capitalizemode == 3:
+            # news = s.title()
+            s = " ".join([x.capitalize() for x in s.split()])
 
-        newname = ''.join(c for c in unicodedata.normalize('NFD', name)
-                           if unicodedata.category(c) != 'Mn')
+        return s
 
-        newpath = self.get_new_path(newname, path)
-        return unicode(newname), unicode(newpath)
+    def replace_accents(self, s):
+        s = s[1]
+        s = "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
+
+        return s
 
     @property
     def dirsonly(self):
