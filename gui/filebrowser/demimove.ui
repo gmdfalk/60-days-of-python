@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>649</height>
+    <width>875</width>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <widget class="QTabWidget" name="treewidget">
        <property name="minimumSize">
         <size>
-         <width>242</width>
+         <width>264</width>
          <height>0</height>
         </size>
        </property>
@@ -440,26 +440,6 @@
          </item>
          <item>
           <layout class="QGridLayout" name="optiongrid" rowstretch="0,0,0" columnstretch="0,0">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="extensioncheck">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Preserve Extensions&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Only the edit the basename of the file. Leave the extension untouched.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Keep filetype</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="recursivecheck">
-             <property name="text">
-              <string>Recursive</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="0">
             <widget class="QCheckBox" name="autopreviewcheck">
              <property name="toolTip">
@@ -470,16 +450,6 @@
              </property>
              <property name="checked">
               <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="hiddencheck">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Include Hidden&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Include hidden files and/or directories in the potential targets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Include hidden</string>
              </property>
             </widget>
            </item>
@@ -500,6 +470,19 @@
              </property>
              <property name="text">
               <string>Stop on error</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="extensioncheck">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Preserve Extensions&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Only the edit the basename of the file. Leave the extension untouched.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Keep filetype</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -550,14 +533,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="buttonlayout">
-          <item>
-           <widget class="QPushButton" name="previewbutton">
-            <property name="text">
-             <string>Preview</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QHBoxLayout" name="buttonlayout" stretch="1,1,3">
           <item>
            <widget class="QPushButton" name="commitbutton">
             <property name="toolTip">
@@ -580,6 +556,23 @@
           </item>
           <item>
            <layout class="QHBoxLayout" name="fileradiolayout">
+            <item>
+             <widget class="QCheckBox" name="hiddencheck">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Include Hidden&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Include hidden files and/or directories in the potential targets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Hidden</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="recursivecheck">
+              <property name="text">
+               <string>Recursive</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QRadioButton" name="dirsradio">
               <property name="toolTip">
