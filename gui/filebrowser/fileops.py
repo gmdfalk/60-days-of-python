@@ -126,12 +126,20 @@ class FileOps(object):
             srcpat = "*"
         if destpat is None:
             destpat = "*"
-        log.debug(path)
+        if self.media:
+            self.spacecheck = True
+            self.spacemode = 0
+            self.capitalizecheck = True
+            self.capitalizemode = 0
+            self.removecheck = True
+            self.remdups = True
+            self.keepext = True
+
         targets = self.find_targets(path, srcpat)
         log.debug("targets found: {}".format(targets))
-        modtargets = self.modify_targets(targets, srcpat, destpat)
-        print targets, modtargets
-        return [i[1] for i in targets], [i[1] for i in modtargets]
+        previews = self.modify_targets(targets, srcpat, destpat)
+        print targets, previews
+        return targets, previews
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
@@ -211,7 +219,10 @@ class FileOps(object):
         if self.countcheck:
             countlen = len(str(len(targets)))
             countrange = range(self.countbase, len(targets), self.countstep)
-            count = (str(i).rjust(countlen, "0") for i in countrange)
+            if self.countfill:
+                count = (str(i).rjust(countlen, "0") for i in countrange)
+            else:
+                count = (str(i) for i in countrange)
         for target in targets:
             name = target[1]
             if self.replacecheck:
@@ -255,13 +266,10 @@ class FileOps(object):
 #         self._filesonly = False if dirsonly else filesonly  # Only file names.
 #         self._recursive = recursive  # Look for files recursively
 #         self._hidden = hidden  # Look at hidden files and directories, too.
-#         self._simulate = simulate  # Simulate renaming and dump result to stdout.
 #         self._interactive = interactive  # Confirm before overwriting.
 #         self._countpos = countpos  # Adds numerical index at position.
 #         self._exclude = exclude  # List of strings to exclude from targets.
 #         self._accents = accents  # Normalize accents (ñé becomes ne).
-#         self._lower = lower  # Convert target to lowercase.
-#         self._upper = upper  # Convert target to uppercase.
 #         self._ignorecase = ignorecase  # Case sensitivity.
 #         self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
 #         self._remdups = remdups  # Remove remdups.
@@ -302,7 +310,7 @@ class FileOps(object):
         if not self.countcheck:
             return s
         s = list(s)
-        # TODO: countfill
+
         if self.countpreedit:
             count = self.countpreedit + count
         if self.countsufedit:
@@ -314,6 +322,13 @@ class FileOps(object):
     def apply_delete(self, s):
         if not self.deletecheck:
             return s
+        return s[:self.deletestart] + s[self.deleteend:]
+
+    def apply_remove(self, s):
+        if not self.removecheck:
+            return s
+        if self.remdups:
+            pass
 
     def apply_replace(self, s, srcpat, destpat):
         if not self.replacecheck:
@@ -323,18 +338,23 @@ class FileOps(object):
             srcpat = fnmatch.translate(srcpat)
             destpat = fnmatch.translate(destpat)
         srcmatch = re.search(srcpat, s)
-        print s, srcpat, srcmatch
         if srcmatch:
-            print "found src:", srcmatch.group()
+            log.debug("found src: {}.".format(srcmatch.group()))
         destmatch = re.search(destpat, s)
         if destmatch:
-            print "found dest:", destmatch.group()
+            log.debug("found dest: {}.".format(destmatch.group()))
+        log.debug("{}, {}, {}, {}".format(srcpat, destpat, srcmatch, destmatch))
+
         # TODO: Two functions: one to convert a glob into a pattern
         # and another to convert one into a replacement.
         return s
 
-    def replace_accents(self, s):
-        return "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
+    def apply_various(self, s):
+        if not self.varcheck:
+            return
+        if self.accents:
+            s = "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
+        return s
 
     @property
     def dirsonly(self):
@@ -648,7 +668,7 @@ class FileOps(object):
 
     @property
     def deletecheck(self):
-        return self._delete
+        return self._deletecheck
 
     @deletecheck.setter
     def deletecheck(self, boolean):
