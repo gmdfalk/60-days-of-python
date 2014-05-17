@@ -1,5 +1,6 @@
 # encoding: utf-8
 # TODO: Exclude option
+# TODO: Fix count (~i)
 import fnmatch
 import logging
 import os
@@ -228,6 +229,10 @@ class FileOps(object):
 
         for preview in previews:
             name = preview[1]
+            if self.capitalizecheck:
+                name = self.apply_capitalize(name)
+            if self.spacecheck:
+                name = self.apply_space(name)
             if self.replacecheck:
                 name = self.apply_replace(name, srcpat, destpat)
             if self.deletecheck:
@@ -241,10 +246,6 @@ class FileOps(object):
                     pass
             if self.insertcheck:
                 name = self.apply_insert(name)
-            if self.capitalizecheck:
-                name = self.apply_capitalize(name)
-            if self.spacecheck:
-                name = self.apply_space(name)
 
             preview[1] = name
 
@@ -253,19 +254,19 @@ class FileOps(object):
     def apply_space(self, s):
         if not self.spacecheck:
             return s
-        print "here", self.spacemode
+
         if self.spacemode == 0:
             s = s.replace(" ", "_")
         elif self.spacemode == 1:
-            s = s.replace("_", " ")
+            s = s.replace(" ", "-")
         elif self.spacemode == 2:
             s = s.replace(" ", ".")
         elif self.spacemode == 3:
             s = s.replace(".", " ")
         elif self.spacemode == 4:
-            s = s.replace(" ", "-")
-        elif self.spacemode == 5:
             s = s.replace("-", " ")
+        elif self.spacemode == 5:
+            s = s.replace("_", " ")
 
         return s
 #         self._interactive = interactive  # Confirm before overwriting.

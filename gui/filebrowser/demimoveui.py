@@ -13,6 +13,9 @@ Options:
     --version            Show the current demimove-ui version.
 """
 # TODO: ConfigParser
+# TODO: Custom ContextMenu for Filebrowser
+# FIXME: Switching between dirs/files/both destroys CWD marker.
+#        Fixed temporariliy by commenting filter changes.
 import logging
 import sys
 
@@ -206,9 +209,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
             if self.cwd:
-                self.update_targetlist()
+                self.update_lists()
 
-    def update_targetlist(self):
+    def update_lists(self):
         trgts, prvws = self.fileops.stage(str(self.cwd))
         self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
@@ -277,11 +280,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
         self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
-        self.spacecheck.clicked.connect(self.on_capitalizecheck)
+        self.spacecheck.clicked.connect(self.on_spacecheck)
         self.spacebox.currentIndexChanged[int].connect(self.on_spacebox)
 
     def on_commitbutton(self):
-        self.update_targetlist()
+        self.update_lists()
         log.debug(self.fileops.get_options())
 #         self.fileops.commit()
 
@@ -290,26 +293,28 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_autopreviewcheck(self, checked):
         self.autopreview = checked
+        if checked:
+            self.update_lists()
 
     def on_extensioncheck(self, checked):
         self.fileops.keepext = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_hiddencheck(self, checked):
         self.fileops.hidden = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_mirrorcheck(self, checked):
         self.fileops.mirror = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_recursivecheck(self, checked):
         self.fileops.recursive = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_autostopcheck(self, checked):
         self.fileops.autostop = checked
@@ -317,170 +322,175 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_replacecheck(self, checked):
         self.fileops.replacecheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_replacecase(self, checked):
         self.fileops.ignorecase = not checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_replaceglob(self, checked):
         self.fileops.regex = not checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_replaceregex(self, checked):
         self.fileops.regex = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_insertcheck(self, checked):
         self.fileops.insertcheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_insertpos(self, num):
         self.fileops.insertpos = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_insertedit(self, text):
         text = unicode(text).encode("utf-8")
         self.fileops.insertedit = text
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countcheck(self, checked):
         self.fileops.countcheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countbase(self, num):
         self.fileops.countbase = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countpos(self, num):
         self.fileops.countpos = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countstep(self, num):
         self.fileops.countstep = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countpreedit(self, text):
         text = unicode(text).encode("utf-8")
         self.fileops.countpreedit = text
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countsufedit(self, text):
         text = unicode(text).encode("utf-8")
         self.fileops.countsufedit = text
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_countfillcheck(self, checked):
         self.fileops.countfill = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_removecheck(self, checked):
         self.fileops.removecheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_removeduplicates(self, checked):
         self.fileops.remdups = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_removeextensions(self, checked):
         self.fileops.remext = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_removenonwords(self, checked):
         self.fileops.remnonwords = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_varaccents(self, checked):
         self.fileops.accents = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_allradio(self, checked):
         self.fileops.filesonly = False
         self.fileops.dirsonly = False
-        self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
-                                    QtCore.QDir.NoDotAndDotDot |
-                                    QtCore.QDir.Hidden)
+#         self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+#                                     QtCore.QDir.NoDotAndDotDot |
+#                                     QtCore.QDir.Hidden)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_dirsradio(self, checked):
         self.fileops.dirsonly = checked
-        self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
-                                    QtCore.QDir.NoDotAndDotDot)
+#         self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
+#                                     QtCore.QDir.NoDotAndDotDot)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_filesradio(self, checked):
         self.fileops.filesonly = checked
-        self.dirmodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
-                                    QtCore.QDir.NoDotAndDotDot)
+#         self.dirmodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
+#                                     QtCore.QDir.NoDotAndDotDot)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
+
+    def on_spacecheck(self, checked):
+        self.fileops.spacecheck = checked
+        if self.autopreview:
+            self.update_lists()
 
     def on_capitalizecheck(self, checked):
         self.fileops.capitalizecheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_sourceedit(self, text):
         text = unicode(text).encode("utf-8")
         self.sourceedit = text
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_targetedit(self, text):
         text = unicode(text).encode("utf-8")
         self.targetedit = text
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_deletecheck(self, checked):
         self.fileops.deletecheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_deletestart(self, num):
         self.fileops.deletestart = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_deleteend(self, num):
         self.fileops.deleteend = int(num)
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_varcheck(self, checked):
         self.fileops.varcheck = checked
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_capitalbox(self, index):
         self.fileops.capitalizemode = index
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     def on_spacebox(self, index):
         self.fileops.spacemode = index
         if self.autopreview:
-            self.update_targetlist()
+            self.update_lists()
 
     @property
     def cwd(self):
