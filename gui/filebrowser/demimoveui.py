@@ -246,6 +246,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.replacecheck.clicked.connect(self.on_replacecheck)
         self.replacecase.clicked.connect(self.on_replacecase)
         self.replaceglob.clicked.connect(self.on_replaceglob)
+        self.replacematchonly.clicked.connect(self.on_replacematchonly)
         self.replaceregex.clicked.connect(self.on_replaceregex)
         self.sourceedit.textChanged.connect(self.on_sourceedit)
         self.targetedit.textChanged.connect(self.on_targetedit)
@@ -326,6 +327,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_replacecase(self, checked):
         self.fileops.ignorecase = checked
+        if self.autopreview:
+            self.update_lists()
+
+    def on_replacematchonly(self, checked):
+        self.fileops.matchonly = checked
         if self.autopreview:
             self.update_lists()
 

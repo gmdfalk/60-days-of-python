@@ -100,6 +100,7 @@ class FileOps(object):
         self._deletestart = 0  # Start index of deletion sequence.
         self._deleteend = 1  # End index of deletion sequence.
         self._replacecheck = True  # Whether to apply source/target patterns.
+        self._matchonly = False
         self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
 
@@ -140,10 +141,10 @@ class FileOps(object):
             self.keepext = True
 
         targets = self.find_targets(path, srcpat)
-        log.debug([i[1] for i in targets])
-        if not self.keepext and self.remext:
-            targets = [self.joinext(i) for i in targets]
-        previews = self.modify_targets(deepcopy(targets), srcpat, destpat)
+        joinedtargets = self.joinext(targets)
+        previews = self.modify_targets(deepcopy(joinedtargets), srcpat, destpat)
+        print "t:", targets
+        print "p:", previews
         log.debug(targets == previews)
         return targets, previews
 #         matches = self.match_targets(targets, expression)
@@ -158,17 +159,20 @@ class FileOps(object):
     def undo(self, action):
         pass
 
-    def joinext(self, target):
-        """Joins a target tuple of (name, extension) back together."""
-        if len(target) > 2:
-            target = (target[1], target[2])
-        name = target[0]
-        if not self.keepext:
-            try:
-                name += target[1]
-            except IndexError:
-                pass
-        return name
+    def joinext(self, targets):
+        """Joins a list of targets into [root, name+ ext] per item."""
+        if self.keepext:
+            return targets
+
+        joinedtargets = []
+        for i in targets:
+            if len(i) > 2 and not self.remext:
+                i = [i[0], i[1] + i[2]]
+            else:
+                i = [i[0], i[1]]
+            joinedtargets.append(i)
+
+        return joinedtargets
 
     def match_files(self, srcpat, files, root):
         """Splits a list of files into filename and extension."""
