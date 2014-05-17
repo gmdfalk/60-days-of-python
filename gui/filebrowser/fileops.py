@@ -137,7 +137,7 @@ class FileOps(object):
             else:
                 destpat = "*"
         if self.mediamode:
-            self.set_mediamode()
+            self.set_mediaoptions()
 
         targets = self.find_targets(path, srcpat)
         joinedtargets = self.joinext(targets)
@@ -147,7 +147,7 @@ class FileOps(object):
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
 
-    def set_mediamode(self):
+    def set_mediaoptions(self):
         self.capitalizecheck = True
         self.spacecheck = True
         self.removecheck = True

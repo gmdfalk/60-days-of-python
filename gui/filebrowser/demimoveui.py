@@ -442,7 +442,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         for k, v in self.combosaves.items():
             k.setCurrentIndex(v)
 
-    def apply_mediaoptions(self):
+    def set_mediaoptions(self):
         for i in self.checks[:-2]:
             i.setChecked(True)
         self.spacebox.setCurrentIndex(6)
@@ -451,7 +451,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def toggle_options(self, boolean):
         if boolean:
             self.save_options()
-            self.apply_mediaoptions()
+            self.set_mediaoptions()
         else:
             self.restore_options()
 

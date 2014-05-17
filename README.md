@@ -34,15 +34,9 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
   * [**Blockify**](https://github.com/mikar/blockify/), almost entirely rewritten.
   * [**File Browser**](https://github.com/mikar/60-days-of-python/blob/master/gui/filebrowser)
-  * optional: IMDB Browser 
-  * optional: Chess/Sudoku
   * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
-  	  * Forum
-	  * Guestbook/Journal/Notes
+  	  * Forum/Guestbook/Journal/Notes
 	  * Drawing Board (FFA)
-	  * optional: TV Show Tracker
-	  * optional: To-Do-List
-	  * optional: PDF Generator and Name Scrambler
   * [**Py3: OOP**](https://github.com/mikar/60-days-of-python/tree/master/oop) (working through the book)
  
