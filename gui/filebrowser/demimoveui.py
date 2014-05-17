@@ -278,6 +278,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         # Various options:
         self.varcheck.clicked.connect(self.on_varcheck)
         self.varaccentscheck.clicked.connect(self.on_varaccents)
+        self.varmediamode.clicked.connect(self.on_varmediamode)
 
         self.capitalizecheck.clicked.connect(self.on_capitalizecheck)
         self.capitalizebox.currentIndexChanged[int].connect(self.on_capitalbox)
@@ -420,6 +421,17 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_varaccents(self, checked):
         self.fileops.accents = checked
+        if self.autopreview:
+            self.update_lists()
+
+    def save_options(self):
+        pass
+
+    def restore_options(self):
+        pass
+
+    def on_varmediamode(self, checked):
+        self.fileops.mediamode = checked
         if self.autopreview:
             self.update_lists()
 

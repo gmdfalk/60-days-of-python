@@ -34,7 +34,7 @@ Options:
     -e, --remext      Remove remext.
     -w, --no-wordchars    Remove wordchars
     -m, --media           Media mode: All lowercase, remove duplicate symbols,
-                          replace spaces, keep remext.
+                          Spaces and dots to underscore, keep extensions...
     -v                    Logging verbosity, up to -vvv (debug).
     -q, --quiet           Do not print log messages to console.
     --version             Show the current demimove version.
@@ -71,7 +71,7 @@ def main():
                       prompt=args["--prompt"],
                       noclobber=args["--no-clobber"],
                       countpos=args["--count"],
-                      media=args["--media"],
+                      mediamode=args["--mediamode"],
                       accents=args["--accents"],
                       lower=args["--lower"],
                       upper=args["--upper"],

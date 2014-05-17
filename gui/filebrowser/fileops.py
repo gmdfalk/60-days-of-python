@@ -42,7 +42,7 @@ class FileOps(object):
                  dirsonly=False, filesonly=False, recursive=False,
                  hidden=False, simulate=False, interactive=False, prompt=False,
                  noclobber=False, keepext=False, regex=False, exclude=None,
-                 media=False, accents=False, lower=False, upper=False,
+                 mediamode=False, accents=False, lower=False, upper=False,
                  remdups=False, remext=False, remnonwords=False,
                  ignorecase=False, countpos=0):
         # List of available options.
@@ -76,7 +76,7 @@ class FileOps(object):
         self._lower = lower  # Convert target to lowercase.
         self._upper = upper  # Convert target to uppercase.
         self._ignorecase = ignorecase  # Case sensitivity.
-        self._media = media  # Mode to sanitize NTFS-filenames/dirnames.
+        self._mediamode = mediamode  # Mode to sanitize NTFS-filenames/dirnames.
         self._remdups = remdups  # Remove remdups.
         self._remnonwords = remnonwords  # Only allow wordchars (\w)
         self._remext = remext  # Remove all remext.
@@ -461,6 +461,15 @@ class FileOps(object):
     def varcheck(self, boolean):
         log.debug("varcheck: {}".format(boolean))
         self._varcheck = boolean
+
+    @property
+    def matchonly(self):
+        return self._matchonly
+
+    @matchonly.setter
+    def matchonly(self, boolean):
+        log.debug("matchonly: {}".format(boolean))
+        self._matchonly = boolean
 
     @property
     def accents(self):
