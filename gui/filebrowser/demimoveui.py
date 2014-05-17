@@ -439,7 +439,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def toggle_options(self):
         if self.mediamode:
-            print "enabling media"
             self.save_options()
             for i in self.checks[:-2]:
                 i.setCheckState(True)
@@ -447,7 +446,6 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.capitalizebox.setCurrentIndex(0)
             self.mediamode = False
         else:
-            print "disabling media"
             for k, v in self.checksaves.items():
                 k.setCheckState(v)
             for k, v in self.combosaves.items():
