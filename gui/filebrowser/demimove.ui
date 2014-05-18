@@ -49,9 +49,9 @@
               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
              </property>
              <item row="0" column="0">
-              <widget class="QCheckBox" name="replacecheck">
+              <widget class="QCheckBox" name="matchcheck">
                <property name="text">
-                <string>Replace</string>
+                <string>Match</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -59,9 +59,9 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <layout class="QHBoxLayout" name="replaceradios" stretch="3,4">
+              <layout class="QHBoxLayout" name="matchradios" stretch="3,4">
                <item>
-                <widget class="QRadioButton" name="replaceglob">
+                <widget class="QRadioButton" name="matchglob">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Globbing&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use globbing instead of regular expressions for pattern matching.&lt;/p&gt;&lt;p&gt;Example: asdf*  * (would remove asdf from all files/dirs that start with &amp;quot;asdf&amp;quot;)&lt;/p&gt;&lt;p&gt;Same with regex:  ^asdf    (empty)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -74,7 +74,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QRadioButton" name="replaceregex">
+                <widget class="QRadioButton" name="matchregex">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Regex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use regular expressions for replacement matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
@@ -86,9 +86,22 @@
               </layout>
              </item>
              <item row="1" column="1">
-              <layout class="QHBoxLayout" name="replacechecks">
+              <layout class="QHBoxLayout" name="matchchecks">
                <item>
-                <widget class="QCheckBox" name="replacecase">
+                <widget class="QCheckBox" name="matchreplace">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only use the matching pattern, not the replacement pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Replace</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="matchignorecase">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -97,16 +110,6 @@
                  </property>
                  <property name="text">
                   <string>IC</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="replacematchonly">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only use the matching pattern, not the replacement pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Match only</string>
                  </property>
                 </widget>
                </item>
@@ -652,14 +655,14 @@
         <item>
          <layout class="QHBoxLayout" name="editlayout">
           <item>
-           <widget class="QLineEdit" name="sourceedit">
+           <widget class="QLineEdit" name="matchedit">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Matching pattern&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="targetedit">
+           <widget class="QLineEdit" name="replaceedit">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Replacement pattern&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -934,9 +937,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>matchcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>replacecase</receiver>
+   <receiver>matchignorecase</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -950,9 +953,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>matchcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>replaceglob</receiver>
+   <receiver>matchglob</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -966,9 +969,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>matchcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>replaceregex</receiver>
+   <receiver>matchregex</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -982,9 +985,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>matchcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sourceedit</receiver>
+   <receiver>matchedit</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -998,9 +1001,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacecheck</sender>
+   <sender>matchcheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>targetedit</receiver>
+   <receiver>replaceedit</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1014,10 +1017,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>replacematchonly</sender>
+   <sender>matchreplace</sender>
    <signal>toggled(bool)</signal>
-   <receiver>targetedit</receiver>
-   <slot>setDisabled(bool)</slot>
+   <receiver>replaceedit</receiver>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>272</x>

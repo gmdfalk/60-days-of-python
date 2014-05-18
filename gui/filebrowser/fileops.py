@@ -1,7 +1,6 @@
 # encoding: utf-8
 # TODO: Exclude option
-# TODO: Fix count (~i)
-# TODO: os.walk depth
+# TODO: Fix count step and count base plus large listings (~i).
 from copy import deepcopy
 from unicodedata import normalize, category
 import fnmatch
@@ -70,7 +69,7 @@ class FileOps(object):
                      "countcheck", "countfill", "countbase", "countpreedit",
                      "countsufedit", "varcheck",
                      "deletecheck", "deletestart", "deleteend",
-                     "replacecheck")
+                     "matchcheck")
         # Universal options:
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
@@ -111,7 +110,7 @@ class FileOps(object):
         self._deletecheck = False  # Whether to delete a specified range.
         self._deletestart = 0  # Start index of deletion sequence.
         self._deleteend = 1  # End index of deletion sequence.
-        self._replacecheck = True  # Whether to apply source/target patterns.
+        self._matchcheck = True  # Whether to apply source/target patterns.
         self._matchonly = False
         self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
@@ -139,7 +138,7 @@ class FileOps(object):
             path = os.getcwd()
 
         targets = []
-        for root, dirs, files in walklevels(path, levels=2):
+        for root, dirs, files in os.walk(path):
             root += "/"
             root = unicode(root, "utf-8")
             dirs = sorted([unicode(d, "utf-8") for d in dirs])
@@ -171,21 +170,21 @@ class FileOps(object):
 
         return targets
 
-    def get_preview(self, targets, srcpat=None, destpat=None):
+    def get_preview(self, targets, matchpat=None, replacepat=None):
         """Simulate rename operation on targets and return results as list."""
-        if srcpat is None:
-            srcpat = "*"
+        if not matchpat:
+            matchpat = "*"
             if self.regex:
-                srcpat = ".*"
-        if destpat is None:
-            destpat = "*"
+                matchpat = ".*"
+        if replacepat is None:
+            replacepat = "*"
             if self.regex:
-                destpat = ".*"
+                replacepat = ".*"
         if self.mediamode:
             self.set_mediaoptions()
 
         joinedtargets = deepcopy(self.joinext(targets))
-        previews = self.modify_targets(joinedtargets, srcpat, destpat)
+        previews = self.modify_targets(joinedtargets, matchpat, replacepat)
 
         return previews
 #         matches = self.match_targets(targets, expression)
@@ -227,17 +226,17 @@ class FileOps(object):
 
         return joinedtargets
 
-    def match(self, srcpat, target):
+    def match(self, matchpat, target):
         """Searches target for pattern and returns a bool."""
         if self.regex:
-            if re.search(srcpat, target):
+            if re.search(matchpat, target):
                 return True
         else:
-            if fnmatch.fnmatch(target, srcpat):
+            if fnmatch.fnmatch(target, matchpat):
                 return True
         return False
 
-    def modify_targets(self, previews, srcpat, destpat):
+    def modify_targets(self, previews, matchpat, replacepat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             countlen = len(str(len(previews)))
@@ -250,8 +249,8 @@ class FileOps(object):
         for preview in previews:
             name = preview[1]
 #             print name
-            if self.replacecheck:
-                name = self.apply_replace(name, srcpat, destpat)
+            if self.matchcheck:
+                name = self.apply_match(name, matchpat, replacepat)
             if self.capitalizecheck:
                 name = self.apply_capitalize(name)
             if self.spacecheck:
@@ -342,22 +341,23 @@ class FileOps(object):
             s = re.sub("\W", "", s)
         return s
 
-    def apply_replace(self, s, srcpat, destpat):
-        if not self.replacecheck:
+    def apply_match(self, s, matchpat, replacepat):
+        if not self.matchcheck:
             return s
         # Translate glob to regular expression.
         if not self.regex:
-            srcpat = fnmatch.translate(srcpat)
-            destpat = fnmatch.translate(destpat)
-        srcmatch = re.search(srcpat, s)
-#         if srcmatch:
-#             log.debug("found src: {}.".format(srcmatch.group()))
-        if self.matchonly:
+            matchpat = fnmatch.translate(matchpat)
+            replacepat = fnmatch.translate(replacepat)
+        match = re.search(matchpat, s)
+        if not self.matchreplace:
             return s
-        destmatch = re.search(destpat, s)
-#         if destmatch:
-#             log.debug("found dest: {}.".format(destmatch.group()))
-#         log.debug("{}, {}, {}, {}".format(srcpat, destpat, srcmatch, destmatch))
+        if match:
+            log.debug("found src: {}.".format(match.group()))
+        replace = re.search(replacepat, s)
+        if replace:
+            log.debug("found dest: {}.".format(replace.group()))
+        log.debug("{}, {}, {}, {}".format(matchpat, replacepat,
+                                          match, replace))
 
         # TODO: Two functions: one to convert a glob into a pattern
         # and another to convert one into a replacement.
@@ -474,13 +474,13 @@ class FileOps(object):
         self._varcheck = boolean
 
     @property
-    def matchonly(self):
-        return self._matchonly
+    def replacematch(self):
+        return self._replacematch
 
-    @matchonly.setter
-    def matchonly(self, boolean):
-        log.debug("matchonly: {}".format(boolean))
-        self._matchonly = boolean
+    @replacematch.setter
+    def replacematch(self, boolean):
+        log.debug("replacematch: {}".format(boolean))
+        self._replacematch = boolean
 
     @property
     def accents(self):
@@ -717,13 +717,13 @@ class FileOps(object):
         self._deleteend = index
 
     @property
-    def replacecheck(self):
-        return self._replacecheck
+    def matchcheck(self):
+        return self._matchcheck
 
-    @replacecheck.setter
-    def replacecheck(self, boolean):
-        log.debug("replacecheck: {}".format(boolean))
-        self._replacecheck = boolean
+    @matchcheck.setter
+    def matchcheck(self, boolean):
+        log.debug("matchcheck: {}".format(boolean))
+        self._matchcheck = boolean
 
     @property
     def capitalizecheck(self):
