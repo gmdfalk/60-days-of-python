@@ -117,16 +117,17 @@ class PreviewFileModel(QtGui.QFileSystemModel):
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
-        indexpath = self.filePath(index)
-        if self.p.cwd in indexpath and item.toString() in self.p.targetlist:
+        itempath = self.filePath(index)
+        itemname = item.toString()
+        if self.p.cwd in itempath and itempath in self.p.targetlist:
             idx = self.p.targetlist.index(item.toString())
             try:
                 return self.p.previewlist[idx]
             except IndexError:
-                pass  # Fail silently.
+                return "indexerror"  # FIXME:
 
     def match_preview_depth(self, item, index):
-        """Currently dead."""
+        """Currently unused."""
         par, cidx = index.parent(), self.p.cwdidx
         parents = [par]
         # Create a list of n generations to specify path depth.
@@ -230,22 +231,19 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_preview()
 
     def update_targets(self):
-        if not self.cwd:
+        if self.cwd:
+            self.targetlist = self.fileops.get_targets(self.cwd)
+        else:
             self.targetlist = []
-            return
-        trgts = self.fileops.get_targets(str(self.cwd))
-        self.targetlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
-        print self.targetlist
+        # [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
 
     def update_preview(self):
-        if not self.cwd:
+        if self.cwd:
+            self.previewlist = self.fileops.get_preview(self.targetlist,
+                                                        self.matchpat,
+                                                        self.replacepat)
+        else:
             self.previewlist = []
-            self.update_view()
-            return
-        prvws = self.fileops.get_preview(self.targetlist, self.matchpat,
-                                         self.replacepat)
-        self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
-        print self.previewlist
         self.update_view()
 
     def update_view(self):

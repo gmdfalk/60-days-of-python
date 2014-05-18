@@ -139,29 +139,31 @@ class FileOps(object):
 
         targets = []
         for root, dirs, files in os.walk(path):
+            dirs.sort()
+            files.sort()
             root += "/"
             root = unicode(root, "utf-8")
-            dirs = sorted([unicode(d, "utf-8") for d in dirs])
-            files = sorted([unicode(f, "utf-8") for f in files])
-            if self.dirsonly:
-                target = [[root, d] for d in dirs]
-            elif self.filesonly:
-                target = [[root, f] for f in files]
-            else:
-                target = [[root, d] for d in dirs] + [[root, f] for f in files]
+            dirs = [[root + unicode(d, "utf-8")] for d in dirs]
+            files = [[root, unicode(f, "utf-8")] for f in files]
 
-            # Exclude hidden and explicitly excluded files+dirs.
-            if self.hidden:
-                targets.extend(target)
+            if self.dirsonly:
+                target = dirs
+            elif self.filesonly:
+                target = files
             else:
-                targets.extend(i for i in target if not i[1].startswith("."))
-            # TODO: Implement this correctly (regex/glob?).
+                target = dirs + files
+
+            if self.hidden:
+                target = [i for i in target if not i[1].startswith(".")]
             if self.exclude:
-                targets = [i for i in targets if i not in self.exclude]
+                target = [i for i in target if i not in self.exclude]
+
+            targets.extend(target)
 
             if not self.recursive:
                 break
 
+        print "init targets:", targets
         return targets
 
     def get_preview(self, targets, matchpat=None, replacepat=None):
