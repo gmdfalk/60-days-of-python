@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 """demimove-ui
 
 Usage:
@@ -36,7 +36,6 @@ except ImportError:
     print "ImportError: Please install docopt to use the CLI."
 
 
-
 class BoldDelegate(QtGui.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
@@ -60,17 +59,17 @@ class DirModel(QtGui.QFileSystemModel):
                 if not self.p.autopreview:
                     return
                 fileindex = self.index(index.row(), 0, index.parent())
-                item = self.data(fileindex, role)
-                return self.match_preview(item, fileindex)
+                item = str(self.data(fileindex, role).toString().toUtf8())
+                return self.match_preview(fileindex, item)
 
         return super(DirModel, self).data(index, role)
 
-    def match_preview(self, item, index):
+    def match_preview(self, index, item):
         if not self.p.cwdidx:
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
-        itempath = self.filePath(index)
+        itempath = self.filePath(index).toUtf8()
         if self.p.cwd in itempath and itempath in self.p.joinedtargets:
             idx = self.p.joinedtargets.index(itempath)
             try:
@@ -78,19 +77,19 @@ class DirModel(QtGui.QFileSystemModel):
             except IndexError:
                 pass  # Fail silently.
 
-    def match_preview_depth(self, item, index):
+    def match_preview_depth(self, index, item):
         """Currently unused."""
         par, cidx = index.parent(), self.p.cwdidx
         parents = [par]
         # Create a list of n generations to specify path depth.
         if self.p.fileops.recursive:
-            for i in xrange(16):
+            for i in xrange(5):
                 par = par.parent()
                 parents.append(par)
         if cidx in parents:
-            if item.toString() in self.p.targets:
-                idx = self.p.targets.index(item.toString())
-                return self.p.previews[idx]
+            if item in self.p.nametargets:
+                idx = self.p.nametargets.index(item)
+                return self.p.previews[idx][1]
 
 
 class DirView(QtGui.QTreeView):
@@ -178,9 +177,11 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.cwd:
             self.targets = self.fileops.get_targets(self.cwd)
             self.joinedtargets = ["".join(i) for i in self.targets]
+            self.nametargets = [i[1] + i[2] if len(i) > 2 else i[1] for i in self.targets]
         else:
             self.targets = []
             self.joinedtargets = []
+            self.nametargets = []
 
     def update_preview(self):
         if self.cwd:
@@ -334,7 +335,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_preview()
 
     def on_insertedit(self, text):
-        text = unicode(text).encode("utf-8")
+        text = str(text.toUtf8())
         self.fileops.insertedit = text
         if self.autopreview:
             self.update_preview()
@@ -360,13 +361,13 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_preview()
 
     def on_countpreedit(self, text):
-        text = unicode(text).encode("utf-8")
+        text = str(text.toUtf8())
         self.fileops.countpreedit = text
         if self.autopreview:
             self.update_preview()
 
     def on_countsufedit(self, text):
-        text = unicode(text).encode("utf-8")
+        text = str(text.toUtf8())
         self.fileops.countsufedit = text
         if self.autopreview:
             self.update_preview()
@@ -465,14 +466,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_preview()
 
     def on_matchedit(self, text):
-        text = unicode(text).encode("utf-8")
+        text = str(text.toUtf8())
         self.matchpat = text
         if self.autopreview:
             self.update_targets()
             self.update_preview()
 
     def on_replaceedit(self, text):
-        text = unicode(text).encode("utf-8")
+        text = str(text.toUtf8())
         self.replacepat = text
         if self.autopreview:
             self.update_preview()

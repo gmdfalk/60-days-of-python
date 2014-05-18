@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 # TODO: Exclude option.
 # TODO: Fix count step and count base plus large listings (~i).
 # TODO: Reconcile keepext and not matchreplace.
@@ -140,11 +140,14 @@ class FileOps(object):
 
         targets = []
         # Limit the depth to 3 levels for now.
-        for root, dirs, files in walklevels(path, 3):
+        levels = 2
+        if self.recursive:
+            levels = 1
+        for root, dirs, files in walklevels(path, levels):
             # To unicode.
-            root = unicode(root + "/", "utf-8")
-            dirs = [unicode(d, "utf-8") for d in dirs]
-            files = [unicode(f, "utf-8") for f in files]
+            root = root.decode("utf-8") + "/"
+            dirs = [d.decode("utf-8") for d in dirs]
+            files = [f.decode("utf-8") for f in files]
             # Exclude targets, if necessary.
             if self.hidden:
                 dirs = [i for i in dirs if not i.startswith(".")]
@@ -170,9 +173,6 @@ class FileOps(object):
                 target = dirs + newfiles
 
             targets.extend(target)
-
-            if not self.recursive:
-                break
 
         return targets
 
@@ -659,7 +659,7 @@ class FileOps(object):
     @countpreedit.setter
     def countpreedit(self, text):
         log.debug("countpreedit: {}".format(text))
-        self._countpreedit = text
+        self._countpreedit = text.decode("utf-8")
 
     @property
     def countsufedit(self):
@@ -668,7 +668,7 @@ class FileOps(object):
     @countsufedit.setter
     def countsufedit(self, text):
         log.debug("countsufedit: {}".format(text))
-        self._countsufedit = text
+        self._countsufedit = text.decode("utf-8")
 
     @property
     def insertcheck(self):
@@ -695,7 +695,7 @@ class FileOps(object):
     @insertedit.setter
     def insertedit(self, text):
         log.debug("insertedit: {}.".format(text))
-        self._insertedit = text
+        self._insertedit = text.decode("utf-8")
 
     @property
     def deletecheck(self):
@@ -780,5 +780,7 @@ class FileOps(object):
 
 
 if __name__ == "__main__":
-    fileops = FileOps(hidden=True, recursive=True, keepext=False, regex=False)
-    fileops.get_preview("*.txt", "asdf")
+    fileops = FileOps(hidden=True, recursive=False, keepext=False, regex=False)
+    targets = fileops.get_targets()
+    fileops.get_preview(targets, "*", "asdf")
+
