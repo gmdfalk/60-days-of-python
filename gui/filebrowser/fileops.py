@@ -36,11 +36,11 @@ def configure_logger(loglevel=2, quiet=False):
         logging.disable(logging.ERROR)
 
 
-def walklevels(some_dir, levels=1):
-    some_dir = some_dir.rstrip(os.path.sep)
-    assert os.path.isdir(some_dir)
-    num_sep = some_dir.count(os.path.sep)
-    for root, dirs, files in os.walk(some_dir):
+def walklevels(path, levels=1):
+    path = path.rstrip(os.path.sep)
+    assert os.path.isdir(path)
+    num_sep = path.count(os.path.sep)
+    for root, dirs, files in os.walk(path):
         yield root, dirs, files
         num_sep_this = root.count(os.path.sep)
         if num_sep + levels <= num_sep_this:
@@ -143,18 +143,12 @@ class FileOps(object):
             root = unicode(root, "utf-8")
             dirs = sorted([unicode(d, "utf-8") for d in dirs])
             files = sorted([unicode(f, "utf-8") for f in files])
-            # Dirs only.
             if self.dirsonly:
                 target = [[root, d] for d in dirs]
-            # Files only.
+            elif self.filesonly:
+                target = [[root, f] for f in files]
             else:
-                target = []
-                for f in files:
-                    fname, ext = os.path.splitext(f)
-                    target.append([root, fname, ext])
-            # Both dirs and files.
-            if not self.filesonly or not self.dirsonly:
-                target = [[root, d] for d in dirs] + target
+                target = [[root, d] for d in dirs] + [[root, f] for f in files]
 
             # Exclude hidden and explicitly excluded files+dirs.
             if self.hidden:
@@ -182,8 +176,9 @@ class FileOps(object):
                 replacepat = ".*"
         if self.mediamode:
             self.set_mediaoptions()
-
+        print "before", targets
         joinedtargets = deepcopy(self.joinext(targets))
+        print "after", joinedtargets
         previews = self.modify_targets(joinedtargets, matchpat, replacepat)
 
         return previews

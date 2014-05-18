@@ -337,6 +337,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_hiddencheck(self, checked):
         self.fileops.hidden = checked
         if self.autopreview:
+            self.update_targets()
             self.update_preview()
 
     def on_mirrorcheck(self, checked):
@@ -347,6 +348,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
     def on_recursivecheck(self, checked):
         self.fileops.recursive = checked
         if self.autopreview:
+            self.update_targets()
             self.update_preview()
 
     def on_autostopcheck(self, checked):
