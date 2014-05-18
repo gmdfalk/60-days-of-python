@@ -1,6 +1,7 @@
 # encoding: utf-8
 # TODO: Exclude option
 # TODO: Fix count (~i)
+# TODO: Recursive depth
 import fnmatch
 import logging
 import os

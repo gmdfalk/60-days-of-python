@@ -120,25 +120,26 @@ class PreviewFileModel(QtGui.QFileSystemModel):
         if self.p.autopreview:
             if not self._cwdidx:
                 return
-#             idx = self._cwdidx
-#             for i in range(self.rowCount(idx)):
-#                 child = idx.child(i, idx.column())
-#                 if child == index:
-#                     if item.toString() in self.p.targetlist:
-#                         pidx = self.p.targetlist.index(item.toString())
-#                         return self.p.previewlist[pidx]
-            par, cidx = index.parent(), self._cwdidx
-            if par == cidx or par.parent() == cidx or par.parent().parent() == cidx:
-                if item.toString() in self.p.targetlist:
-                        idx = self.p.targetlist.index(item.toString())
-                        return self.p.previewlist[idx]
+            return self.match_preview_alt(item, index)
 
-#     QModelIndexList Items = model->match(
-#                 model->index(0, 0),
-#                 Qt::DisplayRole,
-#                 QVariant.fromValue(item),
-#                 2, // look *
-#                 Qt::MatchRecursive); // look *
+    def match_preview(self, item, index):
+        par, cidx = index.parent(), self._cwdidx
+        parents = [par]
+        if self.p.fileops.recursive:
+            for i in xrange(16):
+                par = par.parent()
+                parents.append(par)
+        if cidx in parents:
+            if item.toString() in self.p.targetlist:
+                idx = self.p.targetlist.index(item.toString())
+                return self.p.previewlist[idx]
+
+    def match_preview_alt(self, item, index):
+        d = self.filePath(index)
+        if self._cwd in d and item.toString() in self.p.targetlist:
+            idx = self.p.targetlist.index(item.toString())
+            return self.p.previewlist[idx]
+
 
 class DemiMoveGUI(QtGui.QMainWindow):
 
