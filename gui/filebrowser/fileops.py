@@ -139,7 +139,8 @@ class FileOps(object):
             path = os.getcwd()
 
         targets = []
-        for root, dirs, files in os.walk(path):
+        # Limit the depth to 3 levels for now.
+        for root, dirs, files in walklevels(path, 3):
             # To unicode.
             root = unicode(root + "/", "utf-8")
             dirs = [unicode(d, "utf-8") for d in dirs]
@@ -237,10 +238,12 @@ class FileOps(object):
 
         modified = []
         for preview in previews:
-            if self.remext or self.keepext:
-                name = preview[1]
-            else:
-                name = preview[1] + preview[2]
+            name = preview[1]
+            if not self.remext and not self.keepext:
+                try:
+                    name += preview[2]
+                except IndexError:
+                    pass
 #             print name
             if self.matchcheck:
                 name = self.apply_match(name, matchpat, replacepat)

@@ -528,29 +528,16 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="statustab">
-        <attribute name="title">
-         <string>Status</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="statuslayout">
-         <property name="margin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QTableView" name="statustable"/>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="historytab">
         <attribute name="title">
          <string>History</string>
         </attribute>
-        <layout class="QHBoxLayout" name="historylayout">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <property name="margin">
           <number>4</number>
          </property>
          <item>
-          <widget class="QTableView" name="historytable">
+          <widget class="QTreeView" name="historytree">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;History Tab (NYI)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
@@ -1045,38 +1032,6 @@
     <hint type="destinationlabel">
      <x>212</x>
      <y>478</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>extensioncheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>removeextensionscheck</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>252</x>
-     <y>529</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>212</x>
-     <y>418</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>removeextensionscheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>extensioncheck</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>212</x>
-     <y>418</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>252</x>
-     <y>529</y>
     </hint>
    </hints>
   </connection>
