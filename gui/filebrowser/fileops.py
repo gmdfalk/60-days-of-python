@@ -139,12 +139,20 @@ class FileOps(object):
 
         targets = []
         for root, dirs, files in os.walk(path):
+            # To unicode.
+            root = unicode(root + "/", "utf-8")
+            dirs = [unicode(d, "utf-8") for d in dirs]
+            files = [unicode(f, "utf-8") for f in files]
+            # Exclude targets, if necessary.
+            if self.hidden:
+                dirs = [i for i in dirs if not i.startswith(".")]
+                files = [i for i in files if not i.startswith(".")]
+            if self.exclude:
+                dirs = [i for i in dirs if i not in self.exclude]
+                files = [i for i in files if i not in self.exclude]
+
             dirs.sort()
             files.sort()
-            root += "/"
-            root = unicode(root, "utf-8")
-            dirs = [[root + unicode(d, "utf-8")] for d in dirs]
-            files = [[root, unicode(f, "utf-8")] for f in files]
 
             if self.dirsonly:
                 target = dirs
@@ -153,17 +161,11 @@ class FileOps(object):
             else:
                 target = dirs + files
 
-            if self.hidden:
-                target = [i for i in target if not i[1].startswith(".")]
-            if self.exclude:
-                target = [i for i in target if i not in self.exclude]
-
-            targets.extend(target)
+            targets.extend([root + i for i in target])
 
             if not self.recursive:
                 break
 
-        print "init targets:", targets
         return targets
 
     def get_preview(self, targets, matchpat=None, replacepat=None):
@@ -178,10 +180,9 @@ class FileOps(object):
                 replacepat = ".*"
         if self.mediamode:
             self.set_mediaoptions()
-        print "before", targets
-        joinedtargets = deepcopy(self.joinext(targets))
-        print "after", joinedtargets
-        previews = self.modify_targets(joinedtargets, matchpat, replacepat)
+
+        newtargets = self.prepare_targets(deepcopy(targets))
+        previews = self.modify_targets(newtargets, matchpat, replacepat)
 
         return previews
 #         matches = self.match_targets(targets, expression)
@@ -236,8 +237,9 @@ class FileOps(object):
     def modify_targets(self, previews, matchpat, replacepat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
-            countlen = len(str(len(previews)))
-            countrange = range(self.countbase, len(previews) + 1, self.countstep)
+            lenp, base, step = len(previews), self.countbase, self.countstep
+            countlen = len(str(lenp))
+            countrange = range(base, lenp * step + 1, step)
             if self.countfill:
                 count = (str(i).rjust(countlen, "0") for i in countrange)
             else:
