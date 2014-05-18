@@ -117,10 +117,10 @@ class PreviewFileModel(QtGui.QFileSystemModel):
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
+
         itempath = self.filePath(index)
-        itemname = item.toString()
-        if self.p.cwd in itempath and itempath in self.p.targetlist:
-            idx = self.p.targetlist.index(item.toString())
+        if self.p.cwd in itempath and itempath in self.p.joinedtargets:
+            idx = self.p.targets.index(itempath)
             try:
                 return self.p.previewlist[idx]
             except IndexError:
@@ -136,8 +136,8 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 par = par.parent()
                 parents.append(par)
         if cidx in parents:
-            if item.toString() in self.p.targetlist:
-                idx = self.p.targetlist.index(item.toString())
+            if item.toString() in self.p.targets:
+                idx = self.p.targets.index(item.toString())
                 return self.p.previewlist[idx]
 
 
@@ -153,7 +153,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self._matchpat = ""  # Pattern to search for in files/dirs.
         self._replacepat = ""  # Pattern to replace above found matches with.
         self.previewlist = []
-        self.targetlist = []
+        self.targets = []
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -232,14 +232,15 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def update_targets(self):
         if self.cwd:
-            self.targetlist = self.fileops.get_targets(self.cwd)
+            self.targets = self.fileops.get_targets(self.cwd)
+            self.joinedtargets = ["".join(i) for i in self.targets]
         else:
-            self.targetlist = []
-        # [i[1] + i[2] if len(i) > 2 else i[1] for i in trgts]
+            self.targets = []
+            self.joinedtargets = []
 
     def update_preview(self):
         if self.cwd:
-            self.previewlist = self.fileops.get_preview(self.targetlist,
+            self.previewlist = self.fileops.get_preview(self.targets,
                                                         self.matchpat,
                                                         self.replacepat)
         else:

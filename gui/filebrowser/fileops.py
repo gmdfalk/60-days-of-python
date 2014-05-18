@@ -1,8 +1,8 @@
 # encoding: utf-8
 # TODO: Exclude option
 # TODO: Fix count step and count base plus large listings (~i).
-from copy import deepcopy
 from unicodedata import normalize, category
+import copy
 import fnmatch
 import logging
 import os
@@ -153,15 +153,21 @@ class FileOps(object):
 
             dirs.sort()
             files.sort()
+            dirs = [[root, i] for i in dirs]
+
+            newfiles = []
+            for i in files:
+                fname, ext = os.path.splitext(i)
+                newfiles.append([root, fname, ext])
 
             if self.dirsonly:
                 target = dirs
             elif self.filesonly:
-                target = files
+                target = newfiles
             else:
-                target = dirs + files
+                target = dirs + newfiles
 
-            targets.extend([root + i for i in target])
+            targets.extend(target)
 
             if not self.recursive:
                 break
@@ -181,13 +187,11 @@ class FileOps(object):
         if self.mediamode:
             self.set_mediaoptions()
 
-        newtargets = self.prepare_targets(deepcopy(targets))
-        previews = self.modify_targets(newtargets, matchpat, replacepat)
+        split = self.split_previews(copy.deepcopy(targets))
+        modified = self.modify_previews(split, matchpat, replacepat)
+        finalpreviews = self.join_previews(modified)
 
-        return previews
-#         matches = self.match_targets(targets, expression)
-#         print matches
-        # [i for i, j in zip(a, b) if i != j]
+        return finalpreviews
 
     def set_mediaoptions(self):
         self.capitalizecheck = True
@@ -209,7 +213,25 @@ class FileOps(object):
         if action is None:
             action = self.history.pop()
 
-    def joinext(self, targets):
+    def match(self, matchpat, target):
+        """Searches target for pattern and returns a bool."""
+        if self.regex:
+            if re.search(matchpat, target):
+                return True
+        else:
+            if fnmatch.fnmatch(target, matchpat):
+                return True
+        return False
+
+    def split_previews(self, previews):
+        """Joins a list of targets into [root, name+ ext] per item."""
+        for i in previews:
+            root = os.path.dirname(i)
+            if os.path.isdir(i):
+                name, ext = os.path.splitext(i)
+#             elif os.path.isdir(i)
+
+    def join_previews(self, previews):
         """Joins a list of targets into [root, name+ ext] per item."""
         if self.keepext:
             return targets
@@ -224,17 +246,7 @@ class FileOps(object):
 
         return joinedtargets
 
-    def match(self, matchpat, target):
-        """Searches target for pattern and returns a bool."""
-        if self.regex:
-            if re.search(matchpat, target):
-                return True
-        else:
-            if fnmatch.fnmatch(target, matchpat):
-                return True
-        return False
-
-    def modify_targets(self, previews, matchpat, replacepat):
+    def modify_previews(self, previews, matchpat, replacepat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             lenp, base, step = len(previews), self.countbase, self.countstep
@@ -246,7 +258,7 @@ class FileOps(object):
                 count = (str(i) for i in countrange)
 
         for preview in previews:
-            name = preview[1]
+            name = preview[2]
 #             print name
             if self.matchcheck:
                 name = self.apply_match(name, matchpat, replacepat)
@@ -266,7 +278,7 @@ class FileOps(object):
             if self.insertcheck:
                 name = self.apply_insert(name)
 
-            preview[1] = name
+            preview[2] = name
 
         return previews
 
