@@ -81,7 +81,7 @@ def main():
                       quiet=args["--quiet"],
                       verbosity=args["-v"])
     targets = fileops.get_targets(args["--path"])
-    fileops.get_preview(targets, args["<source>"], args["<target>"])
+    fileops.get_previews(targets, args["<source>"], args["<target>"])
 
 
 if __name__ == "__main__":

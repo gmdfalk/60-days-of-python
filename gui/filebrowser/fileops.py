@@ -115,6 +115,7 @@ class FileOps(object):
         self._matchreplace = True
         self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
+        self._recursivedepth = 1
 
         # Create the logger.
         configure_logger(verbosity, quiet)
@@ -139,25 +140,28 @@ class FileOps(object):
             path = os.getcwd()
 
         targets = []
-        # Limit the depth to 3 levels for now.
-        levels = 2
+
+        # Determine recursion depth.
+        levels = 0
         if self.recursive:
-            levels = 1
+            levels = self.recursivedepth
+        print levels
         for root, dirs, files in walklevels(path, levels):
             # To unicode.
             root = root.decode("utf-8") + "/"
             dirs = [d.decode("utf-8") for d in dirs]
             files = [f.decode("utf-8") for f in files]
             # Exclude targets, if necessary.
-            if self.hidden:
+            if not self.hidden:
                 dirs = [i for i in dirs if not i.startswith(".")]
                 files = [i for i in files if not i.startswith(".")]
             if self.exclude:
                 dirs = [i for i in dirs if i not in self.exclude]
                 files = [i for i in files if i not in self.exclude]
 
-            dirs.sort()
-            files.sort()
+            # TODO: remove/fix sort for count?
+#             dirs.sort()
+#             files.sort()
             dirs = [[root, i] for i in dirs]
 
             newfiles = []
@@ -176,7 +180,7 @@ class FileOps(object):
 
         return targets
 
-    def get_preview(self, targets, matchpat=None, replacepat=None):
+    def get_previews(self, targets, matchpat=None, replacepat=None):
         """Simulate rename operation on targets and return results as list."""
         if not matchpat:
             matchpat = "*"
@@ -189,10 +193,7 @@ class FileOps(object):
         if self.mediamode:
             self.set_mediaoptions()
 
-        print "before:", targets
-        previews = self.modify_previews(deepcopy(targets), matchpat, replacepat)
-        print "after:", previews
-        return previews
+        return self.modify_previews(deepcopy(targets), matchpat, replacepat)
 
     def set_mediaoptions(self):
         self.capitalizecheck = True
@@ -251,23 +252,24 @@ class FileOps(object):
                 name = self.apply_capitalize(name)
             if self.spacecheck:
                 name = self.apply_space(name)
-            if self.countcheck:
-                try:
-                    name = self.apply_count(name, count.next())
-                except StopIteration:
-                    pass
             if self.deletecheck:
                 name = self.apply_delete(name)
             if self.removecheck:
                 name = self.apply_remove(name)
             if self.insertcheck:
                 name = self.apply_insert(name)
+            if self.countcheck:
+                try:
+                    name = self.apply_count(name, count.next())
+                except StopIteration:
+                    pass
 
             if self.keepext:
                 try:
                     name += preview[2]
                 except IndexError:
                     pass
+
             modified.append(name)
 
         previews = [[i[0], i[1] + i[2]] if len(i) > 2 else i for i in previews]
@@ -386,7 +388,7 @@ class FileOps(object):
     def dirsonly(self, boolean):
         log.debug("dirsonly: {}".format(boolean))
         self._dirsonly = boolean
-        if self.dirsonly:
+        if boolean:
             self.filesonly = False
 
     @property
@@ -397,7 +399,7 @@ class FileOps(object):
     def filesonly(self, boolean):
         log.debug("filesonly: {}".format(boolean))
         self._filesonly = boolean
-        if self.filesonly:
+        if boolean:
             self.dirsonly = False
 
     @property
@@ -408,6 +410,15 @@ class FileOps(object):
     def recursive(self, boolean):
         log.debug("recursive: {}".format(boolean))
         self._recursive = boolean
+
+    @property
+    def recursivedepth(self):
+        return self._recursivedepth
+
+    @recursivedepth.setter
+    def recursivedepth(self, num):
+        log.debug("recursivedepth: {}".format(num))
+        self._recursivedepth = num
 
     @property
     def hidden(self):
@@ -782,5 +793,5 @@ class FileOps(object):
 if __name__ == "__main__":
     fileops = FileOps(hidden=True, recursive=False, keepext=False, regex=False)
     targets = fileops.get_targets()
-    fileops.get_preview(targets, "*", "asdf")
+    fileops.get_previews(targets, "*", "asdf")
 

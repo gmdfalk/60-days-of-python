@@ -18,6 +18,7 @@ Options:
 # FIXME: Switching between dirs/files/both destroys CWD marker.
 #        Fixed temporariliy by commenting filter changes.
 # FIXME: Fix performance on many files (recursive)?
+# TODO: Use QFileSystemModels listing insteada of fileops.get_targets()
 import logging
 import os
 import sys
@@ -178,12 +179,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.cwd:
             self.targets = self.fileops.get_targets(self.cwd)
             self.joinedtargets = ["".join(i) for i in self.targets]
+            self.statusbar.showMessage("Found {} targets in {}."
+                                       .format(len(self.targets), self.cwd))
         else:
             self.targets, self.joinedtargets = [], []
 
     def update_preview(self):
         if self.cwd:
-            self.previews = self.fileops.get_preview(self.targets, self.matchpat,
+            self.previews = self.fileops.get_previews(self.targets, self.matchpat,
                                                      self.replacepat)
         else:
             self.previews = []
@@ -213,6 +216,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.hiddencheck.toggled.connect(self.on_hiddencheck)
         self.mirrorcheck.toggled.connect(self.on_mirrorcheck)
         self.recursivecheck.toggled.connect(self.on_recursivecheck)
+        self.recursivedepth.valueChanged.connect(self.on_recursivedepth)
 
         # Match options:
         self.matchcheck.toggled.connect(self.on_matchcheck)
@@ -290,6 +294,12 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_recursivecheck(self, checked):
         self.fileops.recursive = checked
+        if self.autopreview:
+            self.update_targets()
+            self.update_preview()
+
+    def on_recursivedepth(self, num):
+        self.fileops.recursivedepth = int(num)
         if self.autopreview:
             self.update_targets()
             self.update_preview()

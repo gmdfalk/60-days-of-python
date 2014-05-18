@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
-    <height>607</height>
+    <width>909</width>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -603,6 +603,16 @@
              </widget>
             </item>
             <item>
+             <widget class="QSpinBox" name="recursivedepth">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QRadioButton" name="dirsradio">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only edit dirs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1032,6 +1042,22 @@
     <hint type="destinationlabel">
      <x>212</x>
      <y>478</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>recursivecheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>recursivedepth</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>625</x>
+     <y>544</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>699</x>
+     <y>545</y>
     </hint>
    </hints>
   </connection>
