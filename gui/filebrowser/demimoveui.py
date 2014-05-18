@@ -64,12 +64,13 @@ class DirModel(QtGui.QFileSystemModel):
 
         return super(DirModel, self).data(index, role)
 
-    def match_preview(self, index, item):
+    def match_preview(self, index, *args):
         if not self.p.cwdidx:
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
-        itempath = self.filePath(index).toUtf8()
+        itempath = str(self.filePath(index).toUtf8())
+        print itempath, type(itempath), itempath in self.p.joinedtargets
         if self.p.cwd in itempath and itempath in self.p.joinedtargets:
             idx = self.p.joinedtargets.index(itempath)
             try:
@@ -168,6 +169,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def keyPressEvent(self, e):
         "Overloaded to connect return key to self.set_cwd()."
+        # TODO: Move this to TreeView only.
         if e.key() == QtCore.Qt.Key_Return:
             self.set_cwd()
             self.update_targets()
@@ -177,11 +179,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.cwd:
             self.targets = self.fileops.get_targets(self.cwd)
             self.joinedtargets = ["".join(i) for i in self.targets]
-            self.nametargets = [i[1] + i[2] if len(i) > 2 else i[1] for i in self.targets]
         else:
-            self.targets = []
-            self.joinedtargets = []
-            self.nametargets = []
+            self.targets, self.joinedtargets = [], []
 
     def update_preview(self):
         if self.cwd:
