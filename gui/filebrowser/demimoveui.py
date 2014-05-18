@@ -45,14 +45,14 @@ class BoldDelegate(QtGui.QStyledItemDelegate):
         super(BoldDelegate, self).paint(painter, option, index)
 
 
-class PreviewFileModel(QtGui.QFileSystemModel):
+class DirModel(QtGui.QFileSystemModel):
 
     def __init__(self, parent=None):
-        super(PreviewFileModel, self).__init__(parent)
+        super(DirModel, self).__init__(parent)
         self.p = parent
 
     def columnCount(self, parent=QtCore.QModelIndex()):
-        return super(PreviewFileModel, self).columnCount() + 1
+        return super(DirModel, self).columnCount() + 1
 
     def data(self, index, role):
         if index.column() == self.columnCount() - 1:
@@ -63,7 +63,7 @@ class PreviewFileModel(QtGui.QFileSystemModel):
                 item = self.data(fileindex, role)
                 return self.match_preview(item, fileindex)
 
-        return super(PreviewFileModel, self).data(index, role)
+        return super(DirModel, self).data(index, role)
 
     def match_preview(self, item, index):
         if not self.p.cwdidx:
@@ -91,6 +91,10 @@ class PreviewFileModel(QtGui.QFileSystemModel):
             if item.toString() in self.p.targets:
                 idx = self.p.targets.index(item.toString())
                 return self.p.previews[idx]
+
+
+class DirView(QtGui.QTreeView):
+    pass
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -126,7 +130,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.statusbar.showMessage("Select a directory and press Enter.")
 
     def create_browser(self, startdir):
-        self.dirmodel = PreviewFileModel(self)
+        self.dirmodel = DirModel(self)
         # TODO: With readOnly disabled we can use setData for renaming.
         self.dirmodel.setReadOnly(False)
         self.dirmodel.setRootPath("/")
@@ -134,16 +138,16 @@ class DemiMoveGUI(QtGui.QMainWindow):
                                     QtCore.QDir.NoDotAndDotDot |
                                     QtCore.QDir.Hidden)
 
-        self.dirtree.setModel(self.dirmodel)
-        self.dirtree.setColumnHidden(2, True)
-        self.dirtree.header().swapSections(4, 1)
-        self.dirtree.header().resizeSection(0, 300)
-        self.dirtree.header().resizeSection(4, 300)
-        self.dirtree.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
-        self.dirtree.setItemDelegate(BoldDelegate(self))
+        self.dirview.setModel(self.dirmodel)
+        self.dirview.setColumnHidden(2, True)
+        self.dirview.header().swapSections(4, 1)
+        self.dirview.header().resizeSection(0, 300)
+        self.dirview.header().resizeSection(4, 300)
+        self.dirview.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
+        self.dirview.setItemDelegate(BoldDelegate(self))
 
         index = self.dirmodel.index(startdir)
-        self.dirtree.setCurrentIndex(index)
+        self.dirview.setCurrentIndex(index)
 
     def create_historytab(self):
         self.historymodel = history.HistoryTreeModel(parent=self)
@@ -151,16 +155,16 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def set_cwd(self):
         "Set the current working directory for renaming actions."
-        index = self.dirtree.currentIndex()
+        index = self.dirview.currentIndex()
         path = self.dirmodel.filePath(index)
         if self.cwd and path == self.cwd:
-            self.dirtree.setExpanded(self.cwdidx, False)
+            self.dirview.setExpanded(self.cwdidx, False)
             self.cwd = ""
             self.cwdidx = None
         elif path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
-            self.dirtree.setExpanded(self.cwdidx, True)
+            self.dirview.setExpanded(self.cwdidx, True)
         self.update_single_index(index)
 
     def keyPressEvent(self, e):
@@ -187,7 +191,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.update_view()
 
     def update_view(self):
-        m, v = self.dirmodel, self.dirtree
+        m, v = self.dirmodel, self.dirview
         r = v.rect()
         m.dataChanged.emit(v.indexAt(r.topLeft()), v.indexAt(r.bottomRight()))
 

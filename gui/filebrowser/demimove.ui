@@ -557,7 +557,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QTreeView" name="dirtree"/>
+           <widget class="QTreeView" name="dirview"/>
           </item>
          </layout>
         </item>
