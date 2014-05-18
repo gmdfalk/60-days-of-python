@@ -1,8 +1,9 @@
 # encoding: utf-8
-# TODO: Exclude option
+# TODO: Exclude option.
 # TODO: Fix count step and count base plus large listings (~i).
+# TODO: Reconcile keepext and not matchreplace.
+from copy import deepcopy
 from unicodedata import normalize, category
-import copy
 import fnmatch
 import logging
 import os
@@ -187,11 +188,10 @@ class FileOps(object):
         if self.mediamode:
             self.set_mediaoptions()
 
-        split = self.split_previews(copy.deepcopy(targets))
-        modified = self.modify_previews(split, matchpat, replacepat)
-        finalpreviews = self.join_previews(modified)
-
-        return finalpreviews
+        print "before:", targets
+        previews = self.modify_previews(deepcopy(targets), matchpat, replacepat)
+        print "after:", previews
+        return previews
 
     def set_mediaoptions(self):
         self.capitalizecheck = True
@@ -223,30 +223,8 @@ class FileOps(object):
                 return True
         return False
 
-    def split_previews(self, previews):
-        """Joins a list of targets into [root, name+ ext] per item."""
-        for i in previews:
-            root = os.path.dirname(i)
-            if os.path.isdir(i):
-                name, ext = os.path.splitext(i)
-#             elif os.path.isdir(i)
-
-    def join_previews(self, previews):
-        """Joins a list of targets into [root, name+ ext] per item."""
-        if self.keepext:
-            return targets
-
-        joinedtargets = []
-        for i in targets:
-            if len(i) > 2 and not self.remext:
-                i = [i[0], i[1] + i[2]]
-            else:
-                i = [i[0], i[1]]
-            joinedtargets.append(i)
-
-        return joinedtargets
-
     def modify_previews(self, previews, matchpat, replacepat):
+        # root, name, ext
         # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             lenp, base, step = len(previews), self.countbase, self.countstep
@@ -257,8 +235,12 @@ class FileOps(object):
             else:
                 count = (str(i) for i in countrange)
 
+        modified = []
         for preview in previews:
-            name = preview[2]
+            if self.remext or self.keepext:
+                name = preview[1]
+            else:
+                name = preview[1] + preview[2]
 #             print name
             if self.matchcheck:
                 name = self.apply_match(name, matchpat, replacepat)
@@ -278,9 +260,16 @@ class FileOps(object):
             if self.insertcheck:
                 name = self.apply_insert(name)
 
-            preview[2] = name
+            if self.keepext:
+                try:
+                    name += preview[2]
+                except IndexError:
+                    pass
+            modified.append(name)
 
-        return previews
+        previews = [[i[0], i[1] + i[2]] if len(i) > 2 else i for i in previews]
+
+        return zip(previews, modified)
 
     def apply_space(self, s):
         if not self.spacecheck:

@@ -105,10 +105,11 @@ class PreviewFileModel(QtGui.QFileSystemModel):
     def data(self, index, role):
         if index.column() == self.columnCount() - 1:
             if role == QtCore.Qt.DisplayRole:
+                if not self.p.autopreview:
+                    return
                 fileindex = self.index(index.row(), 0, index.parent())
                 item = self.data(fileindex, role)
-                if self.p.autopreview:
-                    return self.match_preview(item, fileindex)
+                return self.match_preview(item, fileindex)
 
         return super(PreviewFileModel, self).data(index, role)
 
@@ -117,12 +118,11 @@ class PreviewFileModel(QtGui.QFileSystemModel):
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
-
         itempath = self.filePath(index)
         if self.p.cwd in itempath and itempath in self.p.joinedtargets:
-            idx = self.p.targets.index(itempath)
+            idx = self.p.joinedtargets.index(itempath)
             try:
-                return self.p.previewlist[idx]
+                return self.p.previewlist[idx][1]
             except IndexError:
                 return "indexerror"  # FIXME:
 

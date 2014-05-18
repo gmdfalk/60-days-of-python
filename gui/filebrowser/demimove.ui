@@ -1048,5 +1048,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>extensioncheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>removeextensionscheck</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>529</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>212</x>
+     <y>418</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removeextensionscheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>extensioncheck</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>212</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>529</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
