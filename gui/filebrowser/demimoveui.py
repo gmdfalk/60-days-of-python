@@ -149,8 +149,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self._autopreview = True
         self._cwd = ""
         self._cwdidx = None
-        self._matchedit = ""  # Pattern to search for in files/dirs.
-        self._replaceedit = ""  # Pattern to replace above found matches with.
+        self._matchpat = ""  # Pattern to search for in files/dirs.
+        self._replacepat = ""  # Pattern to replace above found matches with.
         self.previewlist = []
         self.targetlist = []
         self.fileops = fileops
@@ -242,9 +242,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.previewlist = []
             self.update_view()
             return
-        prvws = self.fileops.get_preview(self.targetlist,
-                                         str(self.matchedit.text),
-                                         str(self.replaceedit.text))
+        prvws = self.fileops.get_preview(self.targetlist, self.matchpat,
+                                         self.replacepat)
         self.previewlist = [i[1] + i[2] if len(i) > 2 else i[1] for i in prvws]
         print self.previewlist
         self.update_view()
@@ -276,7 +275,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
         # Match options:
         self.matchcheck.toggled.connect(self.on_matchcheck)
-        self.matchcase.toggled.connect(self.on_matchcase)
+        self.matchignorecase.toggled.connect(self.on_matchignorecase)
         self.matchglob.toggled.connect(self.on_matchglob)
         self.matchreplace.toggled.connect(self.on_matchreplace)
         self.matchregex.toggled.connect(self.on_matchregex)
@@ -358,7 +357,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.autopreview:
             self.update_preview()
 
-    def on_matchcase(self, checked):
+    def on_matchignorecase(self, checked):
         self.fileops.ignorecase = checked
         if self.autopreview:
             self.update_preview()
@@ -519,14 +518,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_matchedit(self, text):
         text = unicode(text).encode("utf-8")
-        self.matchedit = text
+        self.matchpat = text
         if self.autopreview:
             self.update_targets()
             self.update_preview()
 
     def on_replaceedit(self, text):
         text = unicode(text).encode("utf-8")
-        self.replaceedit = text
+        self.replacepat = text
         if self.autopreview:
             self.update_preview()
 
@@ -566,11 +565,12 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     @cwd.setter
     def cwd(self, path):
+        path = str(path)
         # Exit out if dir is not a valid target.
         self._cwd = path
-        log.debug("cwd: {}".format(self._cwd))
-        if self._cwd:
-            self.statusbar.showMessage("Root is now {}.".format(self._cwd))
+        log.debug("cwd: {}".format(path))
+        if path:
+            self.statusbar.showMessage("Root is now {}.".format(path))
         else:
             self.statusbar.showMessage("No root set.")
 
@@ -601,22 +601,22 @@ class DemiMoveGUI(QtGui.QMainWindow):
         log.debug("autopreview: {}".format(boolean))
 
     @property
-    def matchedit(self):
-        return self._matchedit
+    def matchpat(self):
+        return self._matchpat
 
-    @matchedit.setter
-    def matchedit(self, text):
-        log.debug("matchedit: {}.".format(text))
-        self._matchedit = text
+    @matchpat.setter
+    def matchpat(self, text):
+        log.debug("matchpat: {}".format(text))
+        self._matchpat = str(text)
 
     @property
-    def replaceedit(self):
-        return self._replaceedit
+    def replacepat(self):
+        return self._replacepat
 
-    @replaceedit.setter
-    def replaceedit(self, text):
-        log.debug("replaceedit: {}.".format(text))
-        self._replaceedit = text
+    @replacepat.setter
+    def replacepat(self, text):
+        log.debug("replacepat: {}".format(text))
+        self._replacepat = str(text)
 
 
 def main():

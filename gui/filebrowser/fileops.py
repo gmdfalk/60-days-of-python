@@ -111,7 +111,7 @@ class FileOps(object):
         self._deletestart = 0  # Start index of deletion sequence.
         self._deleteend = 1  # End index of deletion sequence.
         self._matchcheck = True  # Whether to apply source/target patterns.
-        self._matchonly = False
+        self._matchreplace = True
         self._removecheck = False
         self._varcheck = False  # Whether to apply various options (accents).
 
@@ -342,6 +342,7 @@ class FileOps(object):
         return s
 
     def apply_match(self, s, matchpat, replacepat):
+        return s
         if not self.matchcheck:
             return s
         # Translate glob to regular expression.
@@ -349,19 +350,23 @@ class FileOps(object):
             matchpat = fnmatch.translate(matchpat)
             replacepat = fnmatch.translate(replacepat)
         match = re.search(matchpat, s)
-        if not self.matchreplace:
+#         if match:
+#             log.debug("found src: {}.".format(match.group()))
+        if not match:
             return s
-        if match:
-            log.debug("found src: {}.".format(match.group()))
-        replace = re.search(replacepat, s)
-        if replace:
-            log.debug("found dest: {}.".format(replace.group()))
-        log.debug("{}, {}, {}, {}".format(matchpat, replacepat,
+        if not self.matchreplace:
+            result = match.group()
+        else:
+            replace = re.search(replacepat, s)
+            if replace:
+                log.debug("found dest: {}.".format(replace.group()))
+            log.debug("{}, {}, {}, {}".format(matchpat, replacepat,
                                           match, replace))
+            result = replace.group()
 
         # TODO: Two functions: one to convert a glob into a pattern
         # and another to convert one into a replacement.
-        return s
+        return result
 
     def apply_various(self, s):
         if not self.varcheck:
@@ -724,6 +729,15 @@ class FileOps(object):
     def matchcheck(self, boolean):
         log.debug("matchcheck: {}".format(boolean))
         self._matchcheck = boolean
+
+    @property
+    def matchreplace(self):
+        return self._matchreplace
+
+    @matchreplace.setter
+    def matchreplace(self, boolean):
+        log.debug("matchreplace: {}".format(boolean))
+        self._matchreplace = boolean
 
     @property
     def capitalizecheck(self):

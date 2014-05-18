@@ -73,8 +73,7 @@ def main():
                       countpos=args["--count"],
                       mediamode=args["--media"],
                       accents=args["--accents"],
-                      lower=args["--lower"],
-                      upper=args["--upper"],
+                      # TODO: capitalizemode, spacemode
                       remdups=args["--duplicates"],
                       remext=args["--remext"],
                       remnonwords=args["--no-wordchars"],
