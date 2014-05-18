@@ -80,7 +80,8 @@ def main():
                       remnonwords=args["--no-wordchars"],
                       quiet=args["--quiet"],
                       verbosity=args["-v"])
-    fileops.stage(args["<source>"], args["<target>"], args["--path"])
+    targets = fileops.get_targets(args["--path"])
+    fileops.get_preview(targets, args["<source>"], args["<target>"])
 
 
 if __name__ == "__main__":

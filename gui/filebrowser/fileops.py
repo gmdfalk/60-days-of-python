@@ -2,13 +2,13 @@
 # TODO: Exclude option
 # TODO: Fix count (~i)
 # TODO: os.walk depth
+from copy import deepcopy
+from unicodedata import normalize, category
 import fnmatch
 import logging
 import os
 import re
 import sys
-from unicodedata import normalize, category
-from copy import deepcopy
 
 
 log = logging.getLogger("fileops")
@@ -35,6 +35,17 @@ def configure_logger(loglevel=2, quiet=False):
     if quiet:
         log.info("Quiet mode: logging disabled.")
         logging.disable(logging.ERROR)
+
+
+def walklevels(some_dir, levels=1):
+    some_dir = some_dir.rstrip(os.path.sep)
+    assert os.path.isdir(some_dir)
+    num_sep = some_dir.count(os.path.sep)
+    for root, dirs, files in os.walk(some_dir):
+        yield root, dirs, files
+        num_sep_this = root.count(os.path.sep)
+        if num_sep + levels <= num_sep_this:
+            del dirs[:]
 
 
 class FileOps(object):
@@ -122,28 +133,61 @@ class FileOps(object):
     def restore_options(self):
         self.set_options(**self.defaultopts)
 
-    def stage(self, path=None, srcpat=None, destpat=None):
-        """Initialize the rename operation. Returns list of targets and their
-        preview."""
+    def get_targets(self, path=None):
+        """Return a list of files and/or dirs in path."""
         if not path:
             path = os.getcwd()
+
+        targets = []
+        for root, dirs, files in walklevels(path, levels=2):
+            root += "/"
+            root = unicode(root, "utf-8")
+            dirs = sorted([unicode(d, "utf-8") for d in dirs])
+            files = sorted([unicode(f, "utf-8") for f in files])
+            # Dirs only.
+            if self.dirsonly:
+                target = [[root, d] for d in dirs]
+            # Files only.
+            else:
+                target = []
+                for f in files:
+                    fname, ext = os.path.splitext(f)
+                    target.append([root, fname, ext])
+            # Both dirs and files.
+            if not self.filesonly or not self.dirsonly:
+                target = [[root, d] for d in dirs] + target
+
+            # Exclude hidden and explicitly excluded files+dirs.
+            if self.hidden:
+                targets.extend(target)
+            else:
+                targets.extend(i for i in target if not i[1].startswith("."))
+            # TODO: Implement this correctly (regex/glob?).
+            if self.exclude:
+                targets = [i for i in targets if i not in self.exclude]
+
+            if not self.recursive:
+                break
+
+        return targets
+
+    def get_preview(self, targets, srcpat=None, destpat=None):
+        """Simulate rename operation on targets and return results as list."""
         if srcpat is None:
+            srcpat = "*"
             if self.regex:
                 srcpat = ".*"
-            else:
-                srcpat = "*"
         if destpat is None:
+            destpat = "*"
             if self.regex:
                 destpat = ".*"
-            else:
-                destpat = "*"
         if self.mediamode:
             self.set_mediaoptions()
 
-        targets = self.find_targets(path, srcpat)
-        joinedtargets = self.joinext(targets)
-        previews = self.modify_targets(deepcopy(joinedtargets), srcpat, destpat)
-        return targets, previews
+        joinedtargets = deepcopy(self.joinext(targets))
+        previews = self.modify_targets(joinedtargets, srcpat, destpat)
+
+        return previews
 #         matches = self.match_targets(targets, expression)
 #         print matches
         # [i for i, j in zip(a, b) if i != j]
@@ -183,18 +227,6 @@ class FileOps(object):
 
         return joinedtargets
 
-    def match_files(self, srcpat, files, root):
-        """Splits a list of files into filename and extension."""
-        target = []
-        for f in files:
-            if self.match(srcpat, f):
-#                 if self.keepext:
-                fname, ext = os.path.splitext(f)
-                target.append([root, fname, ext])
-#                 else:
-#                     target.append([root, f])
-        return target
-
     def match(self, srcpat, target):
         """Searches target for pattern and returns a bool."""
         if self.regex:
@@ -204,40 +236,6 @@ class FileOps(object):
             if fnmatch.fnmatch(target, srcpat):
                 return True
         return False
-
-    def find_targets(self, path, srcpat):
-        """Creates a list of files and/or directories to work with."""
-        targets = []
-        pathdepth = path.count(os.sep)
-        for root, dirs, files in os.walk(path):
-#             if root.count(os.sep) >= pathdepth + 3:
-#                 del dirs[:]
-            root += "/"
-            root = unicode(root, "utf-8")
-            dirs = sorted([unicode(d, "utf-8") for d in dirs])
-            files = sorted([unicode(f, "utf-8") for f in files])
-            # Check the found files and dirs against our regex/glob filter.
-            if self.dirsonly:
-                target = [[root, d] for d in dirs if self.match(srcpat, d)]
-            elif self.filesonly:
-                target = self.match_files(srcpat, files, root)
-            else:
-                target = [[root, d] for d in dirs if self.match(srcpat, d)]
-                target += self.match_files(srcpat, files, root)
-
-            # Exclude hidden and explicitly excluded files+dirs.
-            if self.hidden:
-                targets.extend(target)
-            else:
-                targets.extend(i for i in target if not i[1].startswith("."))
-            # TODO: Implement this correctly (regex/glob?).
-            if self.exclude:
-                targets = [i for i in targets if i not in self.exclude]
-
-            if not self.recursive:
-                break
-
-        return targets
 
     def modify_targets(self, previews, srcpat, destpat):
         # TODO: Handle case sensitivity (re.IGNORECASE)
@@ -294,10 +292,6 @@ class FileOps(object):
             s = s.replace(" .", "_")
 
         return s
-#         self._interactive = interactive  # Confirm before overwriting.
-#         self._exclude = exclude  # List of strings to exclude from targets.
-#         self._ignorecase = ignorecase  # Case sensitivity.
-#         self._remext = remext  # Remove all remext.
 
     def apply_capitalize(self, s):
         if not self.capitalizecheck:
@@ -310,7 +304,6 @@ class FileOps(object):
         elif self.capitalizemode == 2:
             s = s.capitalize()
         elif self.capitalizemode == 3:
-            # news = s.title()
             s = " ".join([c.capitalize() for c in s.split()])
 
         return s
@@ -771,4 +764,4 @@ class FileOps(object):
 
 if __name__ == "__main__":
     fileops = FileOps(hidden=True, recursive=True, keepext=False, regex=False)
-    fileops.stage("*.txt", "asdf")
+    fileops.get_preview("*.txt", "asdf")
