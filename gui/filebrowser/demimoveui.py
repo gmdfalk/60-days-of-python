@@ -69,8 +69,7 @@ class DirModel(QtGui.QFileSystemModel):
             return
         if not self.p.fileops.recursive and index.parent() != self.p.cwdidx:
             return
-        itempath = str(self.filePath(index).toUtf8())
-        print itempath, type(itempath), itempath in self.p.joinedtargets
+        itempath = str(self.filePath(index).toUtf8()).decode("utf-8")
         if self.p.cwd in itempath and itempath in self.p.joinedtargets:
             idx = self.p.joinedtargets.index(itempath)
             try:
