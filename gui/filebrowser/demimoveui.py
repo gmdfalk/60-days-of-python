@@ -120,25 +120,12 @@ class PreviewFileModel(QtGui.QFileSystemModel):
         if self.p.autopreview:
             if not self._cwdidx:
                 return
-            return self.match_preview_alt(item, index)
-
-    def match_preview(self, item, index):
-        par, cidx = index.parent(), self._cwdidx
-        parents = [par]
-        if self.p.fileops.recursive:
-            for i in xrange(16):
-                par = par.parent()
-                parents.append(par)
-        if cidx in parents:
-            if item.toString() in self.p.targetlist:
+            if not self.p.fileops.recursive and index.parent() != self._cwdidx:
+                return
+            indexpath = self.filePath(index)
+            if self._cwd in indexpath and item.toString() in self.p.targetlist:
                 idx = self.p.targetlist.index(item.toString())
                 return self.p.previewlist[idx]
-
-    def match_preview_alt(self, item, index):
-        d = self.filePath(index)
-        if self._cwd in d and item.toString() in self.p.targetlist:
-            idx = self.p.targetlist.index(item.toString())
-            return self.p.previewlist[idx]
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
