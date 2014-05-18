@@ -16,6 +16,7 @@ Options:
 # TODO: Custom ContextMenu for Filebrowser
 # FIXME: Switching between dirs/files/both destroys CWD marker.
 #        Fixed temporariliy by commenting filter changes.
+# FIXME: Fix performance on many files (recursive)?
 import logging
 import sys
 
@@ -69,23 +70,22 @@ class StatusTableModel (QtCore.QAbstractTableModel):
         return True
 
     def data(self, index, role):
-        if index.isValid():
-            if role == QtCore.Qt.CheckStateRole:
-                if self.data[index.row()].isChecked():
-                    return QtCore.QVariant(QtCore.Qt.Checked)
-                else:
-                    return QtCore.QVariant(QtCore.Qt.Unchecked)
-            elif role == QtCore.Qt.FontRole:
-                font = QtGui.QFont()
-                if self.data[index.row()].isChecked():
-                    font.setBold(True)
-                else:
-                    font.setBold(False)
-                return QtCore.QVariant(font)
-            elif role == QtCore.Qt.DisplayRole:
-                return QtCore.QVariant(self.data[index.row()].text())
-
-        return QtCore.QVariant()
+        if not index.isValid():
+            return QtCore.QVariant()
+        if role == QtCore.Qt.CheckStateRole:
+            if self.data[index.row()].isChecked():
+                return QtCore.QVariant(QtCore.Qt.Checked)
+            else:
+                return QtCore.QVariant(QtCore.Qt.Unchecked)
+        elif role == QtCore.Qt.FontRole:
+            font = QtGui.QFont()
+            if self.data[index.row()].isChecked():
+                font.setBold(True)
+            else:
+                font.setBold(False)
+            return QtCore.QVariant(font)
+        elif role == QtCore.Qt.DisplayRole:
+            return QtCore.QVariant(self.data[index.row()].text())
 
     def headerData(self, col, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:

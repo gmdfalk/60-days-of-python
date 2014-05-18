@@ -1,7 +1,7 @@
 # encoding: utf-8
 # TODO: Exclude option
 # TODO: Fix count (~i)
-# TODO: Recursive depth
+# TODO: os.walk depth
 import fnmatch
 import logging
 import os
@@ -208,7 +208,10 @@ class FileOps(object):
     def find_targets(self, path, srcpat):
         """Creates a list of files and/or directories to work with."""
         targets = []
+        pathdepth = path.count(os.sep)
         for root, dirs, files in os.walk(path):
+#             if root.count(os.sep) >= pathdepth + 3:
+#                 del dirs[:]
             root += "/"
             root = unicode(root, "utf-8")
             dirs = sorted([unicode(d, "utf-8") for d in dirs])
@@ -231,9 +234,9 @@ class FileOps(object):
             if self.exclude:
                 targets = [i for i in targets if i not in self.exclude]
 
-            # Do not enter the second loop for non-recursive searches.
             if not self.recursive:
                 break
+
         return targets
 
     def modify_targets(self, previews, srcpat, destpat):
