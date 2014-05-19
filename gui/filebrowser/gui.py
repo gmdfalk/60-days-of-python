@@ -2,7 +2,7 @@
 """demimove-ui
 
 Usage:
-    dmv-ui [-d <path>] [-c <file>] [-v|-vv|-vvv] [-q] [-h]
+    demimove-ui [-d <path>] [-c <file>] [-v|-vv|-vvv] [-q] [-h]
 
 Options:
     -c, --config=<file>  <NYI> Specify a config file to load.
@@ -109,9 +109,9 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.targets = []
         self.history = []
         self.fileops = fileops
-        uic.loadUi("demimove.ui", self)
+        uic.loadUi("gui.ui", self)
 
-        self.setWindowIcon(QtGui.QIcon("icon.png"))
+        self.setWindowIcon(QtGui.QIcon("data/icon.png"))
         self.mainsplitter.setStretchFactor(0, 2)
         self.mainsplitter.setStretchFactor(1, 3)
 
@@ -149,7 +149,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirview.setCurrentIndex(index)
 
     def create_historytab(self):
-        self.historymodel = history.HistoryTreeModel(parent=self)
+        historyfile = "data/history.txt"
+        self.historymodel = history.HistoryTreeModel(historyfile, parent=self)
         self.historytree.setModel(self.historymodel)
 
     def get_current_fileinfo(self):

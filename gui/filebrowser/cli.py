@@ -2,7 +2,7 @@
 """demimove
 
 Usage:
-    dmv [<source> [<target>]] [-D|-F] [-E <name>...] [-v|-vv|-vvv] [options]
+    demimove [<source> [<target>]] [-D|-F] [-E <name>...] [-v|-vv|-vvv] [options]
 
 Arguments:
     source        (Optional) Pattern to identify targets by.
