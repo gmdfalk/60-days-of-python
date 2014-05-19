@@ -153,10 +153,14 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.historymodel = history.HistoryTreeModel(parent=self)
         self.historytree.setModel(self.historymodel)
 
+    def get_current_fileinfo(self):
+        index = self.dirview.currentIndex()
+        path = str(self.dirmodel.filePath(index).toUtf8()).decode("utf-8")
+        return index, path
+
     def set_cwd(self, force=False):
         "Set the current working directory for renaming actions."
-        index = self.dirview.currentIndex()
-        path = self.dirmodel.filePath(index)
+        index, path = self.get_current_fileinfo()
         if force or  path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
@@ -167,6 +171,12 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.cwdidx = None
         self.update_single_index(index)
 
+    def center(self, widget):
+        qr = widget.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        widget.move(qr.topLeft())
+
     def keyPressEvent(self, e):
         "Overloaded to connect return key to self.set_cwd()."
         # TODO: Move this to TreeView only.
@@ -174,6 +184,18 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.set_cwd()
             self.update_targets()
             self.update_preview()
+        if e.key() == QtCore.Qt.Key_Delete:
+            index, path = self.get_current_fileinfo()
+            name = os.path.basename(path)
+
+            m = QtGui.QMessageBox(self)
+            reply = m.question(self, "Message", "Really delete {}?".format(name),
+                               m.Yes | m.No, m.Yes)
+
+            if reply == QtGui.QMessageBox.Yes:
+                self.dirmodel.remove(index)
+            else:
+                pass
 
     def update_targets(self):
         if self.cwd:
