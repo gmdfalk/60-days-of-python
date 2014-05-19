@@ -1,5 +1,4 @@
 #!/usr/bin/env python2
-# TODO: Add rbg and hex color lineedits after colorpicker button
 # FIXME: Leading 0 for Base.
 import sys
 
@@ -29,7 +28,7 @@ class GUIConverter(QtGui.QWidget):
         # Main Window
         self.setGeometry(300, 300, 350, 300)
         self.setWindowTitle("UnitConverter")
-        self.setWindowIcon(QtGui.QIcon("data/calculator.png"))
+        self.setWindowIcon(QtGui.QIcon("icon.png"))
 
         QtGui.QToolTip.setFont(QtGui.QFont("SansSerif", 10))
 

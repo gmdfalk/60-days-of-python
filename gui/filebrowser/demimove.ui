@@ -26,7 +26,7 @@
       <widget class="QTabWidget" name="treewidget">
        <property name="minimumSize">
         <size>
-         <width>264</width>
+         <width>310</width>
          <height>0</height>
         </size>
        </property>
@@ -59,7 +59,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <layout class="QHBoxLayout" name="matchradios" stretch="3,4,0">
+              <layout class="QHBoxLayout" name="matchradios">
                <item>
                 <widget class="QRadioButton" name="matchglob">
                  <property name="toolTip">
@@ -101,12 +101,9 @@
              <item row="1" column="1">
               <layout class="QHBoxLayout" name="matchchecks">
                <item>
-                <widget class="QCheckBox" name="matchfiltercheck">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only use the matching pattern, not the replacement pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
+                <widget class="QCheckBox" name="matchreplace">
                  <property name="text">
-                  <string>Filter</string>
+                  <string>Replace</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -114,7 +111,17 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="matchexcludecheck">
+                <widget class="QCheckBox" name="matchfilter">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only use the matching pattern, not the replacement pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Filter</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="matchexclude">
                  <property name="text">
                   <string>Exclude</string>
                  </property>
@@ -123,7 +130,10 @@
               </layout>
              </item>
              <item row="2" column="1">
-              <widget class="QLineEdit" name="lineEdit">
+              <widget class="QLineEdit" name="matchfilteredit">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Filter&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Glob/Regex pattern to filter the targets by. &lt;/p&gt;&lt;p&gt;This defaults to &amp;quot;*&amp;quot; or &amp;quot;.*&amp;quot; respectively, to match all targets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -487,7 +497,10 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QLineEdit" name="lineEdit_2">
+              <widget class="QLineEdit" name="matchexcludeedit">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Exclude&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Files and Directories to exclude. Comma separated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -1077,18 +1090,114 @@
    </hints>
   </connection>
   <connection>
-   <sender>matchfiltercheck</sender>
+   <sender>matchreplace</sender>
    <signal>toggled(bool)</signal>
    <receiver>replaceedit</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
+     <x>123</x>
      <y>87</y>
     </hint>
     <hint type="destinationlabel">
      <x>739</x>
      <y>563</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchreplace</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>130</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchfilter</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchcheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchexclude</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchreplace</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchedit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>472</x>
+     <y>591</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchfilter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchfilteredit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>matchexclude</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>matchexcludeedit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>270</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

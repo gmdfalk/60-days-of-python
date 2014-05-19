@@ -430,4 +430,3 @@ class Weight(object):
     @ustons.setter
     def ustons(self, value):
         self._kilograms = value / 0.0011023113109
-

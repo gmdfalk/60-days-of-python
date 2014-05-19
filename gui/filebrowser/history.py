@@ -1,3 +1,5 @@
+import codecs
+
 from PyQt4 import QtGui, QtCore
 
 
@@ -82,17 +84,13 @@ class TreeItem(object):
 
 class HistoryTreeModel(QtCore.QAbstractItemModel):
 
-    def __init__(self, parent=None):
+    def __init__(self, historyfile, parent=None):
         super(HistoryTreeModel, self).__init__(parent)
         self.p = parent
 
         headers = ("Original", "Current")
-        with open("default.txt") as f:
+        with codecs.open(historyfile, encoding="utf-8") as f:
             data = f.read()
-#         file = QtCore.QFile(':/default.txt')
-#         file.open(QtCore.QIODevice.ReadOnly)
-#         data = file.readAll()
-#         file.close()
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
