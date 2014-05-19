@@ -20,7 +20,6 @@ class Client(irc.IRCClient):
         self.nickname = self.factory.network["nickname"]
         self.realname = self.factory.network.get("realname") or "demibot"
         self.username = self.factory.network.get("username") or "demibot"
-        print self.realname, self.username
         self.sourceURL = self.factory.URL  # CTCP source queries to the github.
         self.lineRate = 1  # Print at most n lines per second.
         self.wrap = textwrap.TextWrapper(width=400, break_long_words=True)

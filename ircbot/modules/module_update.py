@@ -14,7 +14,7 @@ def command_update(bot, user, channel, args):
         return bot.say(channel, "Insufficient permissions.")
 
     cmd = ["git", "pull"]
-    cwd = os.getcwd()
+    cwd = bot.factory.basedir
 
     log.debug("Executing git pull in {}.".format(cwd))
 

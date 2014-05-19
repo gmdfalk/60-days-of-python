@@ -33,7 +33,7 @@ Options:
     -v                  Logging verbosity, up to -vvv.
 """
 
-from ConfigParser import SafeConfigParser
+from ConfigParser import ConfigParser, NoOptionError
 import os
 import sys
 
@@ -45,10 +45,8 @@ from reporting import init_logger
 
 
 def get_configdir():
-    # If ~/.demibot or ~/.config/demibot exist, we use that as source and
-    # target for logs and config file.
+    "Determine the directory we read the configuration file from."
     configdir = os.path.dirname(os.path.realpath(__file__))  # We are here.
-#     if not args["<server>"] and not args["--logdir"]:
     home = os.path.join(os.path.expanduser("~"), ".demibot")
     homeconfig = os.path.join(os.path.expanduser("~"), ".config/demibot")
     if os.path.isdir(homeconfig):
@@ -60,7 +58,7 @@ def get_configdir():
 
 
 def parse_config(configdir):
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(os.path.join(configdir, "demibot.ini"))
     networks = {}
     for s in config.sections():
@@ -68,13 +66,17 @@ def parse_config(configdir):
 
     # Correct a couple of values.
     for n in networks:
-        networks[n]["port"] = config.getint(n, "port")
-        networks[n]["ssl"] = config.getboolean(n, "ssl")
-        networks[n]["urltitles_enabled"] = config.getboolean(n, "urltitles_enabled")
-        networks[n]["minperms"] = config.getint(n, "minperms")
-        networks[n]["lost_delay"] = config.getint(n, "lost_delay")
-        networks[n]["failed_delay"] = config.getint(n, "failed_delay")
-        networks[n]["rejoin_delay"] = config.getint(n, "rejoin_delay")
+        networks[n]["port"] = int(config.get(n, "port", 6667))
+        for i in ["urltitles_enabled", "ssl"]:
+            try:
+                networks[n][i] = config.getboolean(n, i)
+            except NoOptionError:
+                print "ConfigError: Could not parse option {}.".format(i)
+        for i in ["minperms", "lost_delay", "failed_delay", "rejoin_delay"]:
+            try:
+                networks[n][i] = config.getint(n, i)
+            except NoOptionError:
+                print "ConfigError: Could not parse option {}.".format(i)
         for k, v in networks[n].items():
             if k == "superadmins":
                 networks[n]["superadmins"] = set(v.replace(" ", "").split(","))
@@ -88,6 +90,7 @@ def parse_config(configdir):
 
 
 def main():
+    args = docopt(__doc__, version="0.3")
     configdir = get_configdir()
 
     if not args["--logdir"]:
@@ -159,5 +162,4 @@ def main():
     reactor.run()
 
 if __name__ == "__main__":
-    args = docopt(__doc__, version="0.3")
     main()
