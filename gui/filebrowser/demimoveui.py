@@ -25,7 +25,7 @@ import sys
 
 from PyQt4 import QtGui, QtCore, uic
 
-from fileops import FileOps
+import fileops
 import history
 
 
@@ -91,10 +91,6 @@ class DirModel(QtGui.QFileSystemModel):
             if item in self.p.nametargets:
                 idx = self.p.nametargets.index(item)
                 return self.p.previews[idx][1]
-
-
-class DirView(QtGui.QTreeView):
-    pass
 
 
 class DemiMoveGUI(QtGui.QMainWindow):
@@ -582,17 +578,17 @@ def main():
     try:
         args = docopt(__doc__, version="0.1")
         args["-v"] = 3  # Force debug mode, for now.
-        fileops = FileOps(verbosity=args["-v"], quiet=args["--quiet"])
+        fileop = fileops.FileOps(verbosity=args["-v"], quiet=args["--quiet"])
         if args["--dir"]:
             startdir = args["--dir"]
     except NameError:
-        fileops = fileops.FileOps()
+        fileop = fileops.FileOps()
         log.error("Please install docopt to use the CLI.")
 
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName("demimove-ui")
 #     app.setStyle("plastique")
-    gui = DemiMoveGUI(startdir, fileops)
+    gui = DemiMoveGUI(startdir, fileop)
     gui.show()
     sys.exit(app.exec_())
 

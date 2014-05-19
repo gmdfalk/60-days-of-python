@@ -145,7 +145,6 @@ class FileOps(object):
         levels = 0
         if self.recursive:
             levels = self.recursivedepth
-        print levels
         for root, dirs, files in walklevels(path, levels):
             # To unicode.
             root = root.decode("utf-8") + "/"
@@ -293,7 +292,7 @@ class FileOps(object):
         elif self.spacemode == 5:
             s = s.replace("_", " ")
         elif self.spacemode == 6:
-            s = s.replace(" .", "_")
+            s = re.sub("[.\s]", "_", s)
 
         return s
 
