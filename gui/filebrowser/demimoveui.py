@@ -19,6 +19,7 @@ Options:
 #        Fixed temporariliy by commenting filter changes.
 # FIXME: Fix performance on many files (recursive)?
 # TODO: Use QFileSystemModels listing insteada of fileops.get_targets()
+# FIXME: Filesonly radio + switchview: bold font doesn't show.
 import logging
 import os
 import sys
@@ -104,8 +105,10 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self._cwdidx = None
         self._matchpat = ""  # Pattern to search for in files/dirs.
         self._replacepat = ""  # Pattern to replace above found matches with.
+        self.switchview = False
         self.previews = []
         self.targets = []
+        self.history = []
         self.fileops = fileops
         uic.loadUi("demimove.ui", self)
 
@@ -138,7 +141,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.dirview.setColumnHidden(2, True)
         self.dirview.header().swapSections(4, 1)
         self.dirview.header().resizeSection(0, 300)
-        self.dirview.header().resizeSection(4, 300)
+        self.dirview.header().resizeSection(4, 220)
+        self.dirview.header().resizeSection(3, 120)
         self.dirview.setEditTriggers(QtGui.QAbstractItemView.EditKeyPressed)
         self.dirview.setItemDelegate(BoldDelegate(self))
 
@@ -149,18 +153,18 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.historymodel = history.HistoryTreeModel(parent=self)
         self.historytree.setModel(self.historymodel)
 
-    def set_cwd(self):
+    def set_cwd(self, force=False):
         "Set the current working directory for renaming actions."
         index = self.dirview.currentIndex()
         path = self.dirmodel.filePath(index)
-        if self.cwd and path == self.cwd:
-            self.dirview.setExpanded(self.cwdidx, False)
-            self.cwd = ""
-            self.cwdidx = None
-        elif path != self.cwd and os.path.isdir(path):
+        if force or  path != self.cwd and os.path.isdir(path):
             self.cwd = path
             self.cwdidx = index
             self.dirview.setExpanded(self.cwdidx, True)
+        elif self.cwd and path == self.cwd:
+            self.dirview.setExpanded(self.cwdidx, False)
+            self.cwd = ""
+            self.cwdidx = None
         self.update_single_index(index)
 
     def keyPressEvent(self, e):
@@ -204,6 +208,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
         self.allradio.toggled.connect(self.on_allradio)
         self.dirsradio.toggled.connect(self.on_dirsradio)
         self.filesradio.toggled.connect(self.on_filesradio)
+        self.switchviewcheck.toggled.connect(self.on_switchviewcheck)
 
         # Main options:
         self.autopreviewcheck.toggled.connect(self.on_autopreviewcheck)
@@ -259,8 +264,8 @@ class DemiMoveGUI(QtGui.QMainWindow):
 
     def on_commitbutton(self):
         self.update_preview()
-        log.debug(self.fileops.get_options())
-#         self.fileops.commit()
+        commit = self.fileops.commit(self.previews)
+        self.history.append(commit)
 
     def on_undobutton(self):
         self.fileops.undo()
@@ -436,27 +441,42 @@ class DemiMoveGUI(QtGui.QMainWindow):
         if self.autopreview:
             self.update_preview()
 
+    def on_switchviewcheck(self, checked):
+        self.switchview = checked
+        if self.filesradio.isChecked():
+            self.on_filesradio(True)
+        elif self.dirsradio.isChecked():
+            self.on_dirsradio(True)
+        elif self.allradio.isChecked():
+            self.on_allradio(True)
+
     def on_allradio(self, checked):
         self.fileops.filesonly = False
         self.fileops.dirsonly = False
-#         self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
-#                                     QtCore.QDir.NoDotAndDotDot |
-#                                     QtCore.QDir.Hidden)
+        if self.switchview:
+            self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Files |
+                                    QtCore.QDir.NoDotAndDotDot |
+                                    QtCore.QDir.Hidden)
         if self.autopreview:
+            self.update_targets()
             self.update_preview()
 
     def on_dirsradio(self, checked):
         self.fileops.dirsonly = checked
-#         self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
-#                                     QtCore.QDir.NoDotAndDotDot)
+        if self.switchview:
+            self.dirmodel.setFilter(QtCore.QDir.Dirs | QtCore.QDir.Hidden |
+                                    QtCore.QDir.NoDotAndDotDot)
         if self.autopreview:
+            self.update_targets()
             self.update_preview()
 
     def on_filesradio(self, checked):
         self.fileops.filesonly = checked
-#         self.dirmodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
-#                                     QtCore.QDir.NoDotAndDotDot)
+        if self.switchview:
+            self.dirmodel.setFilter(QtCore.QDir.Files | QtCore.QDir.Hidden |
+                                    QtCore.QDir.NoDotAndDotDot)
         if self.autopreview:
+            self.update_targets()
             self.update_preview()
 
     def on_spacecheck(self, checked):

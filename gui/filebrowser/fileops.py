@@ -158,9 +158,8 @@ class FileOps(object):
                 dirs = [i for i in dirs if i not in self.exclude]
                 files = [i for i in files if i not in self.exclude]
 
-            # TODO: remove/fix sort for count?
-#             dirs.sort()
-#             files.sort()
+            dirs.sort()
+            files.sort()
             dirs = [[root, i] for i in dirs]
 
             newfiles = []
@@ -174,7 +173,6 @@ class FileOps(object):
                 target = newfiles
             else:
                 target = dirs + newfiles
-
             targets.extend(target)
 
         return targets
@@ -205,9 +203,10 @@ class FileOps(object):
         self.keepext = True
         self.accents = True
 
-    def commit(self, targets):
+    def commit(self, previews):
         if self.simulate:
-            print "{} to {}".format(targets[1], targets[2])
+            for p in previews:
+                print "{} to {}".format(p[1], p[2])
         # clean up self.exclude
 
     def undo(self, action=None):
