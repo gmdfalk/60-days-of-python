@@ -32,7 +32,7 @@ With one additional day as buffer the outcome should be around 15 projects.
   * [**Mail Client**](https://github.com/mikar/60-days-of-python/blob/master/networking/mailclient)
   * [**Unit Converter**](https://github.com/mikar/60-days-of-python/blob/master/gui/unitconverter)
   * [**Calculator**](https://github.com/mikar/60-days-of-python/blob/master/gui/calculator)
-  * [**Blockify**](https://github.com/mikar/blockify/), almost entirely rewritten.
+  * [**Blockify**](https://github.com/mikar/60-days-of-python/blob/master/gui/blockify) (almost entirely rewritten, added GUI).
   * [**File Browser**](https://github.com/mikar/60-days-of-python/blob/master/gui/filebrowser)
   * [**Website with Flask**](https://github.com/mikar/60-days-of-python/tree/master/website)
   	  * Blog
