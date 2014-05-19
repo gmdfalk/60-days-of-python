@@ -16,10 +16,9 @@ Options:
 # TODO: Statustab with Errors/Warnings, Summaries etc
 # TODO: Custom ContextMenu for Filebrowser
 # FIXME: Switching between dirs/files/both destroys CWD marker.
-#        Fixed temporariliy by commenting filter changes.
-# FIXME: Fix performance on many files (recursive)?
-# TODO: Use QFileSystemModels listing insteada of fileops.get_targets()
 # FIXME: Filesonly radio + switchview: bold font doesn't show.
+# FIXME: Fix performance on many files (recursive)? Maybe threading?
+# TODO: Use QFileSystemModels listing instead of fileops.get_targets()
 import logging
 import os
 import sys
@@ -177,6 +176,19 @@ class DemiMoveGUI(QtGui.QMainWindow):
         qr.moveCenter(cp)
         widget.move(qr.topLeft())
 
+    def confirm_file_deletion(self):
+        index, path = self.get_current_fileinfo()
+        name = os.path.basename(path)
+
+        m = QtGui.QMessageBox(self)
+        reply = m.question(self, "Message", "Really delete {}?".format(name),
+                           m.Yes | m.No, m.Yes)
+
+        if reply == QtGui.QMessageBox.Yes:
+            self.dirmodel.remove(index)
+        else:
+            pass
+
     def keyPressEvent(self, e):
         "Overloaded to connect return key to self.set_cwd()."
         # TODO: Move this to TreeView only.
@@ -185,17 +197,7 @@ class DemiMoveGUI(QtGui.QMainWindow):
             self.update_targets()
             self.update_preview()
         if e.key() == QtCore.Qt.Key_Delete:
-            index, path = self.get_current_fileinfo()
-            name = os.path.basename(path)
-
-            m = QtGui.QMessageBox(self)
-            reply = m.question(self, "Message", "Really delete {}?".format(name),
-                               m.Yes | m.No, m.Yes)
-
-            if reply == QtGui.QMessageBox.Yes:
-                self.dirmodel.remove(index)
-            else:
-                pass
+            self.confirm_file_deletion()
 
     def update_targets(self):
         if self.cwd:

@@ -224,8 +224,6 @@ class FileOps(object):
         return False
 
     def modify_previews(self, previews, matchpat, replacepat):
-        # root, name, ext
-        # TODO: Handle case sensitivity (re.IGNORECASE)
         if self.countcheck:
             lenp, base, step = len(previews), self.countbase, self.countstep
             countlen = len(str(lenp))
@@ -346,6 +344,7 @@ class FileOps(object):
 
     def apply_match(self, s, matchpat, replacepat):
         return s
+        # TODO: Handle case sensitivity (re.IGNORECASE)
         if not self.matchcheck:
             return s
         # Translate glob to regular expression.
