@@ -5,5 +5,12 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
-  script: app.app
+- url: .*
+  script: main.app
+
+libraries:
+- name: jinja2
+  version: "2.6"
+- name: markupsafe
+  version: "0.15"
+  
