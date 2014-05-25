@@ -43,7 +43,7 @@ class BlockifyDBus(object):
         self.session_bus = bus
 
         for name in bus.list_names():
-            if re.search(r".*mpris.*spotify", name):
+            if re.match(r".*mpris.*spotify", name):
                 self.spotify_path = str(name)
 
         if self.is_running():

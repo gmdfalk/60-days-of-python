@@ -1,233 +1,264 @@
 # -*- coding: utf-8 -*-
-# TODO: Exclude option.
-# TODO: Fix count step and count base plus large listings (~i).
-# TODO: Reconcile keepext and not matchreplace.
-from copy import deepcopy
-from unicodedata import normalize, category
+from operator import itemgetter
+from unicodedata import normalize
 import fnmatch
 import logging
 import os
 import re
-import sys
+import string
+
+import helpers
 
 
 log = logging.getLogger("fileops")
 
 
-def configure_logger(loglevel=2, quiet=False):
-    "Creates the logger instance and adds handlers and formatting."
-    logger = logging.getLogger()
-
-    # Set the loglevel.
-    if loglevel > 3:
-        loglevel = 3  # Cap at 3 to avoid index errors.
-    levels = [logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
-    logger.setLevel(levels[loglevel])
-
-    logformat = "%(asctime)-14s %(levelname)-8s %(name)-8s %(message)s"
-
-    formatter = logging.Formatter(logformat, "%Y-%m-%d %H:%M:%S")
-
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    if quiet:
-        log.info("Quiet mode: logging disabled.")
-        logging.disable(logging.ERROR)
-
-
-def walklevels(path, levels=1):
-    path = path.rstrip(os.path.sep)
-    assert os.path.isdir(path)
-    num_sep = path.count(os.path.sep)
-    for root, dirs, files in os.walk(path):
-        yield root, dirs, files
-        num_sep_this = root.count(os.path.sep)
-        if num_sep + levels <= num_sep_this:
-            del dirs[:]
-
-
 class FileOps(object):
 
-    def __init__(self, quiet=False, verbosity=1,
-                 dirsonly=False, filesonly=False, recursive=False,
-                 hidden=False, simulate=False, interactive=False, prompt=False,
-                 noclobber=False, keepext=False, regex=False, exclude=None,
-                 mediamode=False, accents=False, lower=False, upper=False,
-                 remdups=False, remext=False, remnonwords=False,
-                 ignorecase=False, countpos=0):
-        # List of available options.
-        self.opts = ("quiet", "verbosity",
-                     "dirsonly", "filesonly", "recursive", "hidden",
-                     "simulate", "interactive", "prompt", "noclobber",
-                     "keepext", "regex", "exclude", "media", "accents",
-                     "lower", "upper", "remdups", "remext", "remnonwords",
-                     "ignorecase", "countpos",
-                     "autostop", "mirror", "spacecheck", "spacemode",
-                     "capitalizecheck", "capitalizemode",
-                     "insertcheck", "insertpos", "insertedit",
-                     "countcheck", "countfill", "countbase", "countpreedit",
-                     "countsufedit", "varcheck",
-                     "deletecheck", "deletestart", "deleteend",
-                     "matchcheck")
+    def __init__(self, casemode=0, countpos=0, dirsonly=False, exclude="",
+                 filesonly=False, hidden=False, ignorecase=False,
+                 interactive=False, keepext=False, mediamode=False,
+                 noclobber=False, recursive=False, regex=False, remdups=False,
+                 remext=False, remnonwords=False, remsymbols=False,
+                 simulate=False, spacemode=0, quiet=False, verbosity=1,
+                 matchpattern="", replacepattern="", recursivedepth=0):
         # Universal options:
+        try:
+            self._casemode = int(casemode)  # 0=lc, 1=uc, 2=flfw, 3=flew
+        except TypeError:
+            self._casemode = 0
+        try:
+            self._countpos = int(countpos)  # Adds numerical index at position.
+        except TypeError:
+            self._countpos = 0
+        try:
+            self._spacemode = int(spacemode)  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
+        except TypeError:
+            self.spacemode = 0
         self._dirsonly = dirsonly  # Only edit directory names.
         self._filesonly = False if dirsonly else filesonly  # Only file names.
-        self._recursive = recursive  # Look for files recursively
         self._hidden = hidden  # Look at hidden files and directories, too.
-        self._simulate = simulate  # Simulate renaming and dump result to stdout.
-        self._interactive = interactive  # Confirm before overwriting.
-        self._prompt = prompt  # Confirm all rename actions.
-        self._noclobber = noclobber  # Don't overwrite anything.
-        self._keepext = keepext  # Don't modify remext.
-        self._countpos = countpos  # Adds numerical index at position.
-        self._regex = regex  # Use regular expressions instead of glob/fnmatch.
-        self._exclude = exclude  # List of strings to exclude from targets.
-        self._accents = accents  # Normalize accents (ñé becomes ne).
-        self._lower = lower  # Convert target to lowercase.
-        self._upper = upper  # Convert target to uppercase.
         self._ignorecase = ignorecase  # Case sensitivity.
+        self._interactive = interactive  # Confirm before overwriting.
+        self._keepext = keepext  # Don't modify remext.
         self._mediamode = mediamode  # Mode to sanitize NTFS-filenames/dirnames.
+        self._noclobber = noclobber  # Don't overwrite anything.
+        self._recursive = recursive  # Look for files recursively
+        self._regex = regex  # Use regular expressions instead of glob/fnmatch.
         self._remdups = remdups  # Remove remdups.
-        self._remnonwords = remnonwords  # Only allow wordchars (\w)
         self._remext = remext  # Remove all remext.
+        self._remnonwords = remnonwords  # Only allow wordchars (\w)
+        self._remsymbols = remsymbols  # Normalize remsymbols (ñé becomes ne).
+        self._simulate = simulate  # Simulate renaming and dump result to stdout.
         # Initialize GUI options.
+        self._recursivedepth = recursivedepth
+        self._excludeedit = "" if not exclude else exclude
+        self._matchedit = "" if not matchpattern else matchpattern
+        self._replaceedit = "" if not replacepattern else replacepattern
         self._autostop = False  # Automatically stop execution on rename error.
-        self._mirror = False  # Mirror manual rename to all targets.
-        self._capitalizecheck = False  # Whether to apply the capitalizemode.
-        self._capitalizemode = 0  # 0=lc, 1=uc, 2=flfw, 3=flew
-        self._spacecheck = False  # Whether to apply the spacemode.
-        self._spacemode = 0  # 0=su, 1=sh, 2=sd, 3=ds, 4=hs, 5=us
-        self._countcheck = False  # Whether to add a counter to the targets.
         self._countbase = 1  # Base to start counting from.
-        self._countstep = 1
         self._countfill = True  # 9->10: 9 becomes 09. 99->100: 99 becomes 099.
         self._countpreedit = ""  # String that is prepended to the counter.
+        self._countstep = 1  # Increment per count iteration.
         self._countsufedit = ""  # String that is appended to the counter.
-        self._insertcheck = False  # Whether to apply an insertion.
-        self._insertpos = 0  # Position/Index to insert at.
-        self._insertedit = ""  # The inserted text/string.
         self._deletecheck = False  # Whether to delete a specified range.
-        self._deletestart = 0  # Start index of deletion sequence.
         self._deleteend = 1  # End index of deletion sequence.
+        self._deletestart = 0  # Start index of deletion sequence.
+        self._filteredit = ""
+        self._insertcheck = False  # Whether to apply an insertion.
+        self._insertedit = ""  # The inserted text/string.
+        self._insertpos = 0  # Position/Index to insert at.
+        self._manualmirror = False  # Mirror manual rename to all targets.
         self._matchcheck = True  # Whether to apply source/target patterns.
-        self._matchreplace = True
-        self._removecheck = False
-        self._varcheck = False  # Whether to apply various options (accents).
-        self._recursivedepth = 1
-
+        self._matchexcludecheck = False
+        self._matchfiltercheck = False
+        self._matchreplacecheck = True
+        self._casecheck = True if isinstance(casemode, str) else False
+        self._countcheck = True if isinstance(countpos, str) else False
+        removelist = [remdups, remext, remnonwords, remsymbols]
+        self._removecheck = True if any(removelist) else False
+        self._spacecheck = True if isinstance(spacemode, str) else False
+        self.stopupdate = False
+        self.stopcommit = False
+        self.includes = set()
+        self.excludes = set()
+        self.recursiveincludes = set()
+        self.recursiveexcludes = set()
+        self.configdir = helpers.get_configdir()
         # Create the logger.
-        configure_logger(verbosity, quiet)
-        self.history = []  # History of commited operations, useful to undo.
-        self.defaultopts = {i:getattr(self, "_" + i, None) for i in self.opts}
+        helpers.configure_logger(verbosity, quiet, self.configdir)
+        self.history = []  # History of commited operations, used to undo them.
+        # Match everything inside one set of braces:
+        self.bracerx = re.compile("(?<=\{)(.*?)(?=\})")
 
-    def get_options(self, *args):
-        if args:
-            return {i: getattr(self, i, None) for i in args}
-        return {i: getattr(self, i, None) for i in self.opts}
+    def match_filter(self, target):
+        if not self.filteredit:
+            return True
+        if "/" in self.filteredit:
+            patterns = self.filteredit.split("/")
+        else:
+            patterns = [self.filteredit]
+        if self.regex:
+            for pattern in patterns:
+                try:
+                    if re.search(pattern, target, flags=self.ignorecase):
+                        return True
+                except:
+                    pass
+        else:
+            for pattern in patterns:
+                if fnmatch.fnmatch(target, pattern):
+                    return True
+        return False
 
-    def set_options(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+    def match_exclude(self, target):
+        if not self.excludeedit:
+            return
+        if "/" in self.excludeedit:
+            patterns = self.excludeedit.split("/")
+        else:
+            patterns = [self.excludeedit]
+        if self.regex:
+            for pattern in patterns:
+                try:
+                    if re.search(pattern, target, flags=self.ignorecase):
+                        return False
+                except:
+                    pass
+        else:
+            for pattern in patterns:
+                if fnmatch.fnmatch(target, pattern):
+                    return False
 
-    def restore_options(self):
-        self.set_options(**self.defaultopts)
+    def match(self, target):
+        """Searches target for pattern and returns a bool."""
+        if not self.hidden and target.startswith("."):
+            return False
+        if self.matchexcludecheck:
+            if self.match_exclude(target) is False:
+                return False
+        if self.excludes and target in self.excludes:
+            return False
+        if self.includes and target in self.includes:
+            return True
+        if self.matchfiltercheck:
+            if self.match_filter(target) is False:
+                return False
+        return True
+
+    def get_dirs(self, root, dirs):
+        """Sort, match and decode a list of dirs."""
+        return [(root, d.decode("utf-8"), u"") for d in dirs if self.match(d)]
+
+    def get_files(self, root, files):
+        """Sort, match and decode a list of files."""
+        return [(root,) + os.path.splitext(f.decode("utf-8")) for f in
+                       files if self.match(f)]
 
     def get_targets(self, path=None):
         """Return a list of files and/or dirs in path."""
         if not path:
             path = os.getcwd()
 
-        targets = []
-
         # Determine recursion depth.
         levels = 0
         if self.recursive:
             levels = self.recursivedepth
-        for root, dirs, files in walklevels(path, levels):
+
+        targets = []
+        for root, dirs, files in helpers.walklevels(path, levels):
             # To unicode.
             root = root.decode("utf-8") + "/"
-            dirs = [d.decode("utf-8") for d in dirs]
-            files = [f.decode("utf-8") for f in files]
-            # Exclude targets, if necessary.
-            if not self.hidden:
-                dirs = [i for i in dirs if not i.startswith(".")]
-                files = [i for i in files if not i.startswith(".")]
-            if self.exclude:
-                dirs = [i for i in dirs if i not in self.exclude]
-                files = [i for i in files if i not in self.exclude]
-
-            dirs.sort()
-            files.sort()
-            dirs = [[root, i] for i in dirs]
-
-            newfiles = []
-            for i in files:
-                fname, ext = os.path.splitext(i)
-                newfiles.append([root, fname, ext])
 
             if self.dirsonly:
-                target = dirs
+                target = self.get_dirs(root, dirs)
             elif self.filesonly:
-                target = newfiles
+                target = self.get_files(root, files)
             else:
-                target = dirs + newfiles
+                target = self.get_dirs(root, dirs) + self.get_files(root, files)
+
             targets.extend(target)
+            if self.stopupdate:
+                return targets
 
         return targets
 
     def get_previews(self, targets, matchpat=None, replacepat=None):
         """Simulate rename operation on targets and return results as list."""
-        if not matchpat:
-            matchpat = "*"
-            if self.regex:
-                matchpat = ".*"
-        if replacepat is None:
-            replacepat = "*"
-            if self.regex:
-                replacepat = ".*"
+        if matchpat:
+            self.matchedit = matchpat
+        if replacepat:
+            self.replaceedit = replacepat
         if self.mediamode:
             self.set_mediaoptions()
 
-        return self.modify_previews(deepcopy(targets), matchpat, replacepat)
+        return self.modify_previews(targets)
 
     def set_mediaoptions(self):
-        self.capitalizecheck = True
+        self.casecheck = True
         self.spacecheck = True
         self.removecheck = True
-        self.varcheck = True
-        self.capitalizemode = 0
+        self.casemode = 0
         self.spacemode = 6
         self.remdups = True
         self.keepext = True
-        self.accents = True
+        self.remsymbols = True
 
     def commit(self, previews):
-        if self.simulate:
-            for p in previews:
-                print "{} to {}".format(p[1], p[2])
-        # clean up self.exclude
+        # The sorted generator comprehension of (unicode)doom:
+        # Reverse sort the paths so that the longest paths are changed first.
+        # This should minimize rename errors for recursive operations, for now.
+        actions = sorted((("".join(i[0]).encode("utf-8"), i[0][0].encode("utf-8")
+                           + i[1].encode("utf-8")) for i in previews),
+                         key=lambda i: i[0].count("/"), reverse=True)
 
-    def undo(self, action=None):
-        if action is None:
-            action = self.history.pop()
+        for i in actions:
+            if self.simulate:
+                log.debug("{} -> {}.".format(i[0], i[1]))
+                continue
+            if self.stopcommit:
+                idx = actions.index(i)
+                log.warn("Stopping commit after {} renames." .format(idx + 1))
+                if idx:
+                    log.warn("Use undo to revert the rename actions.")
+                self.history.append(actions[:idx + 1])
+                return
+            try:
+                os.rename(i[0], i[1])
+            except Exception as e:
+                log.debug("Rename Error: {} -> {} ({}).".format(i[0], i[1], e))
+                if self.autostop:
+                    break
 
-    def match(self, matchpat, target):
-        """Searches target for pattern and returns a bool."""
-        if self.regex:
-            if re.search(matchpat, target):
-                return True
-        else:
-            if fnmatch.fnmatch(target, matchpat):
-                return True
-        return False
+        self.history.append(actions)
+        log.info("Renaming complete.")
 
-    def modify_previews(self, previews, matchpat, replacepat):
+    def undo(self, actions=None):
+        if actions is None:
+            try:
+                actions = self.history.pop()
+            except IndexError:
+                log.error("History list is empty.")
+                return
+
+        for i in actions:
+            if self.simulate:
+                log.debug("{} -> {}.".format(i[1], i[0]))
+                continue
+            try:
+                os.rename(i[1], i[0])
+            except Exception as e:
+                log.error("Rename Error: {} -> {} ({}).".format(i[1], i[0], e))
+                if self.autostop:
+                    break
+
+        log.info("Undo complete.")
+
+    def modify_previews(self, previews):
         if self.countcheck:
             lenp, base, step = len(previews), self.countbase, self.countstep
             countlen = len(str(lenp))
-            countrange = range(base, lenp * step + 1, step)
+            countrange = xrange(base, lenp * step + 1, step)
             if self.countfill:
                 count = (str(i).rjust(countlen, "0") for i in countrange)
             else:
@@ -237,15 +268,9 @@ class FileOps(object):
         for preview in previews:
             name = preview[1]
             if not self.remext and not self.keepext:
-                try:
-                    name += preview[2]
-                except IndexError:
-                    pass
-#             print name
-            if self.matchcheck:
-                name = self.apply_match(name, matchpat, replacepat)
-            if self.capitalizecheck:
-                name = self.apply_capitalize(name)
+                name += preview[2]
+            if self.casecheck:
+                name = self.apply_case(name)
             if self.spacecheck:
                 name = self.apply_space(name)
             if self.deletecheck:
@@ -254,6 +279,8 @@ class FileOps(object):
                 name = self.apply_remove(name)
             if self.insertcheck:
                 name = self.apply_insert(name)
+            if self.matchcheck:
+                name = self.apply_replace(name)
             if self.countcheck:
                 try:
                     name = self.apply_count(name, count.next())
@@ -261,16 +288,12 @@ class FileOps(object):
                     pass
 
             if self.keepext:
-                try:
-                    name += preview[2]
-                except IndexError:
-                    pass
+                name += preview[2]
 
-            modified.append(name)
+            preview = ((preview[0], preview[1] + preview[2]), name)
+            modified.append(preview)
 
-        previews = [[i[0], i[1] + i[2]] if len(i) > 2 else i for i in previews]
-
-        return zip(previews, modified)
+        return modified
 
     def apply_space(self, s):
         if not self.spacecheck:
@@ -293,17 +316,17 @@ class FileOps(object):
 
         return s
 
-    def apply_capitalize(self, s):
-        if not self.capitalizecheck:
+    def apply_case(self, s):
+        if not self.casecheck:
             return s
 
-        if self.capitalizemode == 0:
+        if self.casemode == 0:
             s = s.lower()
-        elif self.capitalizemode == 1:
+        elif self.casemode == 1:
             s = s.upper()
-        elif self.capitalizemode == 2:
+        elif self.casemode == 2:
             s = s.capitalize()
-        elif self.capitalizemode == 3:
+        elif self.casemode == 3:
             s = " ".join([c.capitalize() for c in s.split()])
 
         return s
@@ -336,45 +359,30 @@ class FileOps(object):
     def apply_remove(self, s):
         if not self.removecheck:
             return s
-        if self.remdups:
-            s = re.sub(r"([-_ .])\1+", r"\1", s)
         if self.remnonwords:
-            s = re.sub("\W", "", s)
+            s = re.sub("\W", "", s, flags=self.ignorecase)
+        if self.remsymbols:
+            allowed = string.ascii_letters + string.digits + " .-_+"  # []()
+            s = "".join(c for c in normalize("NFKD", s) if c in allowed)
+        if self.remdups:
+            s = re.sub(r"([-_ .])\1+", r"\1", s, flags=self.ignorecase)
         return s
 
-    def apply_match(self, s, matchpat, replacepat):
-        return s
-        # TODO: Handle case sensitivity (re.IGNORECASE)
-        if not self.matchcheck:
+    def apply_replace(self, s):
+        if not self.matchreplacecheck or not self.matchedit:
             return s
-        # Translate glob to regular expression.
+
         if not self.regex:
-            matchpat = fnmatch.translate(matchpat)
-            replacepat = fnmatch.translate(replacepat)
-        match = re.search(matchpat, s)
-#         if match:
-#             log.debug("found src: {}.".format(match.group()))
-        if not match:
-            return s
-        if not self.matchreplace:
-            result = match.group()
+            matchpat = fnmatch.translate(self.matchedit)
+            replacepat = helpers.translate(self.replaceedit)
         else:
-            replace = re.search(replacepat, s)
-            if replace:
-                log.debug("found dest: {}.".format(replace.group()))
-            log.debug("{}, {}, {}, {}".format(matchpat, replacepat,
-                                          match, replace))
-            result = replace.group()
+            matchpat = self.matchedit
+            replacepat = self.replaceedit
+        try:
+            s = re.sub(matchpat, replacepat, s, flags=self.ignorecase)
+        except:
+            pass
 
-        # TODO: Two functions: one to convert a glob into a pattern
-        # and another to convert one into a replacement.
-        return result
-
-    def apply_various(self, s):
-        if not self.varcheck:
-            return
-        if self.accents:
-            s = "".join(c for c in normalize("NFD", s) if category(c) != "Mn")
         return s
 
     @property
@@ -445,15 +453,6 @@ class FileOps(object):
         self._interactive = boolean
 
     @property
-    def prompt(self):
-        return self._prompt
-
-    @prompt.setter
-    def prompt(self, boolean):
-        log.debug("simulate: {}".format(boolean))
-        self._prompt = boolean
-
-    @property
     def noclobber(self):
         return self._noclobber
 
@@ -490,31 +489,111 @@ class FileOps(object):
         self._varcheck = boolean
 
     @property
-    def replacematch(self):
-        return self._replacematch
+    def matchcheck(self):
+        return self._matchcheck
 
-    @replacematch.setter
-    def replacematch(self, boolean):
-        log.debug("replacematch: {}".format(boolean))
-        self._replacematch = boolean
-
-    @property
-    def accents(self):
-        return self._accents
-
-    @accents.setter
-    def accents(self, boolean):
-        log.debug("accents: {}".format(boolean))
-        self._accents = boolean
+    @matchcheck.setter
+    def matchcheck(self, boolean):
+        log.debug("matchcheck: {}".format(boolean))
+        self._matchcheck = boolean
 
     @property
-    def exclude(self):
-        return self._exclude
+    def matchexcludecheck(self):
+        return self._matchexcludecheck
 
-    @exclude.setter
-    def exclude(self, names):
-        log.debug("Excluding {}.".format(names))
-        self._exclude = names
+    @matchexcludecheck.setter
+    def matchexcludecheck(self, boolean):
+        log.debug("matchexcludecheck: {}".format(boolean))
+        self._matchexcludecheck = boolean
+
+    @property
+    def matchfiltercheck(self):
+        return self._matchfiltercheck
+
+    @matchfiltercheck.setter
+    def matchfiltercheck(self, boolean):
+        log.debug("matchfiltercheck: {}".format(boolean))
+        self._matchfiltercheck = boolean
+
+    @property
+    def matchreplacecheck(self):
+        return self._matchreplacecheck
+
+    @matchreplacecheck.setter
+    def matchreplacecheck(self, boolean):
+        log.debug("matchreplacecheck: {}".format(boolean))
+        self._matchreplacecheck = boolean
+
+    @property
+    def countpreedit(self):
+        return self._countpreedit
+
+    @countpreedit.setter
+    def countpreedit(self, text):
+        log.debug("countpreedit: {}".format(text))
+        self._countpreedit = text.decode("utf-8")
+
+    @property
+    def countsufedit(self):
+        return self._countsufedit
+
+    @countsufedit.setter
+    def countsufedit(self, text):
+        log.debug("countsufedit: {}".format(text))
+        self._countsufedit = text.decode("utf-8")
+    @property
+    def insertedit(self):
+        return self._insertedit
+
+    @insertedit.setter
+    def insertedit(self, text):
+        log.debug("insertedit: {}.".format(text))
+        self._insertedit = text.decode("utf-8")
+
+    @property
+    def matchedit(self):
+        return self._matchedit
+
+    @matchedit.setter
+    def matchedit(self, text):
+        log.debug("matchedit: {}.".format(text))
+        self._matchedit = text.decode("utf-8")
+
+    @property
+    def replaceedit(self):
+        return self._replaceedit
+
+    @replaceedit.setter
+    def replaceedit(self, text):
+        log.debug("replaceedit: {}.".format(text))
+        self._replaceedit = text.decode("utf-8")
+
+    @property
+    def filteredit(self):
+        return self._filteredit
+
+    @filteredit.setter
+    def filteredit(self, text):
+        log.debug("filteredit: {}.".format(text))
+        self._filteredit = text.decode("utf-8")
+
+    @property
+    def excludeedit(self):
+        return self._excludeedit
+
+    @excludeedit.setter
+    def excludeedit(self, text):
+        log.debug("excludeedit: {}.".format(text))
+        self._excludeedit = text.decode("utf-8")
+
+    @property
+    def remsymbols(self):
+        return self._remsymbols
+
+    @remsymbols.setter
+    def remsymbols(self, boolean):
+        log.debug("remsymbols: {}".format(boolean))
+        self._remsymbols = boolean
 
     @property
     def autostop(self):
@@ -526,13 +605,13 @@ class FileOps(object):
         self._autostop = boolean
 
     @property
-    def mirror(self):
-        return self._mirror
+    def manualmirror(self):
+        return self._manualmirror
 
-    @mirror.setter
-    def mirror(self, boolean):
-        log.debug("mirror: {}".format(boolean))
-        self._mirror = boolean
+    @manualmirror.setter
+    def manualmirror(self, boolean):
+        log.debug("manualmirror: {}".format(boolean))
+        self._manualmirror = boolean
 
     @property
     def removecheck(self):
@@ -544,13 +623,13 @@ class FileOps(object):
         self._removecheck = boolean
 
     @property
-    def remnonwords(self):
-        return self._remnonwords
+    def remdups(self):
+        return self._remdups
 
-    @remnonwords.setter
-    def remnonwords(self, boolean):
-        log.debug("remnonwords: {}".format(boolean))
-        self._remnonwords = boolean
+    @remdups.setter
+    def remdups(self, boolean):
+        log.debug("remdups: {}".format(boolean))
+        self._remdups = boolean
 
     @property
     def remext(self):
@@ -562,31 +641,13 @@ class FileOps(object):
         self._remext = boolean
 
     @property
-    def remdups(self):
-        return self._remdups
+    def remnonwords(self):
+        return self._remnonwords
 
-    @remdups.setter
-    def remdups(self, boolean):
-        log.debug("remdups: {}".format(boolean))
-        self._remdups = boolean
-
-    @property
-    def lower(self):
-        return self._lower
-
-    @lower.setter
-    def lower(self, boolean):
-        log.debug("lower: {}".format(boolean))
-        self._lower = boolean
-
-    @property
-    def upper(self):
-        return self._upper
-
-    @upper.setter
-    def upper(self, boolean):
-        log.debug("upper: {}".format(boolean))
-        self._upper = boolean
+    @remnonwords.setter
+    def remnonwords(self, boolean):
+        log.debug("remnonwords: {}".format(boolean))
+        self._remnonwords = boolean
 
     @property
     def ignorecase(self):
@@ -594,17 +655,11 @@ class FileOps(object):
 
     @ignorecase.setter
     def ignorecase(self, boolean):
+        flag = 0
+        if boolean:
+            flag = re.I
         log.debug("ignorecase: {}".format(boolean))
-        self._ignorecase = boolean
-
-    @property
-    def nowords(self):
-        return self._nowords
-
-    @nowords.setter
-    def nowords(self, boolean):
-        log.debug("nowords: {}".format(boolean))
-        self._nowords = boolean
+        self._ignorecase = flag
 
     @property
     def mediamode(self):
@@ -661,24 +716,6 @@ class FileOps(object):
         self._countstep = num
 
     @property
-    def countpreedit(self):
-        return self._countpreedit
-
-    @countpreedit.setter
-    def countpreedit(self, text):
-        log.debug("countpreedit: {}".format(text))
-        self._countpreedit = text.decode("utf-8")
-
-    @property
-    def countsufedit(self):
-        return self._countsufedit
-
-    @countsufedit.setter
-    def countsufedit(self, text):
-        log.debug("countsufedit: {}".format(text))
-        self._countsufedit = text.decode("utf-8")
-
-    @property
     def insertcheck(self):
         return self._insertcheck
 
@@ -695,15 +732,6 @@ class FileOps(object):
     def insertpos(self, index):
         log.debug("insertpos: {}".format(index))
         self._insertpos = index
-
-    @property
-    def insertedit(self):
-        return self._insertedit
-
-    @insertedit.setter
-    def insertedit(self, text):
-        log.debug("insertedit: {}.".format(text))
-        self._insertedit = text.decode("utf-8")
 
     @property
     def deletecheck(self):
@@ -733,40 +761,22 @@ class FileOps(object):
         self._deleteend = index
 
     @property
-    def matchcheck(self):
-        return self._matchcheck
+    def casecheck(self):
+        return self._casecheck
 
-    @matchcheck.setter
-    def matchcheck(self, boolean):
-        log.debug("matchcheck: {}".format(boolean))
-        self._matchcheck = boolean
-
-    @property
-    def matchreplace(self):
-        return self._matchreplace
-
-    @matchreplace.setter
-    def matchreplace(self, boolean):
-        log.debug("matchreplace: {}".format(boolean))
-        self._matchreplace = boolean
+    @casecheck.setter
+    def casecheck(self, boolean):
+        log.debug("casecheck: {}".format(boolean))
+        self._casecheck = boolean
 
     @property
-    def capitalizecheck(self):
-        return self._capitalizecheck
+    def casemode(self):
+        return self._casemode
 
-    @capitalizecheck.setter
-    def capitalizecheck(self, boolean):
-        log.debug("capitalizecheck: {}".format(boolean))
-        self._capitalizecheck = boolean
-
-    @property
-    def capitalizemode(self):
-        return self._capitalizemode
-
-    @capitalizemode.setter
-    def capitalizemode(self, num):
-        log.debug("capitalizemode: {}".format(num))
-        self._capitalizemode = num
+    @casemode.setter
+    def casemode(self, num):
+        log.debug("casemode: {}".format(num))
+        self._casemode = num
 
     @property
     def spacecheck(self):
@@ -788,7 +798,5 @@ class FileOps(object):
 
 
 if __name__ == "__main__":
-    fileops = FileOps(hidden=True, recursive=False, keepext=False, regex=False)
-    targets = fileops.get_targets()
-    fileops.get_previews(targets, "*", "asdf")
-
+    fileops = FileOps(hidden=True, recursive=True, casemode="1")
+    fileops.get_previews(fileops.get_targets(), "*", "asdf")
